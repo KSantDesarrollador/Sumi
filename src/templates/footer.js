@@ -19,10 +19,12 @@ const useStyles = makeStyles((theme) => ({
   },
   footer: {
     position: "fixed",
-    color: "#ffffff",
-    width: "96%",
-    backgroundColor: "#000000",
-    padding: "10px 36%",
+    border: "1px solid #000000",
+    width: "100%",
+    color: "#000000",
+    backgroundColor: "rgba(255,255,255,0.8)",
+    padding: "10px 37%",
+    bottom: 0,
   },
 }));
 
@@ -35,29 +37,31 @@ export default function Footer() {
   const classList = useStyles();
 
   return (
-    <Breadcrumbs aria-label='breadcrumb' className={classList.footer}>
-      <Typography className={classList.link}>
-        <HomeIcon className={classList.icon} />
-        Softvak
-      </Typography>
-      <Link
-        color='inherit'
-        href='https://www.linkedin.com'
-        target='blank'
-        onClick={handleClick}
-        className={classList.link}>
-        <LinkedInIcon className={classList.icon} />
-        LinkedIn
-      </Link>
-      <Link
-        color='inherit'
-        href='https://github.com'
-        target='blank'
-        onClick={handleClick}
-        className={classList.link}>
-        <LanguageIcon className={classList.icon} />
-        Website
-      </Link>
-    </Breadcrumbs>
+    <div>
+      <Breadcrumbs aria-label='breadcrumb' className={classList.footer}>
+        <Typography className={classList.link}>
+          <HomeIcon className={classList.icon} />
+          Softvak
+        </Typography>
+        <Link
+          color='inherit'
+          href='https://www.linkedin.com'
+          target='blank'
+          onClick={handleClick}
+          className={classList.link}>
+          <LinkedInIcon className={classList.icon} />
+          LinkedIn
+        </Link>
+        <Link
+          color='inherit'
+          href='/roles'
+          target='blank'
+          onClick={handleClick}
+          className={classList.link}>
+          <LanguageIcon className={classList.icon} />
+          Website
+        </Link>
+      </Breadcrumbs>
+    </div>
   );
 }

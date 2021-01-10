@@ -1,14 +1,24 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Avatar } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Badge from "@material-ui/core/Badge";
 import { AppBar, Toolbar, IconButton, Typography } from "@material-ui/core";
+import Divider from "@material-ui/core/Divider";
+import List from "@material-ui/core/List";
+import Drawer from "@material-ui/core/Drawer";
+import MainListItems from "./lateralMenu";
+import clsx from "clsx";
+import CssBaseline from "@material-ui/core/CssBaseline";
+
 // importando los iconos
 import MenuIcon from "@material-ui/icons/Menu";
 import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
+import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import "../assets/css/dashStyles.css";
 
-const stylesPage = makeStyles(() => ({
+const drawerWidth = 240;
+const stylesPage = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
@@ -20,23 +30,94 @@ const stylesPage = makeStyles(() => ({
   },
   image: {
     borderRadius: "50%",
+    width: "30px",
+    height: "30px",
   },
+  logo: {
+    marginLeft: "40px",
+    width: "35px",
+    height: "35px",
+  },
+  menu: {
+    height: "55px",
+    top: 0,
+    width: "95%",
+    background: "rgba(85,125,234,1)",
+  },
+  paper: {
+    padding: theme.spacing(2),
+    display: "flex",
+    overflow: "auto",
+    flexDirection: "column",
+  },
+  drawerPaper: {
+    position: "fixed",
+    whiteSpace: "nowrap",
+    background: "rgba(85,125,234,1)",
+    color: "white",
+    border: "none",
+    boxShadow: "2px 4px 3px solid black",
+    width: drawerWidth,
+    transition: theme.transitions.create("width", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  drawerPaperClose: {
+    overflowX: "hidden",
+    transition: theme.transitions.create("width", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    width: theme.spacing(7),
+    [theme.breakpoints.up("sm")]: {
+      width: theme.spacing(9),
+    },
+  },
+  toolbar: {
+    paddingRight: 24, // keep right padding when drawer closed
+  },
+  latMenIcon: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    padding: "0 10px",
+    ...theme.mixins.toolbar,
+  },
+  name: { marginLeft: "27px" },
 }));
 
 const Menu = () => {
   const classList = stylesPage();
+  const [open, setOpen] = useState(false);
+
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
   return (
     <div className={classList.root}>
-      <AppBar position='static'>
+      <CssBaseline />
+      <AppBar position='fixed' className={classList.menu}>
         <Toolbar>
           <IconButton
             edge='start'
-            className={classList.menuButton}
-            color='inherit'>
+            color='inherit'
+            aria-label='open drawer'
+            onClick={handleDrawerOpen}
+            className={clsx(
+              classList.menuButton,
+              open && classList.menuButtonHidden
+            )}>
             <MenuIcon></MenuIcon>
           </IconButton>
           <Typography variant='h5' className={classList.title}>
             S.U.M.I
+            <IconButton className={classList.logo}>
+              <Avatar src={process.env.PUBLIC_URL + "/img/Logo.png"} alt='' />
+            </IconButton>
           </Typography>
           <IconButton aria-label='show 4 new mails' color='inherit'>
             <Badge badgeContent={4} color='secondary'>
@@ -50,15 +131,45 @@ const Menu = () => {
           </IconButton>
           <IconButton color='inherit' edge='end'>
             <Avatar
-              src={require("../assets/img/reporteG3.jpg")}
+              src={process.env.PUBLIC_URL + "/img/avatar-male.png"}
               alt=''
-              width='40px'
-              height='40px'
               className={classList.image}
             />
           </IconButton>
         </Toolbar>
       </AppBar>
+
+      <Drawer
+        variant='permanent'
+        classes={{
+          paper: clsx(
+            classList.drawerPaper,
+            !open && classList.drawerPaperClose
+          ),
+        }}
+        open={open}>
+        <div className={classList.latMenIcon}>
+          <IconButton color='inherit' edge='start'>
+            <Avatar
+              src={process.env.PUBLIC_URL + "/img/avatar-male.png"}
+              alt=''
+              className={classList.image}
+            />
+          </IconButton>
+          <h6>Klever Vaca</h6>
+          <IconButton
+            onClick={handleDrawerClose}
+            className={classList.name}
+            color='inherit'>
+            <ChevronLeftIcon />
+          </IconButton>
+        </div>
+        <Divider />
+        <List>
+          <MainListItems />
+        </List>
+        <Divider />
+      </Drawer>
     </div>
   );
 };

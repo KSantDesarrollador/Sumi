@@ -21,13 +21,13 @@ const Graphics = (props) => {
     datasets: [
       {
         label: "Compras por mes",
-        fill: false,
-        backgroundColor: "rgba(95,155,234,1)",
+        fill: true,
+        backgroundColor: "rgba(255,155,234,1)",
         borderColor: "rgba(95,155,234,1)",
         pointBorderColor: "rgba(95,155,234,1)",
         pointBorderWidth: 1,
         pointHoverRadius: 5,
-        pointHoverBackgroundColor: "rgba(95,155,234,1)",
+        pointHoverBackgroundColor: "rgba(255,155,234,1)",
         pointHoverBorderColor: "rgba(95,155,234,1)",
         pointRadius: 1,
         pointHitRadius: 10,

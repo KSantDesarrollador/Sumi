@@ -7,6 +7,7 @@ const CardsInfo = (props) => {
     root: {
       textAlign: "center",
       background: props.color,
+      marginTop: "auto",
     },
     text: {
       fontSize: 17,

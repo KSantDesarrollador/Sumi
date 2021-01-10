@@ -1,62 +1,98 @@
-import React, { Component } from "react";
+import React, { Component, useState, useEffect } from "react";
 import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
+import { makeStyles } from "@material-ui/core/styles";
+import { Grid } from "@material-ui/core";
 import axios from "axios";
+// importandom los componentes
+import Menu from "../templates/menu";
+import Footer from "../templates/footer";
 
-export default class RolData extends Component {
-  state = {
+const stylesPage = makeStyles(() => ({
+  root: {
+    // flexGrow: 1,
+    backgroundImage: "url('/img/fondo.jpg')",
+    overflow: "auto",
+    backgroundPosition: "top",
+    width: "100%",
+    height: "100vh",
+  },
+  icons: {
+    color: "white",
+    width: "40px",
+    height: "40px",
+  },
+  contain: {
+    marginTop: "auto",
+    alignItems: "center",
+    paddingTop: "15px",
+  },
+  desk: {
+    padding: "5% 2% 0 7%",
+  },
+  modal: {
+    marginTop: "7%",
+  },
+}));
+
+export default function RolData() {
+  const classList = stylesPage();
+  const [data, setData] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [showModalEdit, setShowModalEdit] = useState(false);
+  const [showModalDelete, setShowModalDelete] = useState(false);
+  const [dataSelect, setDataSelect] = useState({
     RrlId: "",
     RrlNomRol: "",
     RrlEstRol: "",
-    dataRol: [],
-    showModal: false,
-    showModalEdit: false,
-    showModalDelete: false,
+  });
+
+  const abrirCerrarModal = () => {
+    setShowModal(!showModal);
   };
 
-  abrirCerrarModal = () => {
-    this.setState({ showModal: !this.state.showModal });
+  const abrirCerrarModalEdit = () => {
+    setShowModalEdit(!showModalEdit);
   };
 
-  abrirCerrarModalEdit = () => {
-    this.setState({ showModalEdit: !this.state.showModalEdit });
+  const abrirCerrarModalDelete = () => {
+    setShowModalDelete(!showModalDelete);
   };
 
-  abrirCerrarModalDelete = () => {
-    this.setState({ showModalDelete: !this.state.showModalDelete });
-  };
-
-  eventinput = (e) => {
-    this.setState({ [e.target.name]: e.target.value });
+  const eventinput = (e) => {
+    setDataSelect((prevState) => ({
+      ...prevState,
+      [e.target.name]: [e.target.value],
+    }));
   };
 
   // obteniendo datos de un servidor
-  listRol = async () => {
+  const listRol = async () => {
     const ServUrl = "http://localhost/SUMI/models/rolModel.php";
     await axios
       .get(ServUrl)
       .then((response) => {
-        this.setState({ dataRol: response.data });
+        setData(response.data);
       })
       .catch((er) => {
         console.log(er);
       });
   };
 
-  componentDidMount() {
-    this.listRol();
-  }
+  useEffect(() => {
+    listRol();
+  }, []);
 
   // Esta función guarda los datos de un nuevo rol
-  newRol = async () => {
+  const newRol = async () => {
     let f = new FormData();
-    f.append("RrlNomRol", this.state.RrlNomRol);
+    f.append("RrlNomRol", dataSelect.RrlNomRol);
     f.append("METHOD", "POST");
     const ServUrl = "http://localhost/SUMI/models/rolModel.php";
     await axios
       .post(ServUrl, f)
       .then((response) => {
-        this.setState({ dataRol: this.state.dataRol.concat(response.data) });
-        this.abrirCerrarModal();
+        setData(data.concat(response.data));
+        abrirCerrarModal();
       })
       .catch((er) => {
         console.log(er);
@@ -64,26 +100,26 @@ export default class RolData extends Component {
   };
 
   // Esta función actualiza los datos del rol selecionado
-  updateRol = async () => {
+  const updateRol = async () => {
     let f = new FormData();
-    f.append("RrlNomRol", this.state.RrlNomRol);
-    f.append("RrlEstRol", this.state.RrlEstRol);
+    f.append("RrlNomRol", dataSelect.RrlNomRol);
+    f.append("RrlEstRol", dataSelect.RrlEstRol);
     f.append("METHOD", "PUT");
     const ServUrl = "http://localhost/SUMI/models/rolModel.php";
     await axios
-      .post(ServUrl, f, { params: { id: this.state.RrlId } })
+      .post(ServUrl, f, { params: { id: dataSelect.RrlId } })
       .then((response) => {
-        let newData = this.state.dataRol;
+        let newData = data;
         newData.map((info) => {
-          if (info.RrlId === this.state.RrlId) {
-            info.RrlNomRol = this.state.RrlNomRol;
-            info.RrlEstRol = this.state.RrlEstRol;
+          if (info.RrlId === dataSelect.RrlId) {
+            info.RrlNomRol = dataSelect.RrlNomRol;
+            info.RrlEstRol = dataSelect.RrlEstRol;
           }
           return info;
         });
 
-        this.setState({ dataRol: newData });
-        this.abrirCerrarModalEdit();
+        setData(newData);
+        abrirCerrarModalEdit();
       })
       .catch((er) => {
         console.log(er);
@@ -91,19 +127,15 @@ export default class RolData extends Component {
   };
 
   // Esta función elimina los datos del rol seleccionado
-  deleteRol = async () => {
+  const deleteRol = async () => {
     let f = new FormData();
     f.append("METHOD", "DELETE");
     const ServUrl = "http://localhost/SUMI/models/rolModel.php";
     await axios
-      .post(ServUrl, f, { params: { id: this.state.RrlId } })
+      .post(ServUrl, f, { params: { id: dataSelect.RrlId } })
       .then((response) => {
-        this.setState({
-          dataRol: this.state.dataRol.filter(
-            (rol) => rol.RrlId !== this.state.RrlId
-          ),
-        });
-        this.abrirCerrarModalDelete();
+        setData(data.filter((rol) => rol.RrlId !== dataSelect.RrlId));
+        abrirCerrarModalDelete();
       })
       .catch((er) => {
         console.log(er);
@@ -111,70 +143,71 @@ export default class RolData extends Component {
   };
 
   // Esta función permite elegir el modal que se abrirá y guaerda los datos en el estado
-  selectedItem = (rol, type) => {
-    this.setState({
-      RrlId: rol.RrlId,
-      RrlNomRol: rol.RrlNomRol,
-      RrlEstRol: rol.RrlEstRol,
-    });
+  const selectedItem = (rol, type) => {
+    setDataSelect(rol);
     if (type === "Edit") {
-      this.abrirCerrarModalEdit();
+      abrirCerrarModalEdit();
     } else {
-      this.abrirCerrarModalDelete();
+      abrirCerrarModalDelete();
     }
   };
-
-  render() {
-    return (
-      <div>
-        <br />
-        <h2>Roles</h2>
-        <div className='d-grid gap-2 d-md-flex justify-content-md-end'>
-          <button
-            className='btn btn-warning me-md-2'
-            onClick={() => this.abrirCerrarModal()}>
-            Agregar
-          </button>
-        </div>
+  return (
+    <div className={classList.root}>
+      <Grid>
+        <Menu />
+      </Grid>
+      <Grid className={classList.desk}>
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <h2>Roles</h2>
+          <div className='d-grid gap-2 d-md-flex justify-content-md-end'>
+            <button
+              className='btn btn-warning me-md-2'
+              onClick={() => abrirCerrarModal()}>
+              Agregar
+            </button>
+          </div>
+        </Grid>
         <br />
 
         {/* Tabla que muestra la información de los roles en bd */}
-        <table className='table table-hover table-light'>
-          <thead className='table-dark'>
-            <tr key=''>
-              <th scope='col'>ID</th>
-              <th scope='col'>ROL</th>
-              <th scope='col'>ESTADO</th>
-              <th>ACCIÓN</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.dataRol.map((data) => {
-              return (
-                <tr key={data.RrlId}>
-                  <th scope='row'>{data.RrlId}</th>
-                  <td>{data.RrlNomRol}</td>
-                  <td>{data.RrlEstRol}</td>
-                  <td>
-                    <button
-                      className='btn btn-primary btn-sm'
-                      onClick={() => this.selectedItem(data, "Edit")}>
-                      Editar
-                    </button>
-                    <button
-                      className='btn btn-danger btn-sm'
-                      onClick={() => this.selectedItem(data, "Delete")}>
-                      Borrar
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <Grid>
+          <table className='table table-hover table-light'>
+            <thead className='table-dark'>
+              <tr key=''>
+                <th scope='col'>ID</th>
+                <th scope='col'>ROL</th>
+                <th scope='col'>ESTADO</th>
+                <th>ACCIÓN</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((data) => {
+                return (
+                  <tr key={data.RrlId}>
+                    <th scope='row'>{data.RrlId}</th>
+                    <td>{data.RrlNomRol}</td>
+                    <td>{data.RrlEstRol}</td>
+                    <td>
+                      <button
+                        className='btn btn-primary btn-sm'
+                        onClick={() => selectedItem(data, "Edit")}>
+                        Editar
+                      </button>
+                      <button
+                        className='btn btn-danger btn-sm'
+                        onClick={() => selectedItem(data, "Delete")}>
+                        Borrar
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </Grid>
 
         {/* Modal que muestra un formulario para agregar un nuevo rol */}
-        <Modal isOpen={this.state.showModal}>
+        <Modal isOpen={showModal} className={classList.modal}>
           <ModalHeader>Agregar Rol</ModalHeader>
           <ModalBody>
             <div>
@@ -184,7 +217,7 @@ export default class RolData extends Component {
                 className='form-control'
                 id='RrlNomRol'
                 placeholder='Nombre del Rol'
-                onChange={this.eventinput}
+                onChange={eventinput}
               />
             </div>
           </ModalBody>
@@ -192,24 +225,24 @@ export default class RolData extends Component {
             <button
               type='submit'
               className='btn btn-success btn-sm'
-              onClick={() => this.newRol()}>
+              onClick={() => newRol()}>
               {" "}
               Guardar
             </button>{" "}
             <button
               className='btn btn-danger btn-sm'
-              onClick={() => this.abrirCerrarModal()}>
+              onClick={() => abrirCerrarModal()}>
               Cancelar
             </button>
           </ModalFooter>
         </Modal>
 
         {/* Modal que muestra los datos del rol a ser editado */}
-        <Modal isOpen={this.state.showModalEdit}>
+        <Modal isOpen={showModalEdit} className={classList.modal}>
           <ModalHeader>Editar Rol</ModalHeader>
           <ModalBody>
             <div className='mb-3'>
-              <input type='hidden' name='RrlId' value={this.state.RrlId} />
+              <input type='hidden' name='RrlId' value={dataSelect.RrlId} />
               <label for='RrlNomRol' className='form-label'>
                 Nombre del Rol
               </label>
@@ -218,8 +251,8 @@ export default class RolData extends Component {
                 name='RrlNomRol'
                 className='form-control'
                 id='RrlNomRol'
-                value={this.state.RrlNomRol}
-                onChange={this.eventinput}
+                value={dataSelect.RrlNomRol}
+                onChange={eventinput}
               />
 
               <label for='RrlEstRol' className='form-label'>
@@ -230,8 +263,8 @@ export default class RolData extends Component {
                 name='RrlEstRol'
                 className='form-control'
                 id='RrlEstRol'
-                value={this.state.RrlEstRol}
-                onChange={this.eventinput}
+                value={dataSelect.RrlEstRol}
+                onChange={eventinput}
               />
             </div>
           </ModalBody>
@@ -239,26 +272,26 @@ export default class RolData extends Component {
             <button
               type='submit'
               className='btn btn-success btn-sm'
-              onClick={() => this.updateRol()}>
+              onClick={() => updateRol()}>
               {" "}
               Editar
             </button>{" "}
             <button
               className='btn btn-danger btn-sm'
-              onClick={() => this.abrirCerrarModalEdit()}>
+              onClick={() => abrirCerrarModalEdit()}>
               Cancelar
             </button>
           </ModalFooter>
         </Modal>
 
         {/* Modal para confirmación antes de eliminar un registro */}
-        <Modal isOpen={this.state.showModalDelete}>
+        <Modal isOpen={showModalDelete} className={classList.modal}>
           <ModalHeader>Eliminar Rol</ModalHeader>
           <ModalBody>
             <div className='mb-3'>
               <p>
                 Está seguro de eliminar el rol:&nbsp;
-                <strong>{this.state.RrlNomRol}</strong>
+                <strong>{dataSelect.RrlNomRol}</strong>
               </p>
             </div>
           </ModalBody>
@@ -266,18 +299,21 @@ export default class RolData extends Component {
             <button
               type='submit'
               className='btn btn-success btn-sm'
-              onClick={() => this.deleteRol()}>
+              onClick={() => deleteRol()}>
               {" "}
               Aceptar
             </button>{" "}
             <button
               className='btn btn-danger btn-sm'
-              onClick={() => this.abrirCerrarModalDelete()}>
+              onClick={() => abrirCerrarModalDelete()}>
               Cancelar
             </button>
           </ModalFooter>
         </Modal>
-      </div>
-    );
-  }
+      </Grid>
+      <Grid>
+        <Footer />
+      </Grid>
+    </div>
+  );
 }

@@ -1,121 +1,131 @@
 import React from "react";
-import { withStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
+import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
-import DraftsIcon from "@material-ui/icons/Drafts";
-import SendIcon from "@material-ui/icons/Send";
+import ListSubheader from "@material-ui/core/ListSubheader";
+import Collapse from "@material-ui/core/Collapse";
+// importando iconos
+import DashboardIcon from "@material-ui/icons/Dashboard";
+import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
+import PeopleIcon from "@material-ui/icons/People";
+import BarChartIcon from "@material-ui/icons/BarChart";
+import LayersIcon from "@material-ui/icons/Layers";
+import AssignmentIcon from "@material-ui/icons/Assignment";
+import ExpandLess from "@material-ui/icons/ExpandLess";
+import ExpandMore from "@material-ui/icons/ExpandMore";
+import StarBorder from "@material-ui/icons/StarBorder";
+import SettingsIcon from "@material-ui/icons/Settings";
+//
+import { makeStyles } from "@material-ui/core/styles";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import Divider from "@material-ui/core/Divider";
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
-const StyledMenu = withStyles({
-  paper: {
-    boxShadow: "2px 2px 2px 2px  rgba(0,0,0,0.5)",
-  },
-})((props) => (
-  <Menu
-    elevation={0}
-    getContentAnchorEl={null}
-    anchorOrigin={{
-      vertical: "bottom",
-      horizontal: "center",
-    }}
-    transformOrigin={{
-      vertical: "top",
-      horizontal: "center",
-    }}
-    {...props}
-  />
-));
-
-const StyledMenuItem = withStyles((theme) => ({
+const stylesPage = makeStyles(() => ({
   root: {
-    "&:focus": {
-      backgroundColor: theme.palette.primary.main,
-      "& .MuiListItemIcon-root, & .MuiListItemText-primary": {
-        color: theme.palette.common.white,
-      },
-    },
+    flexGrow: 1,
+    color: "white",
   },
-}))(MenuItem);
+  icons: {
+    color: "white",
+    width: "40px",
+    height: "40px",
+  },
+  link: {
+    textDecoration: "none",
+    color: "white",
+  },
+}));
 
-export default function LateralMenu() {
-  const [anchorEl, setAnchorEl] = React.useState(null);
+export default function MainListItems() {
+  const classList = stylesPage();
+  const [open, setOpen] = React.useState(false);
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
+  const openList = () => {
+    setOpen(!open);
   };
 
   return (
-    <div>
-      <Button
-        aria-controls='customized-menu'
-        aria-haspopup='true'
-        variant='contained'
-        color='primary'
-        onClick={handleClick}>
-        Open Menu
-      </Button>
-      <StyledMenu
-        id='customized-menu'
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}>
-        <StyledMenuItem>
-          <ListItemIcon>
-            <SendIcon fontSize='small' />
+    <div className={classList.root}>
+      <CssBaseline />
+      <div>
+        {" "}
+        <Link to='/' className={classList.link}>
+          <ListItem button>
+            <ListItemIcon className={classList.icons}>
+              <DashboardIcon />
+            </ListItemIcon>
+            <ListItemText primary='Dashboard' />
+          </ListItem>
+        </Link>
+        <ListItem button onClick={openList}>
+          <ListItemIcon className={classList.icons}>
+            <SettingsIcon />
           </ListItemIcon>
-          <ListItemText primary='Administracionl' />
-        </StyledMenuItem>
-        <StyledMenuItem>
-          <ListItemIcon>
-            <DraftsIcon fontSize='small' />
+          <ListItemText primary='Administración' />
+          {open ? <ExpandLess /> : <ExpandMore />}
+        </ListItem>
+        <Collapse in={open} timeout='auto' unmountOnExit>
+          {/* <List component='div' disablePadding> */}
+          <Link to='/roles' className={classList.link}>
+            <ListItem button className={classList.nested}>
+              <ListItemIcon>
+                <StarBorder />
+              </ListItemIcon>
+              <ListItemText primary='Roles' />
+            </ListItem>
+          </Link>
+          {/* </List> */}
+        </Collapse>
+        <ListItem button>
+          <ListItemIcon className={classList.icons}>
+            <ShoppingCartIcon />
           </ListItemIcon>
-          <ListItemText primary='Alertas' />
-        </StyledMenuItem>
-        <StyledMenuItem>
-          <ListItemIcon>
-            <InboxIcon fontSize='small' />
+          <ListItemText primary='Orders' />
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon className={classList.icons}>
+            <PeopleIcon />
           </ListItemIcon>
-          <ListItemText primary='Bodegas' />
-        </StyledMenuItem>
-        <StyledMenuItem>
-          <ListItemIcon>
-            <InboxIcon fontSize='small' />
+          <ListItemText primary='Customers' />
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon className={classList.icons}>
+            <BarChartIcon />
           </ListItemIcon>
-          <ListItemText primary='Proveedores' />
-        </StyledMenuItem>
-        <StyledMenuItem>
-          <ListItemIcon>
-            <InboxIcon fontSize='small' />
+          <ListItemText primary='Reports' />
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon className={classList.icons}>
+            <LayersIcon />
           </ListItemIcon>
-          <ListItemText primary='Compras' />
-        </StyledMenuItem>
-        <StyledMenuItem>
-          <ListItemIcon>
-            <InboxIcon fontSize='small' />
+          <ListItemText primary='Integrations' />
+        </ListItem>
+      </div>
+      <Divider />
+      <div>
+        <ListSubheader inset>
+          <h5>REPORTES</h5>
+        </ListSubheader>
+        <ListItem button>
+          <ListItemIcon className={classList.icons}>
+            <AssignmentIcon />
           </ListItemIcon>
-          <ListItemText primary='Inventarios' />
-        </StyledMenuItem>
-        <StyledMenuItem>
-          <ListItemIcon>
-            <InboxIcon fontSize='small' />
+          <ListItemText primary='Current month' />
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon className={classList.icons}>
+            <AssignmentIcon />
           </ListItemIcon>
-          <ListItemText primary='Pedidos' />
-        </StyledMenuItem>
-        <StyledMenuItem>
-          <ListItemIcon>
-            <InboxIcon fontSize='small' />
+          <ListItemText primary='Last quarter' />
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon className={classList.icons}>
+            <AssignmentIcon />
           </ListItemIcon>
-          <ListItemText primary='Transacciones' />
-        </StyledMenuItem>
-      </StyledMenu>
+          <ListItemText primary='Year-end sale' />
+        </ListItem>
+      </div>
     </div>
   );
 }
