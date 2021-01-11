@@ -34,18 +34,21 @@ const stylesPage = makeStyles(() => ({
   },
 }));
 
-const ServUrl = "http://localhost/SUMI/models/rolModel.php";
-
-const RolData = () => {
+const UserData = () => {
   const classList = stylesPage();
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [dataSelect, setDataSelect] = useState({
+    UsrId: "",
     RrlId: "",
-    RrlNomRol: "",
-    RrlEstRol: "",
+    UsrNomUsu: "",
+    UsrContraUsu: "",
+    UsrEmailUsu: "",
+    UsrTelfUsu: "",
+    UsrImgUsu: "",
+    UsrEstUsu: "",
   });
 
   const abrirCerrarModal = () => {
@@ -69,6 +72,7 @@ const RolData = () => {
 
   // obteniendo datos de un servidor
   const listRol = async () => {
+    const ServUrl = "http://localhost/SUMI/models/rolModel.php";
     await axios
       .get(ServUrl)
       .then((response) => {
@@ -86,8 +90,9 @@ const RolData = () => {
   // Esta función guarda los datos de un nuevo rol
   const newRol = async () => {
     let f = new FormData();
-    f.append("RrlNomRol", dataSelect.RrlNomRol);
+    f.append("UsrNomUsu", dataSelect.UsrNomUsu);
     f.append("METHOD", "POST");
+    const ServUrl = "http://localhost/SUMI/models/rolModel.php";
     await axios
       .post(ServUrl, f)
       .then((response) => {
@@ -102,17 +107,18 @@ const RolData = () => {
   // Esta función actualiza los datos del rol selecionado
   const updateRol = async () => {
     let f = new FormData();
-    f.append("RrlNomRol", dataSelect.RrlNomRol);
-    f.append("RrlEstRol", dataSelect.RrlEstRol);
+    f.append("UsrNomUsu", dataSelect.UsrNomUsu);
+    f.append("UsrEstUsu", dataSelect.UsrEstUsu);
     f.append("METHOD", "PUT");
+    const ServUrl = "http://localhost/SUMI/models/rolModel.php";
     await axios
-      .post(ServUrl, f, { params: { id: dataSelect.RrlId } })
+      .post(ServUrl, f, { params: { id: dataSelect.UsrId } })
       .then((response) => {
         let newData = data;
         newData.map((info) => {
-          if (info.RrlId === dataSelect.RrlId) {
-            info.RrlNomRol = dataSelect.RrlNomRol;
-            info.RrlEstRol = dataSelect.RrlEstRol;
+          if (info.UsrId === dataSelect.UsrId) {
+            info.UsrNomUsu = dataSelect.UsrNomUsu;
+            info.UsrEstUsu = dataSelect.UsrEstUsu;
           }
           return info;
         });
@@ -129,10 +135,11 @@ const RolData = () => {
   const deleteRol = async () => {
     let f = new FormData();
     f.append("METHOD", "DELETE");
+    const ServUrl = "http://localhost/SUMI/models/rolModel.php";
     await axios
-      .post(ServUrl, f, { params: { id: dataSelect.RrlId } })
+      .post(ServUrl, f, { params: { id: dataSelect.UsrId } })
       .then((response) => {
-        setData(data.filter((rol) => rol.RrlId !== dataSelect.RrlId));
+        setData(data.filter((rol) => rol.UsrId !== dataSelect.UsrId));
         abrirCerrarModalDelete();
       })
       .catch((er) => {
@@ -156,7 +163,7 @@ const RolData = () => {
       </Grid>
       <Grid className={classList.desk}>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          <h2>Roles</h2>
+          <h2>Usuarios</h2>
           <div className='d-grid gap-2 d-md-flex justify-content-md-end'>
             <button
               className='btn btn-warning me-md-2'
@@ -173,7 +180,12 @@ const RolData = () => {
             <thead className='table-dark'>
               <tr key=''>
                 <th scope='col'>ID</th>
+                <th scope='col'>FOTO</th>
                 <th scope='col'>ROL</th>
+                <th scope='col'>USUARIO</th>
+                <th scope='col'>CONTRASEÑA</th>
+                <th scope='col'>EMAIL</th>
+                <th scope='col'>TELÉFONO</th>
                 <th scope='col'>ESTADO</th>
                 <th>ACCIÓN</th>
               </tr>
@@ -181,10 +193,15 @@ const RolData = () => {
             <tbody>
               {data.map((data) => {
                 return (
-                  <tr key={data.RrlId}>
-                    <th scope='row'>{data.RrlId}</th>
-                    <td>{data.RrlNomRol}</td>
-                    <td>{data.RrlEstRol}</td>
+                  <tr key={data.UsrId}>
+                    <th scope='row'>{data.UsrId}</th>
+                    <td>{data.UsrImgUsu}</td>
+                    <td>{data.UsrRolUsu}</td>
+                    <td>{data.UsrNomUsu}</td>
+                    <td>{data.UsrContraUsu}</td>
+                    <td>{data.UsrEmailUsu}</td>
+                    <td>{data.UsrTelfsu}</td>
+                    <td>{data.UsrEstUsu}</td>
                     <td>
                       <button
                         className='btn btn-primary btn-sm'
@@ -206,15 +223,62 @@ const RolData = () => {
 
         {/* Modal que muestra un formulario para agregar un nuevo rol */}
         <Modal isOpen={showModal} className={classList.modal}>
-          <ModalHeader>Agregar Rol</ModalHeader>
+          <ModalHeader>Agregar Usuario</ModalHeader>
           <ModalBody>
             <div>
+              <select className='form-control'>
+                <option value='0' key=''>
+                  SELECCIONE
+                </option>
+                <option value='1' key=''>
+                  Tecnico
+                </option>
+              </select>
+              <br />
               <input
                 type='text'
-                name='RrlNomRol'
+                name='UsrNomUsu'
                 className='form-control'
-                id='RrlNomRol'
-                placeholder='Nombre del Rol'
+                id='UsrNomUsu'
+                placeholder='Nombre de Usuario'
+                onChange={eventinput}
+              />
+              <br />
+              <input
+                type='password'
+                name='UsrContraUsu'
+                className='form-control'
+                id='UsrContraUsu'
+                placeholder='Contraseña'
+                onChange={eventinput}
+              />
+              <br />
+              <input
+                type='email'
+                name='UsrEmailUsu'
+                className='form-control'
+                id='UsrEmailUsu'
+                placeholder='Email'
+                onChange={eventinput}
+              />
+              <br />
+              <input
+                type='telf'
+                name='UsrTelfUsu'
+                className='form-control'
+                id='UsrTelfUsu'
+                placeholder='Teléfono'
+                onChange={eventinput}
+              />
+              <br />
+              <label for='UsrImgUsu' className='form-label'>
+                <h6>Imagen</h6>
+              </label>
+              <input
+                type='file'
+                name='UsrImgUsu'
+                className='form-control'
+                id='UsrImgUsu'
                 onChange={eventinput}
               />
             </div>
@@ -237,31 +301,31 @@ const RolData = () => {
 
         {/* Modal que muestra los datos del rol a ser editado */}
         <Modal isOpen={showModalEdit} className={classList.modal}>
-          <ModalHeader>Editar Rol</ModalHeader>
+          <ModalHeader>Editar Usuario</ModalHeader>
           <ModalBody>
             <div className='mb-3'>
-              <input type='hidden' name='RrlId' value={dataSelect.RrlId} />
-              <label for='RrlNomRol' className='form-label'>
-                Nombre del Rol
+              <input type='hidden' name='UsrId' value={dataSelect.UsrId} />
+              <label for='UsrNomUsu' className='form-label'>
+                Usuario
               </label>
               <input
                 type='text'
-                name='RrlNomRol'
+                name='UsrNomUsu'
                 className='form-control'
-                id='RrlNomRol'
-                value={dataSelect.RrlNomRol}
+                id='UsrNomUsu'
+                value={dataSelect.UsrNomUsu}
                 onChange={eventinput}
               />
 
-              <label for='RrlEstRol' className='form-label'>
+              <label for='UsrEstUsu' className='form-label'>
                 Estado
               </label>
               <input
                 type='text'
-                name='RrlEstRol'
+                name='UsrEstUsu'
                 className='form-control'
-                id='RrlEstRol'
-                value={dataSelect.RrlEstRol}
+                id='UsrEstUsu'
+                value={dataSelect.UsrEstUsu}
                 onChange={eventinput}
               />
             </div>
@@ -289,7 +353,7 @@ const RolData = () => {
             <div className='mb-3'>
               <p>
                 Está seguro de eliminar el rol:&nbsp;
-                <strong>{dataSelect.RrlNomRol}</strong>
+                <strong>{dataSelect.UsrNomUsu}</strong>
               </p>
             </div>
           </ModalBody>
@@ -316,4 +380,4 @@ const RolData = () => {
   );
 };
 
-export default RolData;
+export default UserData;

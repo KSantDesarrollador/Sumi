@@ -119,8 +119,8 @@ const Dashboard = () => {
           <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
             <CardsAdmin
               icon={<EmojiPeopleIcon className={classList.icons} />}
-              title='Empleados'
-              text='100 empleados registradas'
+              title='Unidad Médica'
+              text='5 unidades médicas registradas'
             />
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>

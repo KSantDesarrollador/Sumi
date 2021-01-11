@@ -19,7 +19,7 @@ import SettingsIcon from "@material-ui/icons/Settings";
 import { makeStyles } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Divider from "@material-ui/core/Divider";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const stylesPage = makeStyles(() => ({
   root: {
@@ -50,7 +50,7 @@ export default function MainListItems() {
       <CssBaseline />
       <div>
         {" "}
-        <Link to='/' className={classList.link}>
+        <Link to='/dashboard' className={classList.link}>
           <ListItem button>
             <ListItemIcon className={classList.icons}>
               <DashboardIcon />
@@ -73,6 +73,14 @@ export default function MainListItems() {
                 <StarBorder />
               </ListItemIcon>
               <ListItemText primary='Roles' />
+            </ListItem>
+          </Link>
+          <Link to='/users' className={classList.link}>
+            <ListItem button className={classList.nested}>
+              <ListItemIcon>
+                <PeopleIcon />
+              </ListItemIcon>
+              <ListItemText primary='Usuarios' />
             </ListItem>
           </Link>
           {/* </List> */}
