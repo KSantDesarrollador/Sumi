@@ -13,7 +13,7 @@ import LayersIcon from "@material-ui/icons/Layers";
 import AssignmentIcon from "@material-ui/icons/Assignment";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
-import StarBorder from "@material-ui/icons/StarBorder";
+import AssistantIcon from "@material-ui/icons/Assistant";
 import SettingsIcon from "@material-ui/icons/Settings";
 //
 import { makeStyles } from "@material-ui/core/styles";
@@ -70,7 +70,7 @@ export default function MainListItems() {
           <Link to='/roles' className={classList.link}>
             <ListItem button className={classList.nested}>
               <ListItemIcon>
-                <StarBorder />
+                <AssistantIcon />
               </ListItemIcon>
               <ListItemText primary='Roles' />
             </ListItem>

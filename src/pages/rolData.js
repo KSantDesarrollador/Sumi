@@ -3,6 +3,11 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid } from "@material-ui/core";
 import axios from "axios";
+import MaterialTable from "material-table";
+
+// importando los iconos
+import AssistantIcon from "@material-ui/icons/Assistant";
+import AddIcon from "@material-ui/icons/Add";
 // importandom los componentes
 import Menu from "../templates/menu";
 import Footer from "../templates/footer";
@@ -21,6 +26,11 @@ const stylesPage = makeStyles(() => ({
     width: "40px",
     height: "40px",
   },
+  iconPge: {
+    color: "black",
+    width: "40px",
+    height: "40px",
+  },
   contain: {
     marginTop: "auto",
     alignItems: "center",
@@ -31,6 +41,10 @@ const stylesPage = makeStyles(() => ({
   },
   modal: {
     marginTop: "7%",
+  },
+  table: {
+    boxShadow: "2px 3px 2px 4px solid #000000",
+    background: "#000000",
   },
 }));
 
@@ -149,6 +163,14 @@ const RolData = () => {
       abrirCerrarModalDelete();
     }
   };
+
+  // Formando las columnas de la tabla
+  const columns = [
+    { title: "ID", field: "RrlId" },
+    { title: "ROL", field: "RrlNomRol" },
+    { title: "ESTADO", field: "RrlEstRol" },
+  ];
+
   return (
     <div className={classList.root}>
       <Grid>
@@ -156,12 +178,16 @@ const RolData = () => {
       </Grid>
       <Grid className={classList.desk}>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          <h2>Roles</h2>
+          <h2>
+            Roles <AssistantIcon className={classList.iconPge} />
+          </h2>
+
           <div className='d-grid gap-2 d-md-flex justify-content-md-end'>
             <button
-              className='btn btn-warning me-md-2'
+              className='btn btn-warning btn-sm'
+              tooltip='Agregar'
               onClick={() => abrirCerrarModal()}>
-              Agregar
+              <AddIcon />
             </button>
           </div>
         </Grid>
@@ -169,39 +195,64 @@ const RolData = () => {
 
         {/* Tabla que muestra la información de los roles en bd */}
         <Grid>
-          <table className='table table-hover table-light'>
-            <thead className='table-dark'>
-              <tr key=''>
-                <th scope='col'>ID</th>
-                <th scope='col'>ROL</th>
-                <th scope='col'>ESTADO</th>
-                <th>ACCIÓN</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((data) => {
-                return (
-                  <tr key={data.RrlId}>
-                    <th scope='row'>{data.RrlId}</th>
-                    <td>{data.RrlNomRol}</td>
-                    <td>{data.RrlEstRol}</td>
-                    <td>
-                      <button
-                        className='btn btn-primary btn-sm'
-                        onClick={() => selectedItem(data, "Edit")}>
-                        Editar
-                      </button>
-                      <button
-                        className='btn btn-danger btn-sm'
-                        onClick={() => selectedItem(data, "Delete")}>
-                        Borrar
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <MaterialTable
+            columns={columns}
+            data={data}
+            title='Roles habilitados en el sistema'
+            actions={[
+              {
+                icon: "edit",
+                tooltip: "Editar rol",
+                onClick: (event, rowData) => selectedItem(rowData, "Edit"),
+              },
+              {
+                icon: "delete",
+                tooltip: "Eliminar rol",
+                onClick: (event, rowData) => selectedItem(rowData, "Delete"),
+              },
+            ]}
+            options={{
+              actionsColumnIndex: -1,
+              headerStyle: {
+                background: "#4094e2",
+                color: "#000000",
+                fontWeight: "700",
+                border: "none",
+                fontSize: "18px",
+              },
+              actionsCellStyle: {
+                // background: "#96acc0",
+                color: "#000000",
+                borderBottom: "1px solid #96acc0",
+              },
+              cellStyle: { borderBottom: "1px solid #96acc0" },
+            }}
+            localization={{
+              header: {
+                actions: "ACCIONES",
+              },
+              toolbar: {
+                searchPlaceholder: "Buscar",
+                searchTooltip: "Buscar",
+              },
+              body: {
+                emptyDataSourceMessage: "No hay registros que mostrar",
+                filterRow: {
+                  filterTooltip: "Filtrar",
+                },
+              },
+              pagination: {
+                labelRowsSelect: "registros",
+                firstTooltip: "primera página",
+                previousTooltip: "página anterior",
+                labelRowsPerPage: "Total de registros",
+                labelDisplayedRows:
+                  "{from} - {to} de {count} regsitros encontrados",
+                nextTooltip: "página siguiente",
+                lastTooltip: "última página",
+              },
+            }}
+          />
         </Grid>
 
         {/* Modal que muestra un formulario para agregar un nuevo rol */}
