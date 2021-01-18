@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Avatar } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Badge from "@material-ui/core/Badge";
@@ -9,6 +9,7 @@ import Drawer from "@material-ui/core/Drawer";
 import MainListItems from "./lateralMenu";
 import clsx from "clsx";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import Cookies from "universal-cookie";
 
 // importando los iconos
 import MenuIcon from "@material-ui/icons/Menu";
@@ -51,7 +52,7 @@ const stylesPage = makeStyles((theme) => ({
     flexDirection: "column",
   },
   drawerPaper: {
-    position: "fixed",
+    position: "absolute",
     whiteSpace: "nowrap",
     background: "rgba(85,125,234,1)",
     color: "white",
@@ -87,6 +88,8 @@ const stylesPage = makeStyles((theme) => ({
   name: { marginLeft: "27px" },
 }));
 
+const session = new Cookies();
+
 const Menu = () => {
   const classList = stylesPage();
   const [open, setOpen] = useState(false);
@@ -97,10 +100,25 @@ const Menu = () => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  const closeSession = () => {
+    session.remove("id", { path: "/" });
+    session.remove("email", { path: "/" });
+    session.remove("name", { path: "/" });
+    session.remove("rol", { path: "/" });
+    session.remove("image", { path: "/" });
+    window.location.href = "/";
+  };
+
+  useEffect(() => {
+    if (!session.get("name")) {
+      window.location.href = "/";
+    }
+  }, []);
   return (
     <div className={classList.root}>
       <CssBaseline />
-      <AppBar position='fixed' className={classList.menu}>
+      <AppBar position='absolute' className={classList.menu}>
         <Toolbar>
           <IconButton
             edge='start'
@@ -119,6 +137,8 @@ const Menu = () => {
               <Avatar src={process.env.PUBLIC_URL + "/img/Logo.png"} alt='' />
             </IconButton>
           </Typography>
+          <h5> Usuario conectado:</h5> &nbsp;&nbsp;
+          <h5 style={{ color: "black" }}> {session.get("name")}</h5>&nbsp;
           <IconButton aria-label='show 4 new mails' color='inherit'>
             <Badge badgeContent={4} color='secondary'>
               <MailIcon />
@@ -134,6 +154,7 @@ const Menu = () => {
               src={process.env.PUBLIC_URL + "/img/avatar-male.png"}
               alt=''
               className={classList.image}
+              onClick={() => closeSession()}
             />
           </IconButton>
         </Toolbar>
@@ -156,7 +177,7 @@ const Menu = () => {
               className={classList.image}
             />
           </IconButton>
-          <h6>Klever Vaca</h6>
+          <h6>{session.get("rol")}</h6>
           <IconButton
             onClick={handleDrawerClose}
             className={classList.name}

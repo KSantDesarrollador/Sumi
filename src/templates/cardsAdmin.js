@@ -6,6 +6,7 @@ const stylesPage = makeStyles(() => ({
   root: {
     textAlign: "center",
     background: "rgba(65,180,250,2)",
+    borderRadius: "10px",
   },
   text: {
     fontSize: 17,

@@ -8,6 +8,7 @@ const CardsInfo = (props) => {
       textAlign: "center",
       background: props.color,
       marginTop: "auto",
+      borderRadius: "10px",
     },
     text: {
       fontSize: 17,

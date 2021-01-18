@@ -2,30 +2,27 @@ import React from "react";
 import { Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 // importandom los componentes
-import Menu from "./menu";
-import CardsInfo from "./cardsInfo";
-import CardsAdmin from "./cardsAdmin";
-import Graphics from "./graphics";
-import Footer from "./footer";
+import Menu from "../templates/menu";
+import CardsInfo from "../templates/cardsInfo";
+import CardsAdmin from "../templates/cardsAdmin";
+import Graphics from "../templates/graphics";
+import Footer from "../templates/footer";
 // importando los estilos
-import "../assets/css/dashStyles.css";
 import "fontsource-roboto";
 // importando los iconos
-import PeopleAltIcon from "@material-ui/icons/PeopleAlt"; //usuarios
 import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople"; //empleados
 import LocalGroceryStoreIcon from "@material-ui/icons/LocalGroceryStore"; //compras
 import StoreIcon from "@material-ui/icons/Store"; //bodegas
 import AssessmentIcon from "@material-ui/icons/Assessment"; //reportes
 import AssignmentTurnedInIcon from "@material-ui/icons/AssignmentTurnedIn"; //inventario
 import AssignmentIcon from "@material-ui/icons/Assignment"; //pedidos
-import TransformIcon from "@material-ui/icons/Transform"; //transacciones
 import LocalShippingIcon from "@material-ui/icons/LocalShipping"; //proveedores
-import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline"; //auditoría
+import "../assets/css/dashStyles.css";
 
 const stylesPage = makeStyles(() => ({
   root: {
     // flexGrow: 1,
-    backgroundImage: "url('/img/fondo.jpg')",
+    backgroundImage: "url('/img/inicio.jpg')",
     overflow: "auto",
     backgroundPosition: "top",
     width: "100%",
@@ -37,12 +34,12 @@ const stylesPage = makeStyles(() => ({
     height: "40px",
   },
   contain: {
-    marginTop: "auto",
+    marginTop: "30px",
     alignItems: "center",
     paddingTop: "15px",
   },
   desk: {
-    padding: "5% 2% 0 7%",
+    padding: "6% 2% 0 7%",
   },
 }));
 
@@ -56,7 +53,7 @@ const Dashboard = () => {
       </Grid>
       <Grid container className={classList.desk}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={3} lg={3} xl={3}>
+          <Grid item xs={12} sm={8} md={4} lg={4} xl={4}>
             <CardsInfo
               icon={<LocalGroceryStoreIcon className={classList.icons} />}
               title='Compras'
@@ -65,7 +62,7 @@ const Dashboard = () => {
               font='gray'
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3} lg={3} xl={3}>
+          <Grid item xs={12} sm={8} md={4} lg={4} xl={4}>
             <CardsInfo
               icon={<AssignmentTurnedInIcon className={classList.icons} />}
               title='Inventarios'
@@ -74,20 +71,11 @@ const Dashboard = () => {
               font='gray'
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3} lg={3} xl={3}>
+          <Grid item xs={12} sm={8} md={4} lg={4} xl={4}>
             <CardsInfo
               icon={<AssignmentIcon className={classList.icons} />}
               title='Pedidos'
               text='10 pedidos registradas'
-              color='rgba(250,250,20,15)'
-              font='gray'
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3} lg={3} xl={3}>
-            <CardsInfo
-              icon={<TransformIcon className={classList.icons} />}
-              title='Transacciones'
-              text='10 transacciones registradas'
               color='rgba(250,250,20,15)'
               font='gray'
             />
@@ -111,13 +99,6 @@ const Dashboard = () => {
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
             <CardsAdmin
-              icon={<PeopleAltIcon className={classList.icons} />}
-              title='Usuarios'
-              text='10 usuarios registrados'
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-            <CardsAdmin
               icon={<EmojiPeopleIcon className={classList.icons} />}
               title='Unidad Médica'
               text='5 unidades médicas registradas'
@@ -135,13 +116,6 @@ const Dashboard = () => {
               icon={<StoreIcon className={classList.icons} />}
               title='Bodegas'
               text='10 bodegas registradas'
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-            <CardsAdmin
-              icon={<CheckCircleOutlineIcon className={classList.icons} />}
-              title='Auditoría'
-              text='Más de 100 registros'
             />
           </Grid>
         </Grid>

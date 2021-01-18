@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Grid } from "@material-ui/core";
 import axios from "axios";
 import MaterialTable from "material-table";
+import TextField from "@material-ui/core/TextField";
 
 // importando los iconos
 import AssistantIcon from "@material-ui/icons/Assistant";
@@ -15,7 +16,7 @@ import Footer from "../templates/footer";
 const stylesPage = makeStyles(() => ({
   root: {
     // flexGrow: 1,
-    backgroundImage: "url('/img/fondo.jpg')",
+    backgroundImage: "url('/img/inicio.jpg')",
     overflow: "auto",
     backgroundPosition: "top",
     width: "100%",
@@ -74,6 +75,7 @@ const RolData = () => {
     setShowModalDelete(!showModalDelete);
   };
 
+  // obteniendo los datos de las cajas de texto
   const eventinput = (e) => {
     setDataSelect((prevState) => ({
       ...prevState,
@@ -98,7 +100,8 @@ const RolData = () => {
   }, []);
 
   // Esta función guarda los datos de un nuevo rol
-  const newRol = async () => {
+  const newRol = async (e) => {
+    e.preventDefault();
     let f = new FormData();
     f.append("RrlNomRol", dataSelect.RrlNomRol);
     f.append("METHOD", "POST");
@@ -114,7 +117,8 @@ const RolData = () => {
   };
 
   // Esta función actualiza los datos del rol selecionado
-  const updateRol = async () => {
+  const updateRol = async (e) => {
+    e.preventDefault();
     let f = new FormData();
     f.append("RrlNomRol", dataSelect.RrlNomRol);
     f.append("RrlEstRol", dataSelect.RrlEstRol);
@@ -260,21 +264,31 @@ const RolData = () => {
           <ModalHeader>Agregar Rol</ModalHeader>
           <ModalBody>
             <div>
-              <input
-                type='text'
-                name='RrlNomRol'
-                className='form-control'
-                id='RrlNomRol'
-                placeholder='Nombre del Rol'
-                onChange={eventinput}
-              />
+              <form
+                id='formNewData'
+                encType='multipart/form-data'
+                onSubmit={(e) => newRol(e)}>
+                <TextField
+                  variant='outlined'
+                  margin='normal'
+                  type='text'
+                  name='RrlNomRol'
+                  size='small'
+                  id='RrlNomRol'
+                  label='Nombre del Rol'
+                  fullWidth
+                  autoFocus
+                  required
+                  onChange={eventinput}
+                />
+              </form>
             </div>
           </ModalBody>
           <ModalFooter>
             <button
               type='submit'
               className='btn btn-success btn-sm'
-              onClick={() => newRol()}>
+              form='formNewData'>
               {" "}
               Guardar
             </button>{" "}
@@ -291,37 +305,46 @@ const RolData = () => {
           <ModalHeader>Editar Rol</ModalHeader>
           <ModalBody>
             <div className='mb-3'>
-              <input type='hidden' name='RrlId' value={dataSelect.RrlId} />
-              <label for='RrlNomRol' className='form-label'>
-                Nombre del Rol
-              </label>
-              <input
-                type='text'
-                name='RrlNomRol'
-                className='form-control'
-                id='RrlNomRol'
-                value={dataSelect.RrlNomRol}
-                onChange={eventinput}
-              />
-
-              <label for='RrlEstRol' className='form-label'>
-                Estado
-              </label>
-              <input
-                type='text'
-                name='RrlEstRol'
-                className='form-control'
-                id='RrlEstRol'
-                value={dataSelect.RrlEstRol}
-                onChange={eventinput}
-              />
+              <form
+                id='formUpdateData'
+                encType='multipart/form-data'
+                onSubmit={(e) => updateRol(e)}>
+                <input type='hidden' name='RrlId' value={dataSelect.RrlId} />
+                <TextField
+                  variant='outlined'
+                  margin='normal'
+                  type='text'
+                  name='RrlNomRol'
+                  size='small'
+                  id='RrlNomRol'
+                  label='Nombre del Rol'
+                  fullWidth
+                  autoFocus
+                  required
+                  value={dataSelect.RrlNomRol}
+                  onChange={eventinput}
+                />
+                <TextField
+                  variant='outlined'
+                  margin='normal'
+                  type='text'
+                  name='RrlEstRol'
+                  size='small'
+                  id='RrlEstRol'
+                  label='Estado'
+                  fullWidth
+                  required
+                  value={dataSelect.RrlEstRol}
+                  onChange={eventinput}
+                />
+              </form>
             </div>
           </ModalBody>
           <ModalFooter>
             <button
               type='submit'
               className='btn btn-success btn-sm'
-              onClick={() => updateRol()}>
+              form='formUpdateData'>
               {" "}
               Editar
             </button>{" "}

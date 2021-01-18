@@ -20,6 +20,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Divider from "@material-ui/core/Divider";
 import { Link } from "react-router-dom";
+import Cookies from "universal-cookie";
 
 const stylesPage = makeStyles(() => ({
   root: {
@@ -37,7 +38,9 @@ const stylesPage = makeStyles(() => ({
   },
 }));
 
-export default function MainListItems() {
+const session = new Cookies();
+
+const MainListItems = () => {
   const classList = stylesPage();
   const [open, setOpen] = React.useState(false);
 
@@ -45,12 +48,35 @@ export default function MainListItems() {
     setOpen(!open);
   };
 
+  const setDashboard = () => {
+    let dash = "";
+    let deskRol = session.get("id");
+    switch (deskRol) {
+      case "1":
+        dash = "/dashAdmin";
+        break;
+      case "2":
+        dash = "/dashSuper";
+        break;
+      case "3":
+        dash = "/dashTecni";
+        break;
+      case "4":
+        dash = "/dashUser";
+        break;
+
+      default:
+        break;
+    }
+    return dash;
+  };
+
   return (
     <div className={classList.root}>
       <CssBaseline />
       <div>
         {" "}
-        <Link to='/dashboard' className={classList.link}>
+        <Link to={setDashboard()} className={classList.link}>
           <ListItem button>
             <ListItemIcon className={classList.icons}>
               <DashboardIcon />
@@ -136,4 +162,6 @@ export default function MainListItems() {
       </div>
     </div>
   );
-}
+};
+
+export default MainListItems;

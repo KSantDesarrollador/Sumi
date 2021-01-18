@@ -3,7 +3,9 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid } from "@material-ui/core";
 import axios from "axios";
+import md5 from "md5";
 import MaterialTable from "material-table";
+import TextField from "@material-ui/core/TextField";
 // importando los iconos
 import PeopleIcon from "@material-ui/icons/People";
 import AddIcon from "@material-ui/icons/Add";
@@ -14,7 +16,7 @@ import Footer from "../templates/footer";
 const stylesPage = makeStyles(() => ({
   root: {
     // flexGrow: 1,
-    backgroundImage: "url('/img/fondo.jpg')",
+    backgroundImage: "url('/img/inicio.jpg')",
     overflow: "auto",
     backgroundPosition: "top",
     width: "100%",
@@ -35,6 +37,7 @@ const stylesPage = makeStyles(() => ({
     width: "25px",
     height: "25px",
   },
+  file: { display: "block" },
   contain: {
     marginTop: "auto",
     alignItems: "center",
@@ -67,8 +70,6 @@ const UserData = () => {
     UsrImgUsu: "",
     UsrEstUsu: "",
   });
-  const [image, setImage] = useState(null);
-
   const abrirCerrarModal = () => {
     setShowModal(!showModal);
   };
@@ -81,17 +82,17 @@ const UserData = () => {
     setShowModalDelete(!showModalDelete);
   };
 
+  // obteniendo los datos de las cajas de texto
   const eventinput = (e) => {
-    // console.log([e.target.name]);
     if (e.target.name === "UsrImgUsu") {
       setDataSelect((prevState) => ({
         ...prevState,
-        [e.target.name]: [e.target.files[0]],
+        [e.target.name]: e.target.files[0],
       }));
     } else {
       setDataSelect((prevState) => ({
         ...prevState,
-        [e.target.name]: [e.target.value],
+        [e.target.name]: e.target.value,
       }));
     }
   };
@@ -102,6 +103,7 @@ const UserData = () => {
       .get(ServUrl)
       .then((response) => {
         setData(response.data);
+        console.log(response.data);
       })
       .catch((er) => {
         console.log(er);
@@ -118,7 +120,7 @@ const UserData = () => {
     let f = new FormData();
     f.append("RrlId", dataSelect.RrlId);
     f.append("UsrNomUsu", dataSelect.UsrNomUsu);
-    f.append("UsrContraUsu", dataSelect.UsrContraUsu);
+    f.append("UsrContraUsu", md5(dataSelect.UsrContraUsu));
     f.append("UsrEmailUsu", dataSelect.UsrEmailUsu);
     f.append("UsrTelfUsu", dataSelect.UsrTelfUsu);
     f.append("UsrImgUsu", dataSelect.UsrImgUsu);
@@ -137,11 +139,16 @@ const UserData = () => {
   // Esta función actualiza los datos del rol selecionado
   const updateUser = async (e) => {
     e.preventDefault();
-
+    console.log(dataSelect.UsrContraUsu);
     let f = new FormData();
     f.append("RrlId", dataSelect.RrlId);
     f.append("UsrNomUsu", dataSelect.UsrNomUsu);
-    f.append("UsrContraUsu", dataSelect.UsrContraUsu);
+    if (dataSelect.UsrContraUsu.length > 31) {
+      f.append("UsrContraUsu", 0);
+    } else {
+      f.append("UsrContraUsu", md5(dataSelect.UsrContraUsu));
+    }
+
     f.append("UsrEmailUsu", dataSelect.UsrEmailUsu);
     f.append("UsrTelfUsu", dataSelect.UsrTelfUsu);
     f.append("UsrImgUsu", dataSelect.UsrImgUsu);
@@ -209,7 +216,7 @@ const UserData = () => {
     { title: "FOTO", field: "data:image/png;base64,UsrImgUsu" },
     { title: "ROL", field: "RrlNomRol" },
     { title: "USUARIO", field: "UsrNomUsu" },
-    { title: "CONTRASEÑA", field: "UsrContraUsu" },
+    // { title: "CONTRASEÑA", field: "UsrContraUsu" },
     { title: "EMAIL", field: "UsrEmailUsu" },
     { title: "TELÉFONO", field: "UsrTelfUsu" },
     { title: "ESTADO", field: "UsrEstUsu" },
@@ -302,7 +309,10 @@ const UserData = () => {
           <ModalHeader>Agregar Usuario</ModalHeader>
           <ModalBody>
             <div>
-              <form id='formNewData' encType='multipart/form-data'>
+              <form
+                id='formNewData'
+                encType='multipart/form-data'
+                onSubmit={(e) => newUser(e)}>
                 <select
                   className='form-control'
                   name='RrlId'
@@ -319,55 +329,72 @@ const UserData = () => {
                   <option value='3' key='3'>
                     Tecnico
                   </option>
+                  <option value='4' key='4'>
+                    Usuario
+                  </option>
                 </select>
-                <br />
-                <input
+                <TextField
+                  variant='outlined'
+                  margin='normal'
                   type='text'
                   name='UsrNomUsu'
-                  className='form-control'
+                  size='small'
                   id='UsrNomUsu'
-                  placeholder='Nombre de Usuario'
+                  label='Nombre de Usuario'
+                  fullWidth
+                  autoFocus
+                  required
                   onChange={eventinput}
                 />
-                <br />
-                <input
+                <TextField
+                  variant='outlined'
+                  margin='normal'
                   type='password'
                   name='UsrContraUsu'
-                  className='form-control'
+                  size='small'
                   id='UsrContraUsu'
-                  placeholder='Contraseña'
+                  label='Contraseña'
+                  fullWidth
+                  required
                   onChange={eventinput}
                 />
-                <br />
-                <input
+                <TextField
+                  variant='outlined'
+                  margin='normal'
                   type='email'
                   name='UsrEmailUsu'
-                  className='form-control'
+                  size='small'
                   id='UsrEmailUsu'
-                  placeholder='Email'
+                  label='Email'
+                  fullWidth
+                  required
                   onChange={eventinput}
                 />
-                <br />
-                <input
+                <TextField
+                  variant='outlined'
+                  margin='normal'
                   type='telf'
                   name='UsrTelfUsu'
-                  className='form-control'
+                  size='small'
                   id='UsrTelfUsu'
-                  placeholder='Teléfono'
+                  label='Teléfono'
+                  fullWidth
+                  required
                   onChange={eventinput}
                 />
-                <br />
-                <label for='UsrImgUsu' className='form-label'>
-                  <h6>Imagen</h6>
-                </label>
-                <input
+                <TextField
+                  className={classList.file}
+                  variant='standard'
+                  margin='normal'
                   type='file'
                   name='UsrImgUsu'
-                  className='form-control'
+                  size='small'
                   id='UsrImgUsu'
+                  fullWidth
                   accept='image/*'
                   onChange={eventinput}
                 />
+                <label for='UsrImgUsu'>Imagen de Usuario</label>
               </form>
             </div>
           </ModalBody>
@@ -375,8 +402,7 @@ const UserData = () => {
             <button
               type='submit'
               className='btn btn-success btn-sm'
-              form='formNewData'
-              onClick={(e) => newUser(e)}>
+              form='formNewData'>
               {" "}
               Guardar
             </button>{" "}
@@ -393,7 +419,10 @@ const UserData = () => {
           <ModalHeader>Editar Usuario</ModalHeader>
           <ModalBody>
             <div className='mb-3'>
-              <form id='formUpdateData' encType='multipart/form-data'>
+              <form
+                id='formUpdateData'
+                encType='multipart/form-data'
+                onSubmit={(e) => updateUser(e)}>
                 <input type='hidden' name='UsrId' value={dataSelect.UsrId} />
                 <select
                   className='form-control'
@@ -404,82 +433,81 @@ const UserData = () => {
                   </option>
                   <option value=''>cargando.......</option>
                 </select>
-                <br />
-                <label for='UsrNomUsu' className='form-label'>
-                  Usuario
-                </label>
-                <input
+                <TextField
+                  variant='outlined'
+                  margin='normal'
                   type='text'
                   name='UsrNomUsu'
-                  className='form-control'
+                  size='small'
                   id='UsrNomUsu'
+                  label='Nombre de Usuario'
+                  fullWidth
+                  autoFocus
+                  required
                   value={dataSelect.UsrNomUsu}
                   onChange={eventinput}
                 />
-                <br />
-                <label for='UsrContraUsu' className='form-label'>
-                  Contraseña
-                </label>
-                <input
+                <TextField
+                  variant='outlined'
+                  margin='normal'
                   type='password'
                   name='UsrContraUsu'
-                  className='form-control'
+                  size='small'
                   id='UsrContraUsu'
-                  value={dataSelect.UsrContraUsu}
+                  label='Contraseña'
+                  fullWidth
+                  placeholder='********'
                   onChange={eventinput}
                 />
-                <br />
-                <label for='UsrEmailUsu' className='form-label'>
-                  Email
-                </label>
-                <input
+                <TextField
+                  variant='outlined'
+                  margin='normal'
                   type='email'
                   name='UsrEmailUsu'
-                  className='form-control'
+                  size='small'
                   id='UsrEmailUsu'
+                  label='Email'
+                  fullWidth
+                  required
                   value={dataSelect.UsrEmailUsu}
                   onChange={eventinput}
                 />
-                <br />
-                <label for='UsrTelfUsu' className='form-label'>
-                  Teléfono
-                </label>
-                <input
+                <TextField
+                  variant='outlined'
+                  margin='normal'
                   type='telf'
                   name='UsrTelfUsu'
-                  className='form-control'
+                  size='small'
                   id='UsrTelfUsu'
+                  label='Teléfono'
+                  fullWidth
+                  required
                   value={dataSelect.UsrTelfUsu}
                   onChange={eventinput}
                 />
-                <br />
-                <label for='UsrImgUsu' className='form-label'>
-                  Imagen&nbsp;
-                  <img
-                    className={classList.image}
-                    alt=''
-                    height='45px'
-                    width='45px'
-                    src={dataSelect.image}
-                  />
-                </label>
-                <input
+                <TextField
+                  className={classList.file}
+                  variant='standard'
+                  margin='normal'
                   type='file'
                   name='UsrImgUsu'
-                  className='form-control'
+                  size='small'
                   id='UsrImgUsu'
+                  fullWidth
                   accept='image/*'
                   onChange={eventinput}
                 />
-                <br />
-                <label for='UsrEstUsu' className='form-label'>
-                  Estado
-                </label>
-                <input
+                <label for='UsrImgUsu'>Imagen de Usuario</label>
+                <TextField
+                  variant='outlined'
+                  margin='normal'
                   type='text'
                   name='UsrEstUsu'
-                  className='form-control'
+                  size='small'
                   id='UsrEstUsu'
+                  label='Estado'
+                  fullWidth
+                  required
                   value={dataSelect.UsrEstUsu}
                   onChange={eventinput}
                 />
@@ -490,8 +518,7 @@ const UserData = () => {
             <button
               type='submit'
               className='btn btn-success btn-sm'
-              form='formUpdateData'
-              onClick={(e) => updateUser(e)}>
+              form='formUpdateData'>
               {" "}
               Editar
             </button>{" "}

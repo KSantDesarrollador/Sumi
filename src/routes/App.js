@@ -4,7 +4,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import RolData from "../pages/rolData";
 import UserData from "../pages/userData";
-import Dashboard from "../templates/dashboard";
+import DashAdmin from "../pages/dashAdmin";
+import DashSuper from "../pages/dashSuper";
+import DashTecni from "../pages/dashTecni";
+import DashUser from "../pages/dashUser";
 import Login from "../pages/login";
 
 export default class App extends Component {
@@ -17,7 +20,10 @@ export default class App extends Component {
       <Router>
         <Switch>
           <Route exact path='/' component={Login}></Route>
-          <Route path='/dashboard' component={Dashboard}></Route>
+          <Route path='/dashAdmin' component={DashAdmin}></Route>
+          <Route path='/dashSuper' component={DashSuper}></Route>
+          <Route path='/dashTecni' component={DashTecni}></Route>
+          <Route path='/dashUser' component={DashUser}></Route>
           <Route path='/roles' component={RolData}></Route>
           <Route path='/users' component={UserData}></Route>
         </Switch>
