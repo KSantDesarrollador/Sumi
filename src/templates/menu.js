@@ -45,6 +45,16 @@ const stylesPage = makeStyles((theme) => ({
     width: "95%",
     background: "rgba(85,125,234,1)",
   },
+  clock: {
+    padding: "10px 0 10px 0",
+    background: "#000000",
+    color: "#ffffff",
+    textAlign: "center",
+  },
+  hour: {
+    background: "#000000",
+    color: "#ffffff",
+  },
   paper: {
     padding: theme.spacing(2),
     display: "flex",
@@ -85,7 +95,10 @@ const stylesPage = makeStyles((theme) => ({
     padding: "0 10px",
     ...theme.mixins.toolbar,
   },
-  name: { marginLeft: "27px" },
+  name: {
+    marginLeft: "27px",
+    maxHeight: "40px",
+  },
 }));
 
 const session = new Cookies();
@@ -93,6 +106,34 @@ const session = new Cookies();
 const Menu = () => {
   const classList = stylesPage();
   const [open, setOpen] = useState(false);
+
+  let timerID = null;
+  let timerRunning = false;
+
+  const stopclock = () => {
+    if (timerRunning) clearTimeout(timerID);
+    timerRunning = false;
+  };
+
+  const showtime = () => {
+    let now = new Date();
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    let seconds = now.getSeconds();
+    let timeValue = "" + (hours > 12 ? hours - 12 : hours);
+    if (timeValue === "0") timeValue = 12;
+    timeValue += (minutes < 10 ? ":0" : ":") + minutes;
+    timeValue += (seconds < 10 ? ":0" : ":") + seconds;
+    timeValue += hours >= 12 ? "   P.M." : "   A.M.";
+    document.clock.hour.value = timeValue;
+    timerID = setTimeout(showtime, 1000);
+    timerRunning = true;
+  };
+
+  const startclock = () => {
+    stopclock();
+    showtime();
+  };
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -114,7 +155,9 @@ const Menu = () => {
     if (!session.get("name")) {
       window.location.href = "/";
     }
-  }, []);
+    startclock();
+  });
+
   return (
     <div className={classList.root}>
       <CssBaseline />
@@ -185,6 +228,17 @@ const Menu = () => {
             <ChevronLeftIcon />
           </IconButton>
         </div>
+        <Divider />
+        <form name='clock' className={classList.clock}>
+          <strong>Hora</strong>
+          <br />
+          <input
+            type='button'
+            name='hour'
+            className={classList.hour}
+            disabled
+          />
+        </form>
         <Divider />
         <List>
           <MainListItems />

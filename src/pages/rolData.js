@@ -32,20 +32,11 @@ const stylesPage = makeStyles(() => ({
     width: "40px",
     height: "40px",
   },
-  contain: {
-    marginTop: "auto",
-    alignItems: "center",
-    paddingTop: "15px",
-  },
   desk: {
     padding: "5% 2% 0 7%",
   },
   modal: {
     marginTop: "7%",
-  },
-  table: {
-    boxShadow: "2px 3px 2px 4px solid #000000",
-    background: "#000000",
   },
 }));
 

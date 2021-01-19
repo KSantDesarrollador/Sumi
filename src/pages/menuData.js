@@ -3,7 +3,6 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid } from "@material-ui/core";
 import axios from "axios";
-import md5 from "md5";
 import MaterialTable from "material-table";
 import TextField from "@material-ui/core/TextField";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -36,17 +35,6 @@ const stylesPage = makeStyles((theme) => ({
     width: "40px",
     height: "40px",
   },
-  image: {
-    borderRadius: "30px",
-    width: "25px",
-    height: "25px",
-  },
-  file: { display: "block" },
-  contain: {
-    marginTop: "auto",
-    alignItems: "center",
-    paddingTop: "15px",
-  },
   desk: {
     padding: "5% 2% 0 7%",
   },
@@ -62,24 +50,24 @@ const stylesPage = makeStyles((theme) => ({
   },
 }));
 
-const ServUrl = "http://localhost/SUMI/models/userModel.php";
+const ServUrl = "http://localhost/SUMI/models/menuModel.php";
 
-const UserData = () => {
+const MenuData = () => {
   const classList = stylesPage();
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [dataSelect, setDataSelect] = useState({
-    UsrId: "",
-    RrlId: "",
-    RrlNomRol: "",
-    UsrNomUsu: "",
-    UsrContraUsu: "",
-    UsrEmailUsu: "",
-    UsrTelfUsu: "",
-    UsrImgUsu: "",
-    UsrEstUsu: "",
+    MnuId: "",
+    MnuJerqMen: "",
+    Jerarquia: "",
+    MnuNomMen: "",
+    MnuNivelMen: "",
+    MnuIconMen: "",
+    MnuUrlMen: "",
+    MnuLeyendMen: "",
+    MnuEstMen: "",
   });
   const abrirCerrarModal = () => {
     setShowModal(!showModal);
@@ -95,21 +83,14 @@ const UserData = () => {
 
   // obteniendo los datos de las cajas de texto
   const eventinput = (e) => {
-    if (e.target.name === "UsrImgUsu") {
-      setDataSelect((prevState) => ({
-        ...prevState,
-        [e.target.name]: e.target.files[0],
-      }));
-    } else {
-      setDataSelect((prevState) => ({
-        ...prevState,
-        [e.target.name]: e.target.value,
-      }));
-    }
+    setDataSelect((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   // obteniendo datos de un servidor
-  const listUser = async () => {
+  const listMenu = async () => {
     await axios
       .get(ServUrl)
       .then((response) => {
@@ -122,19 +103,19 @@ const UserData = () => {
   };
 
   useEffect(() => {
-    listUser();
+    listMenu();
   }, []);
 
   // Esta función guarda los datos de un nuevo rol
-  const newUser = async (e) => {
+  const newMenu = async (e) => {
     e.preventDefault();
     let f = new FormData();
-    f.append("RrlId", dataSelect.RrlId);
-    f.append("UsrNomUsu", dataSelect.UsrNomUsu);
-    f.append("UsrContraUsu", md5(dataSelect.UsrContraUsu));
-    f.append("UsrEmailUsu", dataSelect.UsrEmailUsu);
-    f.append("UsrTelfUsu", dataSelect.UsrTelfUsu);
-    f.append("UsrImgUsu", dataSelect.UsrImgUsu);
+    f.append("MnuJerqMen", dataSelect.MnuJerqMen);
+    f.append("MnuNomMen", dataSelect.MnuNomMen);
+    f.append("MnuNivelMen", dataSelect.MnuNivelMen);
+    f.append("MnuIconMen", dataSelect.MnuIconMen);
+    f.append("MnuUrlMen", dataSelect.MnuUrlMen);
+    f.append("MnuLeyendMen", dataSelect.MnuLeyendMen);
     f.append("METHOD", "POST");
     await axios
       .post(ServUrl, f, { headers: { "Content-Type": "multipart/form-data" } })
@@ -148,42 +129,36 @@ const UserData = () => {
   };
 
   // Esta función actualiza los datos del rol selecionado
-  const updateUser = async (e) => {
+  const updateMenu = async (e) => {
     e.preventDefault();
-    console.log(dataSelect.UsrContraUsu);
     let f = new FormData();
-    f.append("RrlId", dataSelect.RrlId);
-    f.append("UsrNomUsu", dataSelect.UsrNomUsu);
-    if (dataSelect.UsrContraUsu.length > 31) {
-      f.append("UsrContraUsu", 0);
-    } else {
-      f.append("UsrContraUsu", md5(dataSelect.UsrContraUsu));
-    }
-
-    f.append("UsrEmailUsu", dataSelect.UsrEmailUsu);
-    f.append("UsrTelfUsu", dataSelect.UsrTelfUsu);
-    f.append("UsrImgUsu", dataSelect.UsrImgUsu);
-    f.append("UsrEstUsu", dataSelect.UsrEstUsu);
+    f.append("MnuJerqMen", dataSelect.MnuJerqMen);
+    f.append("MnuNomMen", dataSelect.MnuNomMen);
+    f.append("MnuNivelMen", dataSelect.MnuNivelMen);
+    f.append("MnuIconMen", dataSelect.MnuIconMen);
+    f.append("MnuUrlMen", dataSelect.MnuUrlMen);
+    f.append("MnuLeyendMen", dataSelect.MnuLeyendMen);
+    f.append("MnuEstMen", dataSelect.MnuEstMen);
     f.append("METHOD", "PUT");
     await axios
       .post(
         ServUrl,
         f,
-        { params: { id: dataSelect.UsrId } },
+        { params: { id: dataSelect.MnuId } },
         { headers: { "Content-Type": "multipart/form-data" } }
       )
       .then((response) => {
         console.log(response.data);
         let newData = data;
         newData.map((info) => {
-          if (info.UsrId === dataSelect.UsrId) {
-            info.RrlId = dataSelect.RrlId;
-            info.UsrNomUsu = dataSelect.UsrNomUsu;
-            info.UsrContraUsu = dataSelect.UsrContraUsu;
-            info.UsrEmailUsu = dataSelect.UsrEmailUsu;
-            info.UsrTelfUsu = dataSelect.UsrTelfUsu;
-            info.UsrImgUsu = dataSelect.UsrImgUsu;
-            info.UsrEstUsu = dataSelect.UsrEstUsu;
+          if (info.MnuId === dataSelect.MnuId) {
+            info.MnuJerqMen = dataSelect.MnuJerqMen;
+            info.MnuNomMen = dataSelect.MnuNomMen;
+            info.MnuNivelMen = dataSelect.MnuNivelMen;
+            info.MnuIconMen = dataSelect.MnuIconMen;
+            info.MnuUrlMen = dataSelect.MnuUrlMen;
+            info.MnuLeyendMen = dataSelect.MnuLeyendMen;
+            info.MnuEstMen = dataSelect.MnuEstMen;
           }
           return info;
         });
@@ -197,13 +172,13 @@ const UserData = () => {
   };
 
   // Esta función elimina los datos del rol seleccionado
-  const deleteUser = async () => {
+  const deleteMenu = async () => {
     let f = new FormData();
     f.append("METHOD", "DELETE");
     await axios
-      .post(ServUrl, f, { params: { id: dataSelect.UsrId } })
+      .post(ServUrl, f, { params: { id: dataSelect.MnuId } })
       .then((response) => {
-        setData(data.filter((user) => user.UsrId !== dataSelect.UsrId));
+        setData(data.filter((menu) => menu.MnuId !== dataSelect.MnuId));
         abrirCerrarModalDelete();
       })
       .catch((er) => {
@@ -212,8 +187,8 @@ const UserData = () => {
   };
 
   // Esta función permite elegir el modal que se abrirá y guaerda los datos en el estado
-  const selectedItem = (user, type) => {
-    setDataSelect(user);
+  const selectedItem = (menu, type) => {
+    setDataSelect(menu);
     if (type === "Edit") {
       abrirCerrarModalEdit();
     } else {
@@ -223,14 +198,14 @@ const UserData = () => {
 
   // Formando las columnas de la tabla
   const columns = [
-    { title: "ID", field: "UsrId" },
-    { title: "FOTO", field: "data:image/png;base64,UsrImgUsu" },
-    { title: "ROL", field: "RrlNomRol" },
-    { title: "USUARIO", field: "UsrNomUsu" },
-    // { title: "CONTRASEÑA", field: "UsrContraUsu" },
-    { title: "EMAIL", field: "UsrEmailUsu" },
-    { title: "TELÉFONO", field: "UsrTelfUsu" },
-    { title: "ESTADO", field: "UsrEstUsu" },
+    { title: "ID", field: "MnuId" },
+    { title: "PADRE", field: "MnuJerqMen" },
+    { title: "NOMBRE", field: "MnuNomMen" },
+    { title: "NIVEL", field: "MnuNivelMen" },
+    { title: "ICONO", field: "MnuIconMen" },
+    { title: "URL", field: "MnuUrlMen" },
+    { title: "LEYENDA", field: "MnuLeyendMen" },
+    { title: "ESTADO", field: "MnuEstMen" },
   ];
 
   return (
@@ -241,7 +216,7 @@ const UserData = () => {
       <Grid className={classList.desk}>
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
           <h2>
-            Usuarios <PeopleIcon className={classList.iconPge} />
+            Menús <PeopleIcon className={classList.iconPge} />
           </h2>
           <div className='d-grid gap-2 d-md-flex justify-content-md-end'>
             <button
@@ -258,16 +233,16 @@ const UserData = () => {
           <MaterialTable
             columns={columns}
             data={data}
-            title='Usuarios habilitados en el sistema'
+            title='Lista de menús en el sistema'
             actions={[
               {
                 icon: "edit",
-                tooltip: "Editar usuario",
+                tooltip: "Editar menú",
                 onClick: (event, rowData) => selectedItem(rowData, "Edit"),
               },
               {
                 icon: "delete",
-                tooltip: "Eliminar usuario",
+                tooltip: "Eliminar menú",
                 onClick: (event, rowData) => selectedItem(rowData, "Delete"),
               },
             ]}
@@ -323,38 +298,42 @@ const UserData = () => {
               <form
                 id='formNewData'
                 encType='multipart/form-data'
-                onSubmit={(e) => newUser(e)}>
+                onSubmit={(e) => newMenu(e)}>
                 <FormControl
                   variant='outlined'
                   className={classList.formControl}>
                   <InputLabel htmlFor='outlined-age-native-simple'>
-                    Seleccione un Rol
+                    Menú contenedor
                   </InputLabel>
                   <Select
                     native
-                    value={dataSelect.RrlId}
+                    value={dataSelect.MnuJerqMen}
                     onChange={eventinput}
-                    label='Seleccione un Rol'
+                    label='Menú contenedor'
                     required
                     inputProps={{
-                      name: "RrlId",
+                      name: "MnuJerqMen",
                       id: "outlined-age-native-simple",
                     }}>
                     <option aria-label='None' value='' />
-                    <option value={2}>Supervisor</option>
-                    <option value={3}>Técnico</option>
-                    <option value={4}>Usuario</option>
-                    <option value={5}>Invitado</option>
+                    <option value={1}>Administración</option>
+                    <option value={8}>Auditoría</option>
+                    <option value={2}>Catálogo</option>
+                    <option value={3}>Configuración</option>
+                    <option value={4}>Procesos</option>
+                    <option value={5}>Transacciones</option>
+                    <option value={6}>Usuarios</option>
+                    <option value={7}>Reportes</option>
                   </Select>
                 </FormControl>
                 <TextField
                   variant='outlined'
                   margin='normal'
                   type='text'
-                  name='UsrNomUsu'
+                  name='MnuNomMen'
                   size='small'
-                  id='UsrNomUsu'
-                  label='Nombre de Usuario'
+                  id='MnuNomMen'
+                  label='Nombre del menú'
                   fullWidth
                   autoFocus
                   required
@@ -363,11 +342,13 @@ const UserData = () => {
                 <TextField
                   variant='outlined'
                   margin='normal'
-                  type='password'
-                  name='UsrContraUsu'
+                  type='number'
+                  name='MnuNivelMen'
                   size='small'
-                  id='UsrContraUsu'
-                  label='Contraseña'
+                  id='MnuNivelMen'
+                  label='Nivel'
+                  minimum='0'
+                  maximum='1'
                   fullWidth
                   required
                   onChange={eventinput}
@@ -375,11 +356,11 @@ const UserData = () => {
                 <TextField
                   variant='outlined'
                   margin='normal'
-                  type='email'
-                  name='UsrEmailUsu'
+                  type='text'
+                  name='MnuIconMen'
                   size='small'
-                  id='UsrEmailUsu'
-                  label='Email'
+                  id='MnuIconMen'
+                  label='Icono'
                   fullWidth
                   required
                   onChange={eventinput}
@@ -387,28 +368,28 @@ const UserData = () => {
                 <TextField
                   variant='outlined'
                   margin='normal'
-                  type='telf'
-                  name='UsrTelfUsu'
+                  type='text'
+                  name='MnuUrlMen'
                   size='small'
-                  id='UsrTelfUsu'
-                  label='Teléfono'
+                  id='MnuUrlMen'
+                  label='Url'
                   fullWidth
                   required
                   onChange={eventinput}
                 />
                 <TextField
                   className={classList.file}
-                  variant='standard'
+                  variant='outlined'
                   margin='normal'
-                  type='file'
-                  name='UsrImgUsu'
+                  type='text'
+                  name='MnuLeyendMen'
                   size='small'
-                  id='UsrImgUsu'
+                  id='MnuLeyendMen'
+                  label='Leyenda'
                   fullWidth
-                  accept='image/*'
+                  required
                   onChange={eventinput}
                 />
-                <label for='UsrImgUsu'>Imagen de Usuario</label>
               </form>
             </div>
           </ModalBody>
@@ -430,115 +411,120 @@ const UserData = () => {
 
         {/* Modal que muestra los datos del rol a ser editado */}
         <Modal isOpen={showModalEdit} className={classList.modal}>
-          <ModalHeader>Editar Usuario</ModalHeader>
+          <ModalHeader>Editar Menú</ModalHeader>
           <ModalBody>
             <div className='mb-3'>
               <form
                 id='formUpdateData'
                 encType='multipart/form-data'
-                onSubmit={(e) => updateUser(e)}>
-                <input type='hidden' name='UsrId' value={dataSelect.UsrId} />
+                onSubmit={(e) => updateMenu(e)}>
+                <input type='hidden' name='MnuId' value={dataSelect.MnuId} />
                 <FormControl
                   variant='outlined'
                   className={classList.formControl}>
                   <InputLabel htmlFor='outlined-age-native-simple'>
-                    Seleccione un Rol
+                    Menú contenedor
                   </InputLabel>
                   <Select
                     native
-                    value={dataSelect.RrlId}
+                    value={dataSelect.MnuJerqMen}
                     onChange={eventinput}
-                    label='Seleccione un Rol'
+                    label='Menú contenedor'
                     inputProps={{
-                      name: "RrlId",
+                      name: "MnuJerqMen",
                       id: "outlined-age-native-simple",
                     }}>
                     <option
-                      label={dataSelect.RrlNomRol}
-                      value={dataSelect.RrlId}
+                      label={dataSelect.Jerarquia}
+                      value={dataSelect.MnuJerqMen}
                     />
-                    <option value={1}>Supervisor</option>
-                    <option value={8}>Técnico</option>
-                    <option value={2}>Usuario</option>
-                    <option value={3}>Invitado</option>
+                    <option value={1}>Administración</option>
+                    <option value={8}>Auditoría</option>
+                    <option value={2}>Catálogo</option>
+                    <option value={3}>Configuración</option>
+                    <option value={4}>Procesos</option>
+                    <option value={5}>Transacciones</option>
+                    <option value={6}>Usuarios</option>
+                    <option value={7}>Reportes</option>
                   </Select>
                 </FormControl>
                 <TextField
                   variant='outlined'
                   margin='normal'
                   type='text'
-                  name='UsrNomUsu'
+                  name='MnuNomMen'
                   size='small'
-                  id='UsrNomUsu'
-                  label='Nombre de Usuario'
+                  id='MnuNomMen'
+                  label='Nombre del menú'
                   fullWidth
                   autoFocus
                   required
-                  value={dataSelect.UsrNomUsu}
+                  value={dataSelect.MnuNomMen}
                   onChange={eventinput}
                 />
                 <TextField
                   variant='outlined'
                   margin='normal'
-                  type='password'
-                  name='UsrContraUsu'
+                  type='number'
+                  name='MnuNivelMen'
                   size='small'
-                  id='UsrContraUsu'
-                  label='Contraseña'
-                  fullWidth
-                  placeholder='********'
-                  onChange={eventinput}
-                />
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='email'
-                  name='UsrEmailUsu'
-                  size='small'
-                  id='UsrEmailUsu'
-                  label='Email'
+                  id='MnuNivelMen'
+                  label='Nivel'
                   fullWidth
                   required
-                  value={dataSelect.UsrEmailUsu}
+                  value={dataSelect.MnuNivelMen}
                   onChange={eventinput}
                 />
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='telf'
-                  name='UsrTelfUsu'
-                  size='small'
-                  id='UsrTelfUsu'
-                  label='Teléfono'
-                  fullWidth
-                  required
-                  value={dataSelect.UsrTelfUsu}
-                  onChange={eventinput}
-                />
-                <TextField
-                  className={classList.file}
-                  variant='standard'
-                  margin='normal'
-                  type='file'
-                  name='UsrImgUsu'
-                  size='small'
-                  id='UsrImgUsu'
-                  fullWidth
-                  accept='image/*'
-                  onChange={eventinput}
-                />
-                <label for='UsrImgUsu'>Imagen de Usuario</label>
                 <TextField
                   variant='outlined'
                   margin='normal'
                   type='text'
-                  name='UsrEstUsu'
+                  name='MnuIconMen'
                   size='small'
-                  id='UsrEstUsu'
+                  id='MnuIconMen'
+                  label='Icono'
+                  fullWidth
+                  required
+                  value={dataSelect.MnuIconMen}
+                  onChange={eventinput}
+                />
+                <TextField
+                  variant='outlined'
+                  margin='normal'
+                  type='text'
+                  name='MnuUrlMen'
+                  size='small'
+                  id='MnuUrlMen'
+                  label='Url'
+                  fullWidth
+                  value={dataSelect.MnuUrlMen}
+                  onChange={eventinput}
+                />
+                <TextField
+                  className={classList.file}
+                  variant='outlined'
+                  margin='normal'
+                  type='text'
+                  name='MnuLeyendMen'
+                  size='small'
+                  id='MnuLeyendMen'
+                  label='Leyenda'
+                  fullWidth
+                  required
+                  value={dataSelect.MnuLeyendMen}
+                  onChange={eventinput}
+                />
+                <TextField
+                  variant='outlined'
+                  margin='normal'
+                  type='text'
+                  name='MnuEstMen'
+                  size='small'
+                  id='MnuEstMen'
                   label='Estado'
                   fullWidth
                   required
-                  value={dataSelect.UsrEstUsu}
+                  value={dataSelect.MnuEstMen}
                   onChange={eventinput}
                 />
               </form>
@@ -567,7 +553,7 @@ const UserData = () => {
             <div className='mb-3'>
               <p>
                 Está seguro de eliminar el usuario:&nbsp;
-                <strong>{dataSelect.UsrNomUsu}</strong>
+                <strong>{dataSelect.MnuNomMen}</strong>
               </p>
             </div>
           </ModalBody>
@@ -575,7 +561,7 @@ const UserData = () => {
             <button
               type='submit'
               className='btn btn-success btn-sm'
-              onClick={() => deleteUser()}>
+              onClick={() => deleteMenu()}>
               {" "}
               Aceptar
             </button>{" "}
@@ -594,4 +580,4 @@ const UserData = () => {
   );
 };
 
-export default UserData;
+export default MenuData;
