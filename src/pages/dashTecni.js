@@ -13,27 +13,47 @@ import AssignmentIcon from "@material-ui/icons/Assignment"; //pedidos
 import TransformIcon from "@material-ui/icons/Transform"; //transacciones
 import "../assets/css/dashStyles.css";
 
-const stylesPage = makeStyles(() => ({
+const stylesPage = makeStyles((theme) => ({
   root: {
-    // flexGrow: 1,
+    display: "flex",
     backgroundImage: "url('/img/inicio.jpg')",
     overflow: "auto",
     backgroundPosition: "top",
     width: "100%",
-    height: "100vh",
+    height: "95vh",
   },
   icons: {
-    color: "gray",
+    color: "#676C71",
     width: "40px",
-    height: "40px",
+    height: "35px",
   },
   contain: {
-    marginTop: "auto",
+    marginTop: "30px",
     alignItems: "center",
     paddingTop: "15px",
   },
-  desk: {
-    padding: "4.5% 20% 0 25%",
+  toolbar: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+  },
+  content: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    paddingLeft: theme.spacing(10),
+    paddingRight: theme.spacing(10),
+  },
+  title: {
+    width: "100%",
+    fontFamily: "Dungeon",
+    textAlign: "center",
+    padding: "10px 0",
+    color: "#ffffff",
+    backgroundColor: "rgba(0,0,0,0.7)",
+    borderRadius: "10px",
   },
 }));
 
@@ -42,61 +62,66 @@ const Dashboard = () => {
 
   return (
     <div className={classList.root}>
-      <Grid item xs={12}>
-        <Menu />
-      </Grid>
-      <Grid container className={classList.desk}>
-        <Grid container spacing={1}>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <CardsInfo
-              icon={<AssignmentTurnedInIcon className={classList.icons} />}
-              title='Inventarios'
-              text='10 inventarios registradas'
-              color='rgba(250,250,20,15)'
-              font='gray'
-            />
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <CardsInfo
-              icon={<AssignmentIcon className={classList.icons} />}
-              title='Pedidos'
-              text='10 pedidos registradas'
-              color='rgba(250,250,20,15)'
-              font='gray'
-            />
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <CardsInfo
-              icon={<TransformIcon className={classList.icons} />}
-              title='Transacciones'
-              text='10 transacciones registradas'
-              color='rgba(250,250,20,15)'
-              font='gray'
-            />
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <CardsInfo
-              icon={<TransformIcon className={classList.icons} />}
-              title='Bodegas'
-              text='10 Bodegas registradas'
-              color='rgba(250,250,20,15)'
-              font='gray'
-            />
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <CardsInfo
-              icon={<TransformIcon className={classList.icons} />}
-              title='Productos'
-              text='10 productos registradas'
-              color='rgba(250,250,20,15)'
-              font='gray'
-            />
+      <Menu />
+      <main>
+        <Grid container className={classList.content}>
+          <div className={classList.toolbar}></div>
+          <Grid container spacing={3}>
+            <Grid container>
+              {" "}
+              <h4 className={classList.title}>
+                SISTEMA UNICO DE MANEJO DE INVENTARIOS
+              </h4>
+            </Grid>
+            <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
+              <CardsInfo
+                icon={<AssignmentTurnedInIcon className={classList.icons} />}
+                title='Inventarios'
+                text='10 inventarios registradas'
+                color='rgba(250,250,20,15)'
+                font='gray'
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
+              <CardsInfo
+                icon={<AssignmentIcon className={classList.icons} />}
+                title='Pedidos'
+                text='10 pedidos registradas'
+                color='rgba(250,250,20,15)'
+                font='gray'
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
+              <CardsInfo
+                icon={<TransformIcon className={classList.icons} />}
+                title='Transacciones'
+                text='10 transacciones registradas'
+                color='rgba(250,250,20,15)'
+                font='gray'
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
+              <CardsInfo
+                icon={<TransformIcon className={classList.icons} />}
+                title='Bodegas'
+                text='10 Bodegas registradas'
+                color='rgba(250,250,20,15)'
+                font='gray'
+              />
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+              <CardsInfo
+                icon={<TransformIcon className={classList.icons} />}
+                title='Productos'
+                text='10 productos registradas'
+                color='rgba(250,250,20,15)'
+                font='gray'
+              />
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
-      <Grid item xs={0} sm={0} md={0}>
         <Footer />
-      </Grid>
+      </main>
     </div>
   );
 };

@@ -7,7 +7,6 @@ import md5 from "md5";
 import MaterialTable from "material-table";
 import TextField from "@material-ui/core/TextField";
 import InputLabel from "@material-ui/core/InputLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 // importando los iconos
@@ -19,12 +18,12 @@ import Footer from "../templates/footer";
 
 const stylesPage = makeStyles((theme) => ({
   root: {
-    // flexGrow: 1,
+    display: "flex",
     backgroundImage: "url('/img/inicio.jpg')",
     overflow: "auto",
     backgroundPosition: "top",
     width: "100%",
-    height: "100vh",
+    height: "95vh",
   },
   icons: {
     color: "white",
@@ -47,9 +46,6 @@ const stylesPage = makeStyles((theme) => ({
     alignItems: "center",
     paddingTop: "15px",
   },
-  desk: {
-    padding: "5% 2% 0 7%",
-  },
   modal: {
     marginTop: "5%",
   },
@@ -59,6 +55,18 @@ const stylesPage = makeStyles((theme) => ({
   },
   selectEmpty: {
     marginTop: theme.spacing(2),
+  },
+  toolbar: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+  },
+  content: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
   },
 }));
 
@@ -235,361 +243,364 @@ const UserData = () => {
 
   return (
     <div className={classList.root}>
-      <Grid>
-        <Menu />
-      </Grid>
-      <Grid className={classList.desk}>
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          <h2>
-            Usuarios <PeopleIcon className={classList.iconPge} />
-          </h2>
-          <div className='d-grid gap-2 d-md-flex justify-content-md-end'>
-            <button
-              className='btn btn-warning me-md-2'
-              onClick={() => abrirCerrarModal()}>
-              <AddIcon />
-            </button>
-          </div>
-        </Grid>
-        <br />
+      <Menu />
+      <main>
+        <Grid container className={classList.content}>
+          <div className={classList.toolbar}></div>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+              <h2>
+                Usuarios <PeopleIcon className={classList.iconPge} />
+              </h2>
+              <div className='d-grid gap-2 d-md-flex justify-content-md-end'>
+                <button
+                  className='btn btn-warning me-md-2'
+                  onClick={() => abrirCerrarModal()}>
+                  <AddIcon />
+                </button>
+              </div>
+            </Grid>
+          </Grid>
+          <br />
 
-        {/* Tabla que muestra la información de los roles en bd */}
-        <Grid>
-          <MaterialTable
-            columns={columns}
-            data={data}
-            title='Usuarios habilitados en el sistema'
-            actions={[
-              {
-                icon: "edit",
-                tooltip: "Editar usuario",
-                onClick: (event, rowData) => selectedItem(rowData, "Edit"),
-              },
-              {
-                icon: "delete",
-                tooltip: "Eliminar usuario",
-                onClick: (event, rowData) => selectedItem(rowData, "Delete"),
-              },
-            ]}
-            options={{
-              actionsColumnIndex: -1,
-              headerStyle: {
-                background: "#4094e2",
-                color: "#000000",
-                fontWeight: "700",
-                border: "none",
-                fontSize: "17px",
-              },
-              actionsCellStyle: {
-                // background: "#96acc0",
-                color: "#000000",
-                borderBottom: "1px solid #96acc0",
-              },
-              cellStyle: { borderBottom: "1px solid #96acc0" },
-            }}
-            localization={{
-              header: {
-                actions: "ACCIONES",
-              },
-              toolbar: {
-                searchPlaceholder: "Buscar",
-                searchTooltip: "Buscar",
-              },
-              body: {
-                emptyDataSourceMessage: "No hay registros que mostrar",
-                filterRow: {
-                  filterTooltip: "Filtrar",
-                },
-              },
-              pagination: {
-                labelRowsSelect: "registros",
-                firstTooltip: "primera página",
-                previousTooltip: "página anterior",
-                labelRowsPerPage: "Total de registros",
-                labelDisplayedRows:
-                  "{from} - {to} de {count} regsitros encontrados",
-                nextTooltip: "página siguiente",
-                lastTooltip: "última página",
-              },
-            }}
-          />
-        </Grid>
-
-        {/* Modal que muestra un formulario para agregar un nuevo rol */}
-        <Modal isOpen={showModal} className={classList.modal}>
-          <ModalHeader>Agregar Usuario</ModalHeader>
-          <ModalBody>
-            <div>
-              <form
-                id='formNewData'
-                encType='multipart/form-data'
-                onSubmit={(e) => newUser(e)}>
-                <FormControl
-                  variant='outlined'
-                  className={classList.formControl}>
-                  <InputLabel htmlFor='outlined-age-native-simple'>
-                    Seleccione un Rol
-                  </InputLabel>
-                  <Select
-                    native
-                    value={dataSelect.RrlId}
-                    onChange={eventinput}
-                    label='Seleccione un Rol'
-                    required
-                    inputProps={{
-                      name: "RrlId",
-                      id: "outlined-age-native-simple",
-                    }}>
-                    <option aria-label='None' value='' />
-                    <option value={2}>Supervisor</option>
-                    <option value={3}>Técnico</option>
-                    <option value={4}>Usuario</option>
-                    <option value={5}>Invitado</option>
-                  </Select>
-                </FormControl>
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='text'
-                  name='UsrNomUsu'
-                  size='small'
-                  id='UsrNomUsu'
-                  label='Nombre de Usuario'
-                  fullWidth
-                  autoFocus
-                  required
-                  onChange={eventinput}
-                />
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='password'
-                  name='UsrContraUsu'
-                  size='small'
-                  id='UsrContraUsu'
-                  label='Contraseña'
-                  fullWidth
-                  required
-                  onChange={eventinput}
-                />
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='email'
-                  name='UsrEmailUsu'
-                  size='small'
-                  id='UsrEmailUsu'
-                  label='Email'
-                  fullWidth
-                  required
-                  onChange={eventinput}
-                />
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='telf'
-                  name='UsrTelfUsu'
-                  size='small'
-                  id='UsrTelfUsu'
-                  label='Teléfono'
-                  fullWidth
-                  required
-                  onChange={eventinput}
-                />
-                <TextField
-                  className={classList.file}
-                  variant='standard'
-                  margin='normal'
-                  type='file'
-                  name='UsrImgUsu'
-                  size='small'
-                  id='UsrImgUsu'
-                  fullWidth
-                  accept='image/*'
-                  onChange={eventinput}
-                />
-                <label for='UsrImgUsu'>Imagen de Usuario</label>
-              </form>
-            </div>
-          </ModalBody>
-          <ModalFooter>
-            <button
-              type='submit'
-              className='btn btn-success btn-sm'
-              form='formNewData'>
-              {" "}
-              Guardar
-            </button>{" "}
-            <button
-              className='btn btn-danger btn-sm'
-              onClick={() => abrirCerrarModal()}>
-              Cancelar
-            </button>
-          </ModalFooter>
-        </Modal>
-
-        {/* Modal que muestra los datos del rol a ser editado */}
-        <Modal isOpen={showModalEdit} className={classList.modal}>
-          <ModalHeader>Editar Usuario</ModalHeader>
-          <ModalBody>
-            <div className='mb-3'>
-              <form
-                id='formUpdateData'
-                encType='multipart/form-data'
-                onSubmit={(e) => updateUser(e)}>
-                <input type='hidden' name='UsrId' value={dataSelect.UsrId} />
-                <FormControl
-                  variant='outlined'
-                  className={classList.formControl}>
-                  <InputLabel htmlFor='outlined-age-native-simple'>
-                    Seleccione un Rol
-                  </InputLabel>
-                  <Select
-                    native
-                    value={dataSelect.RrlId}
-                    onChange={eventinput}
-                    label='Seleccione un Rol'
-                    inputProps={{
-                      name: "RrlId",
-                      id: "outlined-age-native-simple",
-                    }}>
-                    <option
-                      label={dataSelect.RrlNomRol}
+          {/* Tabla que muestra la información de los roles en bd */}
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+              <MaterialTable
+                columns={columns}
+                data={data}
+                title='Usuarios habilitados en el sistema'
+                actions={[
+                  {
+                    icon: "edit",
+                    tooltip: "Editar usuario",
+                    onClick: (event, rowData) => selectedItem(rowData, "Edit"),
+                  },
+                  {
+                    icon: "delete",
+                    tooltip: "Eliminar usuario",
+                    onClick: (event, rowData) =>
+                      selectedItem(rowData, "Delete"),
+                  },
+                ]}
+                options={{
+                  actionsColumnIndex: -1,
+                  headerStyle: {
+                    background: "#4094e2",
+                    color: "#000000",
+                    fontWeight: "700",
+                    border: "none",
+                    fontSize: "17px",
+                  },
+                  actionsCellStyle: {
+                    // background: "#96acc0",
+                    color: "#000000",
+                    borderBottom: "1px solid #96acc0",
+                  },
+                  cellStyle: { borderBottom: "1px solid #96acc0" },
+                }}
+                localization={{
+                  header: {
+                    actions: "ACCIONES",
+                  },
+                  toolbar: {
+                    searchPlaceholder: "Buscar",
+                    searchTooltip: "Buscar",
+                  },
+                  body: {
+                    emptyDataSourceMessage: "No hay registros que mostrar",
+                    filterRow: {
+                      filterTooltip: "Filtrar",
+                    },
+                  },
+                  pagination: {
+                    labelRowsSelect: "registros",
+                    firstTooltip: "primera página",
+                    previousTooltip: "página anterior",
+                    labelRowsPerPage: "Total de registros",
+                    labelDisplayedRows:
+                      "{from} - {to} de {count} regsitros encontrados",
+                    nextTooltip: "página siguiente",
+                    lastTooltip: "última página",
+                  },
+                }}
+              />
+            </Grid>
+          </Grid>
+          {/* Modal que muestra un formulario para agregar un nuevo rol */}
+          <Modal isOpen={showModal} className={classList.modal}>
+            <ModalHeader>Agregar Usuario</ModalHeader>
+            <ModalBody>
+              <div>
+                <form
+                  id='formNewData'
+                  encType='multipart/form-data'
+                  onSubmit={(e) => newUser(e)}>
+                  <FormControl
+                    variant='outlined'
+                    className={classList.formControl}>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Seleccione un Rol
+                    </InputLabel>
+                    <Select
+                      native
                       value={dataSelect.RrlId}
-                    />
-                    <option value={1}>Supervisor</option>
-                    <option value={8}>Técnico</option>
-                    <option value={2}>Usuario</option>
-                    <option value={3}>Invitado</option>
-                  </Select>
-                </FormControl>
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='text'
-                  name='UsrNomUsu'
-                  size='small'
-                  id='UsrNomUsu'
-                  label='Nombre de Usuario'
-                  fullWidth
-                  autoFocus
-                  required
-                  value={dataSelect.UsrNomUsu}
-                  onChange={eventinput}
-                />
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='password'
-                  name='UsrContraUsu'
-                  size='small'
-                  id='UsrContraUsu'
-                  label='Contraseña'
-                  fullWidth
-                  placeholder='********'
-                  onChange={eventinput}
-                />
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='email'
-                  name='UsrEmailUsu'
-                  size='small'
-                  id='UsrEmailUsu'
-                  label='Email'
-                  fullWidth
-                  required
-                  value={dataSelect.UsrEmailUsu}
-                  onChange={eventinput}
-                />
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='telf'
-                  name='UsrTelfUsu'
-                  size='small'
-                  id='UsrTelfUsu'
-                  label='Teléfono'
-                  fullWidth
-                  required
-                  value={dataSelect.UsrTelfUsu}
-                  onChange={eventinput}
-                />
-                <TextField
-                  className={classList.file}
-                  variant='standard'
-                  margin='normal'
-                  type='file'
-                  name='UsrImgUsu'
-                  size='small'
-                  id='UsrImgUsu'
-                  fullWidth
-                  accept='image/*'
-                  onChange={eventinput}
-                />
-                <label for='UsrImgUsu'>Imagen de Usuario</label>
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='text'
-                  name='UsrEstUsu'
-                  size='small'
-                  id='UsrEstUsu'
-                  label='Estado'
-                  fullWidth
-                  required
-                  value={dataSelect.UsrEstUsu}
-                  onChange={eventinput}
-                />
-              </form>
-            </div>
-          </ModalBody>
-          <ModalFooter>
-            <button
-              type='submit'
-              className='btn btn-success btn-sm'
-              form='formUpdateData'>
-              {" "}
-              Editar
-            </button>{" "}
-            <button
-              className='btn btn-danger btn-sm'
-              onClick={() => abrirCerrarModalEdit()}>
-              Cancelar
-            </button>
-          </ModalFooter>
-        </Modal>
+                      onChange={eventinput}
+                      label='Seleccione un Rol'
+                      required
+                      inputProps={{
+                        name: "RrlId",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option aria-label='None' value='' />
+                      <option value={2}>Supervisor</option>
+                      <option value={3}>Técnico</option>
+                      <option value={4}>Usuario</option>
+                      <option value={5}>Invitado</option>
+                    </Select>
+                  </FormControl>
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='text'
+                    name='UsrNomUsu'
+                    size='small'
+                    id='UsrNomUsu'
+                    label='Nombre de Usuario'
+                    fullWidth
+                    autoFocus
+                    required
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='password'
+                    name='UsrContraUsu'
+                    size='small'
+                    id='UsrContraUsu'
+                    label='Contraseña'
+                    fullWidth
+                    required
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='email'
+                    name='UsrEmailUsu'
+                    size='small'
+                    id='UsrEmailUsu'
+                    label='Email'
+                    fullWidth
+                    required
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='telf'
+                    name='UsrTelfUsu'
+                    size='small'
+                    id='UsrTelfUsu'
+                    label='Teléfono'
+                    fullWidth
+                    required
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    className={classList.file}
+                    variant='standard'
+                    margin='normal'
+                    type='file'
+                    name='UsrImgUsu'
+                    size='small'
+                    id='UsrImgUsu'
+                    fullWidth
+                    accept='image/*'
+                    onChange={eventinput}
+                  />
+                  <label for='UsrImgUsu'>Imagen de Usuario</label>
+                </form>
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <button
+                type='submit'
+                className='btn btn-success btn-sm'
+                form='formNewData'>
+                {" "}
+                Guardar
+              </button>{" "}
+              <button
+                className='btn btn-danger btn-sm'
+                onClick={() => abrirCerrarModal()}>
+                Cancelar
+              </button>
+            </ModalFooter>
+          </Modal>
 
-        {/* Modal para confirmación antes de eliminar un registro */}
-        <Modal isOpen={showModalDelete} className={classList.modal}>
-          <ModalHeader>Eliminar Usuario</ModalHeader>
-          <ModalBody>
-            <div className='mb-3'>
-              <p>
-                Está seguro de eliminar el usuario:&nbsp;
-                <strong>{dataSelect.UsrNomUsu}</strong>
-              </p>
-            </div>
-          </ModalBody>
-          <ModalFooter>
-            <button
-              type='submit'
-              className='btn btn-success btn-sm'
-              onClick={() => deleteUser()}>
-              {" "}
-              Aceptar
-            </button>{" "}
-            <button
-              className='btn btn-danger btn-sm'
-              onClick={() => abrirCerrarModalDelete()}>
-              Cancelar
-            </button>
-          </ModalFooter>
-        </Modal>
-      </Grid>
-      <Grid>
+          {/* Modal que muestra los datos del rol a ser editado */}
+          <Modal isOpen={showModalEdit} className={classList.modal}>
+            <ModalHeader>Editar Usuario</ModalHeader>
+            <ModalBody>
+              <div className='mb-3'>
+                <form
+                  id='formUpdateData'
+                  encType='multipart/form-data'
+                  onSubmit={(e) => updateUser(e)}>
+                  <input type='hidden' name='UsrId' value={dataSelect.UsrId} />
+                  <FormControl
+                    variant='outlined'
+                    className={classList.formControl}>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Seleccione un Rol
+                    </InputLabel>
+                    <Select
+                      native
+                      value={dataSelect.RrlId}
+                      onChange={eventinput}
+                      label='Seleccione un Rol'
+                      inputProps={{
+                        name: "RrlId",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option
+                        label={dataSelect.RrlNomRol}
+                        value={dataSelect.RrlId}
+                      />
+                      <option value={1}>Supervisor</option>
+                      <option value={8}>Técnico</option>
+                      <option value={2}>Usuario</option>
+                      <option value={3}>Invitado</option>
+                    </Select>
+                  </FormControl>
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='text'
+                    name='UsrNomUsu'
+                    size='small'
+                    id='UsrNomUsu'
+                    label='Nombre de Usuario'
+                    fullWidth
+                    autoFocus
+                    required
+                    value={dataSelect.UsrNomUsu}
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='password'
+                    name='UsrContraUsu'
+                    size='small'
+                    id='UsrContraUsu'
+                    label='Contraseña'
+                    fullWidth
+                    placeholder='********'
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='email'
+                    name='UsrEmailUsu'
+                    size='small'
+                    id='UsrEmailUsu'
+                    label='Email'
+                    fullWidth
+                    required
+                    value={dataSelect.UsrEmailUsu}
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='telf'
+                    name='UsrTelfUsu'
+                    size='small'
+                    id='UsrTelfUsu'
+                    label='Teléfono'
+                    fullWidth
+                    required
+                    value={dataSelect.UsrTelfUsu}
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    className={classList.file}
+                    variant='standard'
+                    margin='normal'
+                    type='file'
+                    name='UsrImgUsu'
+                    size='small'
+                    id='UsrImgUsu'
+                    fullWidth
+                    accept='image/*'
+                    onChange={eventinput}
+                  />
+                  <label for='UsrImgUsu'>Imagen de Usuario</label>
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='text'
+                    name='UsrEstUsu'
+                    size='small'
+                    id='UsrEstUsu'
+                    label='Estado'
+                    fullWidth
+                    required
+                    value={dataSelect.UsrEstUsu}
+                    onChange={eventinput}
+                  />
+                </form>
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <button
+                type='submit'
+                className='btn btn-success btn-sm'
+                form='formUpdateData'>
+                {" "}
+                Editar
+              </button>{" "}
+              <button
+                className='btn btn-danger btn-sm'
+                onClick={() => abrirCerrarModalEdit()}>
+                Cancelar
+              </button>
+            </ModalFooter>
+          </Modal>
+
+          {/* Modal para confirmación antes de eliminar un registro */}
+          <Modal isOpen={showModalDelete} className={classList.modal}>
+            <ModalHeader>Eliminar Usuario</ModalHeader>
+            <ModalBody>
+              <div className='mb-3'>
+                <p>
+                  Está seguro de eliminar el usuario:&nbsp;
+                  <strong>{dataSelect.UsrNomUsu}</strong>
+                </p>
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <button
+                type='submit'
+                className='btn btn-success btn-sm'
+                onClick={() => deleteUser()}>
+                {" "}
+                Aceptar
+              </button>{" "}
+              <button
+                className='btn btn-danger btn-sm'
+                onClick={() => abrirCerrarModalDelete()}>
+                Cancelar
+              </button>
+            </ModalFooter>
+          </Modal>
+        </Grid>
         <Footer />
-      </Grid>
+      </main>
     </div>
   );
 };

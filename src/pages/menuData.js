@@ -18,12 +18,12 @@ import Footer from "../templates/footer";
 
 const stylesPage = makeStyles((theme) => ({
   root: {
-    // flexGrow: 1,
+    display: "flex",
     backgroundImage: "url('/img/inicio.jpg')",
     overflow: "auto",
     backgroundPosition: "top",
     width: "100%",
-    height: "100vh",
+    height: "95vh",
   },
   icons: {
     color: "white",
@@ -35,9 +35,6 @@ const stylesPage = makeStyles((theme) => ({
     width: "40px",
     height: "40px",
   },
-  desk: {
-    padding: "5% 2% 0 7%",
-  },
   modal: {
     marginTop: "5%",
   },
@@ -47,6 +44,18 @@ const stylesPage = makeStyles((theme) => ({
   },
   selectEmpty: {
     marginTop: theme.spacing(2),
+  },
+  toolbar: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+  },
+  content: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
   },
 }));
 
@@ -210,372 +219,375 @@ const MenuData = () => {
 
   return (
     <div className={classList.root}>
-      <Grid>
-        <Menu />
-      </Grid>
-      <Grid className={classList.desk}>
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          <h2>
-            Menús <PeopleIcon className={classList.iconPge} />
-          </h2>
-          <div className='d-grid gap-2 d-md-flex justify-content-md-end'>
-            <button
-              className='btn btn-warning me-md-2'
-              onClick={() => abrirCerrarModal()}>
-              <AddIcon />
-            </button>
-          </div>
-        </Grid>
-        <br />
+      <Menu />
+      <main>
+        <Grid container className={classList.content}>
+          <div className={classList.toolbar}></div>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+              <h2>
+                Menús <PeopleIcon className={classList.iconPge} />
+              </h2>
+              <div className='d-grid gap-2 d-md-flex justify-content-md-end'>
+                <button
+                  className='btn btn-warning me-md-2'
+                  onClick={() => abrirCerrarModal()}>
+                  <AddIcon />
+                </button>
+              </div>
+            </Grid>
+          </Grid>
 
-        {/* Tabla que muestra la información de los roles en bd */}
-        <Grid>
-          <MaterialTable
-            columns={columns}
-            data={data}
-            title='Lista de menús en el sistema'
-            actions={[
-              {
-                icon: "edit",
-                tooltip: "Editar menú",
-                onClick: (event, rowData) => selectedItem(rowData, "Edit"),
-              },
-              {
-                icon: "delete",
-                tooltip: "Eliminar menú",
-                onClick: (event, rowData) => selectedItem(rowData, "Delete"),
-              },
-            ]}
-            options={{
-              actionsColumnIndex: -1,
-              headerStyle: {
-                background: "#4094e2",
-                color: "#000000",
-                fontWeight: "700",
-                border: "none",
-                fontSize: "17px",
-              },
-              actionsCellStyle: {
-                // background: "#96acc0",
-                color: "#000000",
-                borderBottom: "1px solid #96acc0",
-              },
-              cellStyle: { borderBottom: "1px solid #96acc0" },
-            }}
-            localization={{
-              header: {
-                actions: "ACCIONES",
-              },
-              toolbar: {
-                searchPlaceholder: "Buscar",
-                searchTooltip: "Buscar",
-              },
-              body: {
-                emptyDataSourceMessage: "No hay registros que mostrar",
-                filterRow: {
-                  filterTooltip: "Filtrar",
-                },
-              },
-              pagination: {
-                labelRowsSelect: "registros",
-                firstTooltip: "primera página",
-                previousTooltip: "página anterior",
-                labelRowsPerPage: "Total de registros",
-                labelDisplayedRows:
-                  "{from} - {to} de {count} regsitros encontrados",
-                nextTooltip: "página siguiente",
-                lastTooltip: "última página",
-              },
-            }}
-          />
-        </Grid>
+          {/* Tabla que muestra la información de los roles en bd */}
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+              <MaterialTable
+                columns={columns}
+                data={data}
+                title='Lista de menús en el sistema'
+                actions={[
+                  {
+                    icon: "edit",
+                    tooltip: "Editar menú",
+                    onClick: (event, rowData) => selectedItem(rowData, "Edit"),
+                  },
+                  {
+                    icon: "delete",
+                    tooltip: "Eliminar menú",
+                    onClick: (event, rowData) =>
+                      selectedItem(rowData, "Delete"),
+                  },
+                ]}
+                options={{
+                  actionsColumnIndex: -1,
+                  headerStyle: {
+                    background: "#4094e2",
+                    color: "#000000",
+                    fontWeight: "700",
+                    border: "none",
+                    fontSize: "17px",
+                  },
+                  actionsCellStyle: {
+                    // background: "#96acc0",
+                    color: "#000000",
+                    borderBottom: "1px solid #96acc0",
+                  },
+                  cellStyle: { borderBottom: "1px solid #96acc0" },
+                }}
+                localization={{
+                  header: {
+                    actions: "ACCIONES",
+                  },
+                  toolbar: {
+                    searchPlaceholder: "Buscar",
+                    searchTooltip: "Buscar",
+                  },
+                  body: {
+                    emptyDataSourceMessage: "No hay registros que mostrar",
+                    filterRow: {
+                      filterTooltip: "Filtrar",
+                    },
+                  },
+                  pagination: {
+                    labelRowsSelect: "registros",
+                    firstTooltip: "primera página",
+                    previousTooltip: "página anterior",
+                    labelRowsPerPage: "Total de registros",
+                    labelDisplayedRows:
+                      "{from} - {to} de {count} regsitros encontrados",
+                    nextTooltip: "página siguiente",
+                    lastTooltip: "última página",
+                  },
+                }}
+              />
+            </Grid>
+          </Grid>
 
-        {/* Modal que muestra un formulario para agregar un nuevo rol */}
-        <Modal isOpen={showModal} className={classList.modal}>
-          <ModalHeader>Agregar Usuario</ModalHeader>
-          <ModalBody>
-            <div>
-              <form
-                id='formNewData'
-                encType='multipart/form-data'
-                onSubmit={(e) => newMenu(e)}>
-                <FormControl
-                  variant='outlined'
-                  className={classList.formControl}>
-                  <InputLabel htmlFor='outlined-age-native-simple'>
-                    Menú contenedor
-                  </InputLabel>
-                  <Select
-                    native
-                    value={dataSelect.MnuJerqMen}
-                    onChange={eventinput}
-                    label='Menú contenedor'
-                    required
-                    inputProps={{
-                      name: "MnuJerqMen",
-                      id: "outlined-age-native-simple",
-                    }}>
-                    <option aria-label='None' value='' />
-                    <option value={1}>Administración</option>
-                    <option value={8}>Auditoría</option>
-                    <option value={2}>Catálogo</option>
-                    <option value={3}>Configuración</option>
-                    <option value={4}>Procesos</option>
-                    <option value={5}>Transacciones</option>
-                    <option value={6}>Usuarios</option>
-                    <option value={7}>Reportes</option>
-                  </Select>
-                </FormControl>
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='text'
-                  name='MnuNomMen'
-                  size='small'
-                  id='MnuNomMen'
-                  label='Nombre del menú'
-                  fullWidth
-                  autoFocus
-                  required
-                  onChange={eventinput}
-                />
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='number'
-                  name='MnuNivelMen'
-                  size='small'
-                  id='MnuNivelMen'
-                  label='Nivel'
-                  minimum='0'
-                  maximum='1'
-                  fullWidth
-                  required
-                  onChange={eventinput}
-                />
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='text'
-                  name='MnuIconMen'
-                  size='small'
-                  id='MnuIconMen'
-                  label='Icono'
-                  fullWidth
-                  required
-                  onChange={eventinput}
-                />
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='text'
-                  name='MnuUrlMen'
-                  size='small'
-                  id='MnuUrlMen'
-                  label='Url'
-                  fullWidth
-                  required
-                  onChange={eventinput}
-                />
-                <TextField
-                  className={classList.file}
-                  variant='outlined'
-                  margin='normal'
-                  type='text'
-                  name='MnuLeyendMen'
-                  size='small'
-                  id='MnuLeyendMen'
-                  label='Leyenda'
-                  fullWidth
-                  required
-                  onChange={eventinput}
-                />
-              </form>
-            </div>
-          </ModalBody>
-          <ModalFooter>
-            <button
-              type='submit'
-              className='btn btn-success btn-sm'
-              form='formNewData'>
-              {" "}
-              Guardar
-            </button>{" "}
-            <button
-              className='btn btn-danger btn-sm'
-              onClick={() => abrirCerrarModal()}>
-              Cancelar
-            </button>
-          </ModalFooter>
-        </Modal>
-
-        {/* Modal que muestra los datos del rol a ser editado */}
-        <Modal isOpen={showModalEdit} className={classList.modal}>
-          <ModalHeader>Editar Menú</ModalHeader>
-          <ModalBody>
-            <div className='mb-3'>
-              <form
-                id='formUpdateData'
-                encType='multipart/form-data'
-                onSubmit={(e) => updateMenu(e)}>
-                <input type='hidden' name='MnuId' value={dataSelect.MnuId} />
-                <FormControl
-                  variant='outlined'
-                  className={classList.formControl}>
-                  <InputLabel htmlFor='outlined-age-native-simple'>
-                    Menú contenedor
-                  </InputLabel>
-                  <Select
-                    native
-                    value={dataSelect.MnuJerqMen}
-                    onChange={eventinput}
-                    label='Menú contenedor'
-                    inputProps={{
-                      name: "MnuJerqMen",
-                      id: "outlined-age-native-simple",
-                    }}>
-                    <option
-                      label={dataSelect.Jerarquia}
+          {/* Modal que muestra un formulario para agregar un nuevo rol */}
+          <Modal isOpen={showModal} className={classList.modal}>
+            <ModalHeader>Agregar Usuario</ModalHeader>
+            <ModalBody>
+              <div>
+                <form
+                  id='formNewData'
+                  encType='multipart/form-data'
+                  onSubmit={(e) => newMenu(e)}>
+                  <FormControl
+                    variant='outlined'
+                    className={classList.formControl}>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Menú contenedor
+                    </InputLabel>
+                    <Select
+                      native
                       value={dataSelect.MnuJerqMen}
-                    />
-                    <option value={1}>Administración</option>
-                    <option value={8}>Auditoría</option>
-                    <option value={2}>Catálogo</option>
-                    <option value={3}>Configuración</option>
-                    <option value={4}>Procesos</option>
-                    <option value={5}>Transacciones</option>
-                    <option value={6}>Usuarios</option>
-                    <option value={7}>Reportes</option>
-                  </Select>
-                </FormControl>
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='text'
-                  name='MnuNomMen'
-                  size='small'
-                  id='MnuNomMen'
-                  label='Nombre del menú'
-                  fullWidth
-                  autoFocus
-                  required
-                  value={dataSelect.MnuNomMen}
-                  onChange={eventinput}
-                />
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='number'
-                  name='MnuNivelMen'
-                  size='small'
-                  id='MnuNivelMen'
-                  label='Nivel'
-                  fullWidth
-                  required
-                  value={dataSelect.MnuNivelMen}
-                  onChange={eventinput}
-                />
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='text'
-                  name='MnuIconMen'
-                  size='small'
-                  id='MnuIconMen'
-                  label='Icono'
-                  fullWidth
-                  required
-                  value={dataSelect.MnuIconMen}
-                  onChange={eventinput}
-                />
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='text'
-                  name='MnuUrlMen'
-                  size='small'
-                  id='MnuUrlMen'
-                  label='Url'
-                  fullWidth
-                  value={dataSelect.MnuUrlMen}
-                  onChange={eventinput}
-                />
-                <TextField
-                  className={classList.file}
-                  variant='outlined'
-                  margin='normal'
-                  type='text'
-                  name='MnuLeyendMen'
-                  size='small'
-                  id='MnuLeyendMen'
-                  label='Leyenda'
-                  fullWidth
-                  required
-                  value={dataSelect.MnuLeyendMen}
-                  onChange={eventinput}
-                />
-                <TextField
-                  variant='outlined'
-                  margin='normal'
-                  type='text'
-                  name='MnuEstMen'
-                  size='small'
-                  id='MnuEstMen'
-                  label='Estado'
-                  fullWidth
-                  required
-                  value={dataSelect.MnuEstMen}
-                  onChange={eventinput}
-                />
-              </form>
-            </div>
-          </ModalBody>
-          <ModalFooter>
-            <button
-              type='submit'
-              className='btn btn-success btn-sm'
-              form='formUpdateData'>
-              {" "}
-              Editar
-            </button>{" "}
-            <button
-              className='btn btn-danger btn-sm'
-              onClick={() => abrirCerrarModalEdit()}>
-              Cancelar
-            </button>
-          </ModalFooter>
-        </Modal>
+                      onChange={eventinput}
+                      label='Menú contenedor'
+                      required
+                      inputProps={{
+                        name: "MnuJerqMen",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option aria-label='None' value='' />
+                      <option value={1}>Administración</option>
+                      <option value={8}>Auditoría</option>
+                      <option value={2}>Catálogo</option>
+                      <option value={3}>Configuración</option>
+                      <option value={4}>Procesos</option>
+                      <option value={5}>Transacciones</option>
+                      <option value={6}>Usuarios</option>
+                      <option value={7}>Reportes</option>
+                    </Select>
+                  </FormControl>
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='text'
+                    name='MnuNomMen'
+                    size='small'
+                    id='MnuNomMen'
+                    label='Nombre del menú'
+                    fullWidth
+                    autoFocus
+                    required
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='number'
+                    name='MnuNivelMen'
+                    size='small'
+                    id='MnuNivelMen'
+                    label='Nivel'
+                    minimum='0'
+                    maximum='1'
+                    fullWidth
+                    required
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='text'
+                    name='MnuIconMen'
+                    size='small'
+                    id='MnuIconMen'
+                    label='Icono'
+                    fullWidth
+                    required
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='text'
+                    name='MnuUrlMen'
+                    size='small'
+                    id='MnuUrlMen'
+                    label='Url'
+                    fullWidth
+                    required
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    className={classList.file}
+                    variant='outlined'
+                    margin='normal'
+                    type='text'
+                    name='MnuLeyendMen'
+                    size='small'
+                    id='MnuLeyendMen'
+                    label='Leyenda'
+                    fullWidth
+                    required
+                    onChange={eventinput}
+                  />
+                </form>
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <button
+                type='submit'
+                className='btn btn-success btn-sm'
+                form='formNewData'>
+                {" "}
+                Guardar
+              </button>{" "}
+              <button
+                className='btn btn-danger btn-sm'
+                onClick={() => abrirCerrarModal()}>
+                Cancelar
+              </button>
+            </ModalFooter>
+          </Modal>
 
-        {/* Modal para confirmación antes de eliminar un registro */}
-        <Modal isOpen={showModalDelete} className={classList.modal}>
-          <ModalHeader>Eliminar Usuario</ModalHeader>
-          <ModalBody>
-            <div className='mb-3'>
-              <p>
-                Está seguro de eliminar el usuario:&nbsp;
-                <strong>{dataSelect.MnuNomMen}</strong>
-              </p>
-            </div>
-          </ModalBody>
-          <ModalFooter>
-            <button
-              type='submit'
-              className='btn btn-success btn-sm'
-              onClick={() => deleteMenu()}>
-              {" "}
-              Aceptar
-            </button>{" "}
-            <button
-              className='btn btn-danger btn-sm'
-              onClick={() => abrirCerrarModalDelete()}>
-              Cancelar
-            </button>
-          </ModalFooter>
-        </Modal>
-      </Grid>
-      <Grid>
+          {/* Modal que muestra los datos del rol a ser editado */}
+          <Modal isOpen={showModalEdit} className={classList.modal}>
+            <ModalHeader>Editar Menú</ModalHeader>
+            <ModalBody>
+              <div className='mb-3'>
+                <form
+                  id='formUpdateData'
+                  encType='multipart/form-data'
+                  onSubmit={(e) => updateMenu(e)}>
+                  <input type='hidden' name='MnuId' value={dataSelect.MnuId} />
+                  <FormControl
+                    variant='outlined'
+                    className={classList.formControl}>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Menú contenedor
+                    </InputLabel>
+                    <Select
+                      native
+                      value={dataSelect.MnuJerqMen}
+                      onChange={eventinput}
+                      label='Menú contenedor'
+                      inputProps={{
+                        name: "MnuJerqMen",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option
+                        label={dataSelect.Jerarquia}
+                        value={dataSelect.MnuJerqMen}
+                      />
+                      <option value={1}>Administración</option>
+                      <option value={8}>Auditoría</option>
+                      <option value={2}>Catálogo</option>
+                      <option value={3}>Configuración</option>
+                      <option value={4}>Procesos</option>
+                      <option value={5}>Transacciones</option>
+                      <option value={6}>Usuarios</option>
+                      <option value={7}>Reportes</option>
+                    </Select>
+                  </FormControl>
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='text'
+                    name='MnuNomMen'
+                    size='small'
+                    id='MnuNomMen'
+                    label='Nombre del menú'
+                    fullWidth
+                    autoFocus
+                    required
+                    value={dataSelect.MnuNomMen}
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='number'
+                    name='MnuNivelMen'
+                    size='small'
+                    id='MnuNivelMen'
+                    label='Nivel'
+                    fullWidth
+                    required
+                    value={dataSelect.MnuNivelMen}
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='text'
+                    name='MnuIconMen'
+                    size='small'
+                    id='MnuIconMen'
+                    label='Icono'
+                    fullWidth
+                    required
+                    value={dataSelect.MnuIconMen}
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='text'
+                    name='MnuUrlMen'
+                    size='small'
+                    id='MnuUrlMen'
+                    label='Url'
+                    fullWidth
+                    value={dataSelect.MnuUrlMen}
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    className={classList.file}
+                    variant='outlined'
+                    margin='normal'
+                    type='text'
+                    name='MnuLeyendMen'
+                    size='small'
+                    id='MnuLeyendMen'
+                    label='Leyenda'
+                    fullWidth
+                    required
+                    value={dataSelect.MnuLeyendMen}
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='text'
+                    name='MnuEstMen'
+                    size='small'
+                    id='MnuEstMen'
+                    label='Estado'
+                    fullWidth
+                    required
+                    value={dataSelect.MnuEstMen}
+                    onChange={eventinput}
+                  />
+                </form>
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <button
+                type='submit'
+                className='btn btn-success btn-sm'
+                form='formUpdateData'>
+                {" "}
+                Editar
+              </button>{" "}
+              <button
+                className='btn btn-danger btn-sm'
+                onClick={() => abrirCerrarModalEdit()}>
+                Cancelar
+              </button>
+            </ModalFooter>
+          </Modal>
+
+          {/* Modal para confirmación antes de eliminar un registro */}
+          <Modal isOpen={showModalDelete} className={classList.modal}>
+            <ModalHeader>Eliminar Usuario</ModalHeader>
+            <ModalBody>
+              <div className='mb-3'>
+                <p>
+                  Está seguro de eliminar el usuario:&nbsp;
+                  <strong>{dataSelect.MnuNomMen}</strong>
+                </p>
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <button
+                type='submit'
+                className='btn btn-success btn-sm'
+                onClick={() => deleteMenu()}>
+                {" "}
+                Aceptar
+              </button>{" "}
+              <button
+                className='btn btn-danger btn-sm'
+                onClick={() => abrirCerrarModalDelete()}>
+                Cancelar
+              </button>
+            </ModalFooter>
+          </Modal>
+        </Grid>
         <Footer />
-      </Grid>
+      </main>
     </div>
   );
 };

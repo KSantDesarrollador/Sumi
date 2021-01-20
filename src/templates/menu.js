@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Avatar } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Badge from "@material-ui/core/Badge";
 import { AppBar, Toolbar, IconButton, Typography } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
@@ -16,12 +16,13 @@ import MenuIcon from "@material-ui/icons/Menu";
 import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import "../assets/css/dashStyles.css";
 
 const drawerWidth = 240;
 const stylesPage = makeStyles((theme) => ({
   root: {
-    flexGrow: 1,
+    display: "flex",
   },
   menuButton: {
     marginRight: "15px",
@@ -39,12 +40,6 @@ const stylesPage = makeStyles((theme) => ({
     width: "35px",
     height: "35px",
   },
-  menu: {
-    height: "55px",
-    top: 0,
-    width: "95%",
-    background: "rgba(85,125,234,1)",
-  },
   clock: {
     padding: "10px 0 10px 0",
     background: "#000000",
@@ -55,49 +50,63 @@ const stylesPage = makeStyles((theme) => ({
     background: "#000000",
     color: "#ffffff",
   },
-  paper: {
-    padding: theme.spacing(2),
-    display: "flex",
-    overflow: "auto",
-    flexDirection: "column",
+  hide: {
+    display: "none",
   },
-  drawerPaper: {
-    position: "absolute",
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  appBarShift: {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
     whiteSpace: "nowrap",
-    background: "rgba(85,125,234,1)",
-    color: "white",
     border: "none",
-    boxShadow: "2px 4px 3px solid black",
+  },
+  drawerOpen: {
+    backgroundColor: "#3393FF",
+    border: "none",
     width: drawerWidth,
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
   },
-  drawerPaperClose: {
-    overflowX: "hidden",
+  drawerClose: {
+    backgroundColor: "#3393FF",
+    border: "none",
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    width: theme.spacing(7),
+    overflowX: "hidden",
+    width: theme.spacing(7) + 1,
     [theme.breakpoints.up("sm")]: {
-      width: theme.spacing(9),
+      width: theme.spacing(9) + 1,
     },
   },
   toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
-  },
-  latMenIcon: {
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-end",
-    padding: "0 10px",
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
     ...theme.mixins.toolbar,
   },
-  name: {
-    marginLeft: "27px",
-    maxHeight: "40px",
+  content: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
   },
 }));
 
@@ -105,7 +114,8 @@ const session = new Cookies();
 
 const Menu = () => {
   const classList = stylesPage();
-  const [open, setOpen] = useState(false);
+  const theme = useTheme();
+  const [open, setOpen] = useState(true);
 
   let timerID = null;
   let timerRunning = false;
@@ -124,7 +134,7 @@ const Menu = () => {
     if (timeValue === "0") timeValue = 12;
     timeValue += (minutes < 10 ? ":0" : ":") + minutes;
     timeValue += (seconds < 10 ? ":0" : ":") + seconds;
-    timeValue += hours >= 12 ? "   P.M." : "   A.M.";
+    timeValue += hours >= 12 ? "    P.M." : "    A.M.";
     document.clock.hour.value = timeValue;
     timerID = setTimeout(showtime, 1000);
     timerRunning = true;
@@ -161,20 +171,23 @@ const Menu = () => {
   return (
     <div className={classList.root}>
       <CssBaseline />
-      <AppBar position='absolute' className={classList.menu}>
+      <AppBar
+        position='fixed'
+        className={clsx(classList.appBar, {
+          [classList.appBarShift]: open,
+        })}>
         <Toolbar>
           <IconButton
             edge='start'
             color='inherit'
             aria-label='open drawer'
             onClick={handleDrawerOpen}
-            className={clsx(
-              classList.menuButton,
-              open && classList.menuButtonHidden
-            )}>
-            <MenuIcon></MenuIcon>
+            className={clsx(classList.menuButton, {
+              [classList.hide]: open,
+            })}>
+            <MenuIcon />
           </IconButton>
-          <Typography variant='h5' className={classList.title}>
+          <Typography variant='h5' className={classList.title} noWrap>
             S.U.M.I
             <IconButton className={classList.logo}>
               <Avatar src={process.env.PUBLIC_URL + "/img/Logo.png"} alt='' />
@@ -204,15 +217,19 @@ const Menu = () => {
       </AppBar>
 
       <Drawer
+        position='fixed'
         variant='permanent'
+        className={clsx(classList.drawer, {
+          [classList.drawerOpen]: open,
+          [classList.drawerClose]: !open,
+        })}
         classes={{
-          paper: clsx(
-            classList.drawerPaper,
-            !open && classList.drawerPaperClose
-          ),
-        }}
-        open={open}>
-        <div className={classList.latMenIcon}>
+          paper: clsx({
+            [classList.drawerOpen]: open,
+            [classList.drawerClose]: !open,
+          }),
+        }}>
+        <div className={classList.toolbar}>
           <IconButton color='inherit' edge='start'>
             <Avatar
               src={process.env.PUBLIC_URL + "/img/avatar-male.png"}
@@ -223,9 +240,13 @@ const Menu = () => {
           <h6>{session.get("rol")}</h6>
           <IconButton
             onClick={handleDrawerClose}
-            className={classList.name}
+            // className={classList.name}
             color='inherit'>
-            <ChevronLeftIcon />
+            {theme.direction === "rtl" ? (
+              <ChevronRightIcon />
+            ) : (
+              <ChevronLeftIcon />
+            )}
           </IconButton>
         </div>
         <Divider />

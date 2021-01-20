@@ -10,12 +10,12 @@ const stylesPage = makeStyles(() => ({
   },
   text: {
     fontSize: 17,
-    color: "white",
+    color: "#676C71",
   },
   title: {
     fontWeight: "bold",
     fontSize: 20,
-    color: "white",
+    color: "#676C71",
   },
 }));
 

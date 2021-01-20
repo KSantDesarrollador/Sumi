@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
   },
   footer: {
     position: "fixed",
-    border: "1px solid #000000",
+    borderTop: "1px solid #000000",
     width: "100%",
     color: "#000000",
     backgroundColor: "rgba(255,255,255,0.8)",

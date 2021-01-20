@@ -19,27 +19,46 @@ import AssignmentIcon from "@material-ui/icons/Assignment"; //pedidos
 import LocalShippingIcon from "@material-ui/icons/LocalShipping"; //proveedores
 import "../assets/css/dashStyles.css";
 
-const stylesPage = makeStyles(() => ({
+const stylesPage = makeStyles((theme) => ({
   root: {
-    // flexGrow: 1,
+    display: "flex",
     backgroundImage: "url('/img/inicio.jpg')",
     overflow: "auto",
     backgroundPosition: "top",
     width: "100%",
-    height: "100vh",
+    height: "95vh",
   },
   icons: {
-    color: "white",
+    color: "#676C71",
     width: "40px",
-    height: "40px",
+    height: "25px",
   },
   contain: {
     marginTop: "30px",
     alignItems: "center",
     paddingTop: "15px",
   },
-  desk: {
-    padding: "6% 2% 0 7%",
+  toolbar: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+  },
+  content: {
+    flexGrow: 1,
+    padding: theme.spacing(2),
+    // width: "100%",
+  },
+  title: {
+    width: "100%",
+    fontFamily: "Dungeon",
+    textAlign: "center",
+    padding: "10px 0",
+    color: "#ffffff",
+    backgroundColor: "rgba(0,0,0,0.7)",
+    borderRadius: "10px",
   },
 }));
 
@@ -48,92 +67,97 @@ const Dashboard = () => {
 
   return (
     <div className={classList.root}>
-      <Grid item xs={12}>
-        <Menu />
-      </Grid>
-      <Grid container className={classList.desk}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={8} md={4} lg={4} xl={4}>
-            <CardsInfo
-              icon={<LocalGroceryStoreIcon className={classList.icons} />}
-              title='Compras'
-              text='10 compras registradas'
-              color='rgba(250,250,20,15)'
-              font='gray'
-            />
+      <Menu />
+      <main>
+        <Grid container className={classList.content}>
+          <div className={classList.toolbar}></div>
+          <Grid container spacing={2}>
+            <Grid container>
+              {" "}
+              <h4 className={classList.title}>
+                SISTEMA UNICO DE MANEJO DE INVENTARIOS
+              </h4>
+            </Grid>
+            <Grid item xs={12} sm={8} md={4} lg={4} xl={4}>
+              <CardsInfo
+                icon={<LocalGroceryStoreIcon className={classList.icons} />}
+                title='Compras'
+                text='10 compras registradas'
+                color='rgba(250,250,20,15)'
+                font='gray'
+              />
+            </Grid>
+            <Grid item xs={12} sm={8} md={4} lg={4} xl={4}>
+              <CardsInfo
+                icon={<AssignmentTurnedInIcon className={classList.icons} />}
+                title='Inventarios'
+                text='10 inventarios registradas'
+                color='rgba(250,250,20,15)'
+                font='gray'
+              />
+            </Grid>
+            <Grid item xs={12} sm={8} md={4} lg={4} xl={4}>
+              <CardsInfo
+                icon={<AssignmentIcon className={classList.icons} />}
+                title='Pedidos'
+                text='10 pedidos registradas'
+                color='rgba(250,250,20,15)'
+                font='gray'
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={8} md={4} lg={4} xl={4}>
-            <CardsInfo
-              icon={<AssignmentTurnedInIcon className={classList.icons} />}
-              title='Inventarios'
-              text='10 inventarios registradas'
-              color='rgba(250,250,20,15)'
-              font='gray'
-            />
+          <Grid
+            container
+            spacing={1}
+            className={classList.contain}
+            xs={12}
+            sm={12}
+            md={6}
+            lg={6}
+            xl={6}>
+            <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
+              <CardsAdmin
+                icon={<AssessmentIcon className={classList.icons} />}
+                title='Reportes'
+                text='1000 reportes registradas'
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
+              <CardsAdmin
+                icon={<EmojiPeopleIcon className={classList.icons} />}
+                title='Unidad Médica'
+                text='5 unidades registradas'
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
+              <CardsAdmin
+                icon={<LocalShippingIcon className={classList.icons} />}
+                title='Proveedores'
+                text='10 provedores registradas'
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
+              <CardsAdmin
+                icon={<StoreIcon className={classList.icons} />}
+                title='Bodegas'
+                text='10 bodegas registradas'
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={8} md={4} lg={4} xl={4}>
-            <CardsInfo
-              icon={<AssignmentIcon className={classList.icons} />}
-              title='Pedidos'
-              text='10 pedidos registradas'
-              color='rgba(250,250,20,15)'
-              font='gray'
-            />
+          <Grid item xs={0} sm={0} md={1} lg={1} xl={1}></Grid>
+          <Grid
+            className={classList.contain}
+            item
+            xs={12}
+            sm={12}
+            md={5}
+            lg={5}
+            xl={5}>
+            <Graphics />
           </Grid>
         </Grid>
-        <Grid
-          container
-          spacing={1}
-          className={classList.contain}
-          xs={12}
-          sm={12}
-          md={6}
-          lg={6}
-          xl={6}>
-          <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-            <CardsAdmin
-              icon={<AssessmentIcon className={classList.icons} />}
-              title='Reportes'
-              text='1000 reportes registradas'
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-            <CardsAdmin
-              icon={<EmojiPeopleIcon className={classList.icons} />}
-              title='Unidad Médica'
-              text='5 unidades médicas registradas'
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-            <CardsAdmin
-              icon={<LocalShippingIcon className={classList.icons} />}
-              title='Proveedores'
-              text='10 provedores registradas'
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-            <CardsAdmin
-              icon={<StoreIcon className={classList.icons} />}
-              title='Bodegas'
-              text='10 bodegas registradas'
-            />
-          </Grid>
-        </Grid>
-        <Grid item xs={0} sm={0} md={1} lg={1} xl={1}></Grid>
-        <Grid
-          className={classList.contain}
-          item
-          xs={12}
-          sm={12}
-          md={5}
-          lg={5}
-          xl={5}>
-          <Graphics />
-        </Grid>
-      </Grid>
-      <Grid item xs={0} sm={0} md={0}>
         <Footer />
-      </Grid>
+      </main>
     </div>
   );
 };

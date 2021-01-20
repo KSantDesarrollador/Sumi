@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Cookies from "universal-cookie";
 import axios from "axios";
 // importando componentes de material ui
+import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -37,20 +38,36 @@ const ServUrl = "http://localhost/SUMI/models/menuModel.php";
 
 const MainListItems = () => {
   const classList = stylesPage();
-  const [data, setData] = useState([]);
+  const [dataMenu, setDataMenu] = useState([]);
+  const [dataSubmenu, setDataSubmenu] = useState([]);
+  const [idSelect, setIdSelect] = useState(null);
   const [open, setOpen] = useState(false);
 
   const openList = () => {
+    listSubmenu();
     setOpen(!open);
   };
 
   // obteniendo datos de un servidor
   const listMenu = async () => {
     await axios
-      .get(ServUrl)
+      .get(ServUrl + "?rol=" + session.get("id"))
       .then((response) => {
-        setData(response.data);
-        console.log(response.data);
+        setDataMenu(response.data);
+        // console.log(response.data);
+      })
+      .catch((er) => {
+        console.log(er);
+      });
+  };
+
+  //obteniendo datos de un servidor
+  const listSubmenu = async () => {
+    await axios
+      .get(ServUrl + "?id=" + idSelect)
+      .then((response) => {
+        setDataSubmenu(response.data);
+        // console.log(response.data);
       })
       .catch((er) => {
         console.log(er);
@@ -59,7 +76,7 @@ const MainListItems = () => {
 
   useEffect(() => {
     listMenu();
-  }, []);
+  });
 
   const setDashboard = () => {
     let dash = "";
@@ -83,47 +100,57 @@ const MainListItems = () => {
     }
     return dash;
   };
-  console.log(data);
+  // console.log(dataMenu);
   return (
     <div className={classList.root}>
       <CssBaseline />
-      <div>
+      <List component='nav'>
         {" "}
-        <Link to={setDashboard()} className={classList.link}>
-          <ListItem button>
-            <ListItemIcon className={classList.icons}>
-              <DashboardIcon />
-            </ListItemIcon>
-            <ListItemText primary='Escritorio' />
-          </ListItem>
-        </Link>
-        <Divider />
-        {data.map((item) => (
-          <ListItem button onClick={openList}>
-            <Tooltip title={item.MnuLeyendMen} placement='right'>
+        <List component='ul'>
+          <Link to={setDashboard()} className={classList.link}>
+            <ListItem button>
               <ListItemIcon className={classList.icons}>
-                <i className={item.MnuIconMen} />
+                <DashboardIcon />
               </ListItemIcon>
-            </Tooltip>
-            <ListItemText primary={item.MnuNomMen} />
-            {open ? <ExpandLess /> : <ExpandMore />}
-          </ListItem>
-        ))}
-        {data.map((item) => (
-          <Collapse in={open} timeout='auto' unmountOnExit>
-            {/* <List component='div' disablePadding> */}
-            <Link to={item.MnuUrlMen} className={classList.link}>
-              {" "}
-              <ListItem button className={classList.nested}>
-                <ListItemIcon>
-                  <i className={item.MnuIconMen} />
-                </ListItemIcon>
-                <ListItemText primary={item.MnuNomMen} />
+              <ListItemText primary='Escritorio' />
+            </ListItem>
+          </Link>
+          <Divider />
+          <List component='li'>
+            {dataMenu.map((itemMenu) => (
+              <ListItem
+                button
+                onClick={() => {
+                  setIdSelect(itemMenu.MnuId);
+                }}>
+                <Tooltip title={itemMenu.MnuLeyendMen} placement='right'>
+                  <ListItemIcon className={classList.icons}>
+                    <i className={itemMenu.MnuIconMen} />
+                  </ListItemIcon>
+                </Tooltip>
+                <ListItemText primary={itemMenu.MnuNomMen} onClick={openList} />
+                {open ? <ExpandLess /> : <ExpandMore />}
               </ListItem>
-            </Link>
-          </Collapse>
-        ))}
-      </div>
+            ))}
+
+            {dataSubmenu.map((itemSubmenu) => (
+              <List component='ul'>
+                <Collapse in={open} timeout='auto' unmountOnExit>
+                  <Link to={itemSubmenu.MnuUrlMen} className={classList.link}>
+                    {" "}
+                    <ListItem button className={classList.nested}>
+                      <ListItemIcon>
+                        <i className={itemSubmenu.MnuIconMen} />
+                      </ListItemIcon>
+                      <ListItemText primary={itemSubmenu.MnuNomMen} />
+                    </ListItem>
+                  </Link>
+                </Collapse>
+              </List>
+            ))}
+          </List>
+        </List>
+      </List>
     </div>
   );
 };
