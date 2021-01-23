@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { Avatar } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Badge from "@material-ui/core/Badge";
 import { AppBar, Toolbar, IconButton, Typography } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
-import List from "@material-ui/core/List";
 import Drawer from "@material-ui/core/Drawer";
 import MainListItems from "./lateralMenu";
 import clsx from "clsx";
-import CssBaseline from "@material-ui/core/CssBaseline";
+import { CssBaseline, Hidden } from "@material-ui/core";
 import Cookies from "universal-cookie";
 
 // importando los iconos
@@ -25,7 +25,10 @@ const stylesPage = makeStyles((theme) => ({
     display: "flex",
   },
   menuButton: {
-    marginRight: "15px",
+    marginRight: theme.spacing(2),
+    [theme.breakpoints.up("sm")]: {
+      display: "none",
+    },
   },
   title: {
     flexGrow: 1,
@@ -54,12 +57,12 @@ const stylesPage = makeStyles((theme) => ({
     display: "none",
   },
   appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
+    [theme.breakpoints.up("sm")]: {
+      width: `calc(100% - ${drawerWidth}px)`,
+      marginLeft: drawerWidth,
+    },
   },
+
   appBarShift: {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
@@ -74,12 +77,15 @@ const stylesPage = makeStyles((theme) => ({
     whiteSpace: "nowrap",
     border: "none",
   },
+  drawerPaper: {
+    width: drawerWidth,
+  },
   drawerOpen: {
     backgroundColor: "#3393FF",
     border: "none",
     width: drawerWidth,
     transition: theme.transitions.create("width", {
-      easing: theme.transitions.easing.sharp,
+      easing: theme.transitions.easing.easeInOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
   },
@@ -87,7 +93,7 @@ const stylesPage = makeStyles((theme) => ({
     backgroundColor: "#3393FF",
     border: "none",
     transition: theme.transitions.create("width", {
-      easing: theme.transitions.easing.sharp,
+      easing: theme.transitions.easing.easeInOut,
       duration: theme.transitions.duration.leavingScreen,
     }),
     overflowX: "hidden",
@@ -100,7 +106,14 @@ const stylesPage = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-end",
-    padding: theme.spacing(0, 1),
+    padding: theme.spacing(0, 3),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+  },
+  infoUser: {
+    display: "flex",
+    alignItems: "center",
+    padding: theme.spacing(0, 2),
     // necessary for content to be below app bar
     ...theme.mixins.toolbar,
   },
@@ -112,10 +125,11 @@ const stylesPage = makeStyles((theme) => ({
 
 const session = new Cookies();
 
-const Menu = () => {
+const Menu = (props) => {
   const classList = stylesPage();
+  const { window } = props;
   const theme = useTheme();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   let timerID = null;
   let timerRunning = false;
@@ -134,7 +148,7 @@ const Menu = () => {
     if (timeValue === "0") timeValue = 12;
     timeValue += (minutes < 10 ? ":0" : ":") + minutes;
     timeValue += (seconds < 10 ? ":0" : ":") + seconds;
-    timeValue += hours >= 12 ? "    P.M." : "    A.M.";
+    timeValue += hours >= 12 ? "     P.M." : "     A.M.";
     document.clock.hour.value = timeValue;
     timerID = setTimeout(showtime, 1000);
     timerRunning = true;
@@ -146,10 +160,7 @@ const Menu = () => {
   };
 
   const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-  const handleDrawerClose = () => {
-    setOpen(false);
+    setOpen(!open);
   };
 
   const closeSession = () => {
@@ -168,23 +179,20 @@ const Menu = () => {
     startclock();
   });
 
+  const container =
+    window !== undefined ? () => window().document.body : undefined;
+
   return (
     <div className={classList.root}>
       <CssBaseline />
-      <AppBar
-        position='fixed'
-        className={clsx(classList.appBar, {
-          [classList.appBarShift]: open,
-        })}>
+      <AppBar position='fixed' className={classList.appBar}>
         <Toolbar>
           <IconButton
             edge='start'
             color='inherit'
             aria-label='open drawer'
             onClick={handleDrawerOpen}
-            className={clsx(classList.menuButton, {
-              [classList.hide]: open,
-            })}>
+            className={classList.menuButton}>
             <MenuIcon />
           </IconButton>
           <Typography variant='h5' className={classList.title} noWrap>
@@ -193,8 +201,8 @@ const Menu = () => {
               <Avatar src={process.env.PUBLIC_URL + "/img/Logo.png"} alt='' />
             </IconButton>
           </Typography>
-          <h5> Usuario conectado:</h5> &nbsp;&nbsp;
-          <h5 style={{ color: "black" }}> {session.get("name")}</h5>&nbsp;
+          <h5> Usuario:</h5> &nbsp;&nbsp;
+          <h5 style={{ color: "yellow" }}> {session.get("name")}</h5>&nbsp;
           <IconButton aria-label='show 4 new mails' color='inherit'>
             <Badge badgeContent={4} color='secondary'>
               <MailIcon />
@@ -215,59 +223,113 @@ const Menu = () => {
           </IconButton>
         </Toolbar>
       </AppBar>
-
-      <Drawer
-        position='fixed'
-        variant='permanent'
-        className={clsx(classList.drawer, {
-          [classList.drawerOpen]: open,
-          [classList.drawerClose]: !open,
-        })}
-        classes={{
-          paper: clsx({
-            [classList.drawerOpen]: open,
-            [classList.drawerClose]: !open,
-          }),
-        }}>
-        <div className={classList.toolbar}>
-          <IconButton color='inherit' edge='start'>
-            <Avatar
-              src={process.env.PUBLIC_URL + "/img/avatar-male.png"}
-              alt=''
-              className={classList.image}
-            />
-          </IconButton>
-          <h6>{session.get("rol")}</h6>
-          <IconButton
-            onClick={handleDrawerClose}
-            // className={classList.name}
-            color='inherit'>
-            {theme.direction === "rtl" ? (
-              <ChevronRightIcon />
-            ) : (
-              <ChevronLeftIcon />
-            )}
-          </IconButton>
-        </div>
-        <Divider />
-        <form name='clock' className={classList.clock}>
-          <strong>Hora</strong>
-          <br />
-          <input
-            type='button'
-            name='hour'
-            className={classList.hour}
-            disabled
-          />
-        </form>
-        <Divider />
-        <List>
-          <MainListItems />
-        </List>
-        <Divider />
-      </Drawer>
+      <nav>
+        <Hidden smUp implementation='css'>
+          <Drawer
+            container={container}
+            open={open}
+            variant='temporary'
+            anchor={theme.direction === "rtl" ? "right" : "left"}
+            // className={clsx(classList.drawer)}
+            classes={{
+              paper: clsx(
+                classList.drawerPaper,
+                classList.drawerOpen
+                // classList.drawerClose
+              ),
+            }}
+            ModalProps={{
+              keepMounted: true, // Better open performance on mobile.
+            }}>
+            <div className={classList.toolbar}>
+              <IconButton color='inherit' edge='start'>
+                <Avatar
+                  src={process.env.PUBLIC_URL + "/img/avatar-male.png"}
+                  alt=''
+                  className={classList.image}
+                />
+              </IconButton>
+              <h6>{session.get("rol")}</h6>
+              <IconButton
+                onClick={handleDrawerOpen}
+                // className={classList.name}
+                color='inherit'>
+                {theme.direction === "rtl" ? (
+                  <ChevronRightIcon />
+                ) : (
+                  <ChevronLeftIcon />
+                )}
+              </IconButton>
+            </div>
+            <Divider />
+            {/* <form name='clock' className={classList.clock}>
+              <strong>Hora</strong>
+              <br />
+              <input
+                type='button'
+                name='hour'
+                className={classList.hour}
+                disabled
+              />
+            </form> */}
+            <Divider />
+            <div>
+              <MainListItems />
+            </div>
+            <Divider />
+          </Drawer>
+        </Hidden>
+        <Hidden xsDown implementation='css' className={classList.drawer}>
+          <Drawer
+            open={open}
+            variant='permanent'
+            // className={clsx(classList.drawer)}
+            classes={{
+              paper: clsx(
+                classList.drawerPaper,
+                classList.drawerOpen
+                // classList.drawerClose
+              ),
+            }}>
+            <div className={classList.infoUser}>
+              <IconButton color='inherit' edge='start'>
+                <Avatar
+                  src={process.env.PUBLIC_URL + "/img/avatar-male.png"}
+                  alt=''
+                  className={classList.image}
+                />
+              </IconButton>
+              <h6>{session.get("rol")}</h6>
+            </div>
+            <Divider />
+            <form name='clock' className={classList.clock}>
+              <strong>Hora</strong>
+              <br />
+              <input
+                type='button'
+                name='hour'
+                className={classList.hour}
+                disabled
+              />
+            </form>
+            <Divider />
+            <div>
+              <MainListItems />
+            </div>
+            <Divider />
+          </Drawer>
+        </Hidden>
+      </nav>
     </div>
   );
+};
+
+Menu.propTypes = {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * You won't need it on your project.
+   */
+  window: PropTypes.func,
 };
 
 export default Menu;

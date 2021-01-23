@@ -44,7 +44,7 @@ const stylesPage = makeStyles((theme) => ({
   toolbar: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "flex-end",
+    // justifyContent: "flex-end",
     padding: theme.spacing(0, 1),
     // necessary for content to be below app bar
     ...theme.mixins.toolbar,
@@ -85,7 +85,7 @@ const Dashboard = () => {
               <CardsInfo
                 icon={<LocalGroceryStoreIcon className={classList.icons} />}
                 title='Compras'
-                text='10 compras registradas'
+                text='10 registros'
                 color='rgba(250,250,20,15)'
                 font='gray'
               />
@@ -94,7 +94,7 @@ const Dashboard = () => {
               <CardsInfo
                 icon={<AssignmentTurnedInIcon className={classList.icons} />}
                 title='Inventarios'
-                text='10 inventarios registradas'
+                text='10 registros'
                 color='rgba(250,250,20,15)'
                 font='gray'
               />
@@ -103,7 +103,7 @@ const Dashboard = () => {
               <CardsInfo
                 icon={<AssignmentIcon className={classList.icons} />}
                 title='Pedidos'
-                text='10 pedidos registradas'
+                text='10 registros'
                 color='rgba(250,250,20,15)'
                 font='gray'
               />
@@ -112,7 +112,7 @@ const Dashboard = () => {
               <CardsInfo
                 icon={<TransformIcon className={classList.icons} />}
                 title='Transacciones'
-                text='10 transacciones registradas'
+                text='10 registros'
                 color='rgba(250,250,20,15)'
                 font='gray'
               />
@@ -122,6 +122,7 @@ const Dashboard = () => {
             container
             spacing={1}
             className={classList.contain}
+            item
             xs={12}
             sm={12}
             md={6}
@@ -131,35 +132,35 @@ const Dashboard = () => {
               <CardsAdmin
                 icon={<AssessmentIcon className={classList.icons} />}
                 title='Reportes'
-                text='1000 reportes registradas'
+                text='1000 registros'
               />
             </Grid>
             <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
               <CardsAdmin
                 icon={<PeopleAltIcon className={classList.icons} />}
                 title='Usuarios'
-                text='10 usuarios registrados'
+                text='10 registrados'
               />
             </Grid>
             <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
               <CardsAdmin
                 icon={<EmojiPeopleIcon className={classList.icons} />}
                 title='Unidad Médica'
-                text='5 unidades registradas'
+                text='5 registros'
               />
             </Grid>
             <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
               <CardsAdmin
                 icon={<LocalShippingIcon className={classList.icons} />}
                 title='Proveedores'
-                text='10 provedores registradas'
+                text='10 registros'
               />
             </Grid>
             <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
               <CardsAdmin
                 icon={<StoreIcon className={classList.icons} />}
                 title='Bodegas'
-                text='10 bodegas registradas'
+                text='10 registros'
               />
             </Grid>
             <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
@@ -170,7 +171,7 @@ const Dashboard = () => {
               />
             </Grid>
           </Grid>
-          <Grid item xs={0} sm={0} md={1} lg={1} xl={1}></Grid>
+          <Grid item xs={false} sm={false} md={1} lg={1} xl={1}></Grid>
           <Grid
             className={classList.contain}
             item

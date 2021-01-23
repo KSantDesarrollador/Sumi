@@ -1,14 +1,13 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import Breadcrumbs from "@material-ui/core/Breadcrumbs";
+// import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Link from "@material-ui/core/Link";
 import HomeIcon from "@material-ui/icons/Home";
 import LanguageIcon from "@material-ui/icons/Language";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
+// import LinkedInIcon from "@material-ui/icons/LinkedIn";
 const useStyles = makeStyles((theme) => ({
   link: {
-    display: "flex",
     textDecoration: "none",
     right: 0,
   },
@@ -18,12 +17,15 @@ const useStyles = makeStyles((theme) => ({
     height: 20,
   },
   footer: {
+    display: "block",
     position: "fixed",
     borderTop: "1px solid #000000",
-    width: "100%",
+    width: "95%",
     color: "#000000",
     backgroundColor: "rgba(255,255,255,0.8)",
-    padding: "10px 37%",
+    textAlign: "center",
+    paddingTop: "8px",
+    paddingBottom: "8px",
     bottom: 0,
   },
 }));
@@ -38,30 +40,21 @@ export default function Footer() {
 
   return (
     <div>
-      <Breadcrumbs aria-label='breadcrumb' className={classList.footer}>
+      <div aria-label='breadcrumb' className={classList.footer}>
         <Typography className={classList.link}>
           <HomeIcon className={classList.icon} />
-          Softvak
+          Softvak &nbsp;
+          <Link
+            color='inherit'
+            href='/roles'
+            target='blank'
+            onClick={handleClick}
+            className={classList.link}>
+            <LanguageIcon className={classList.icon} />
+            Website
+          </Link>
         </Typography>
-        <Link
-          color='inherit'
-          href='https://www.linkedin.com'
-          target='blank'
-          onClick={handleClick}
-          className={classList.link}>
-          <LinkedInIcon className={classList.icon} />
-          LinkedIn
-        </Link>
-        <Link
-          color='inherit'
-          href='/roles'
-          target='blank'
-          onClick={handleClick}
-          className={classList.link}>
-          <LanguageIcon className={classList.icon} />
-          Website
-        </Link>
-      </Breadcrumbs>
+      </div>
     </div>
   );
 }

@@ -4,32 +4,43 @@ import { makeStyles } from "@material-ui/core/styles";
 import Cookies from "universal-cookie";
 import axios from "axios";
 // importando componentes de material ui
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import Collapse from "@material-ui/core/Collapse";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Divider from "@material-ui/core/Divider";
-import Tooltip from "@material-ui/core/Tooltip";
-// importando iconos
-import DashboardIcon from "@material-ui/icons/Dashboard";
-import ExpandLess from "@material-ui/icons/ExpandLess";
-import ExpandMore from "@material-ui/icons/ExpandMore";
+import { List, Tooltip, Divider, CssBaseline } from "@material-ui/core";
 
-const stylesPage = makeStyles(() => ({
+const stylesPage = makeStyles((theme) => ({
   root: {
-    flexGrow: 1,
-    color: "white",
+    width: "100%",
+    maxWidth: 360,
+    backgroundColor: "#3393FF",
+    position: "relative",
+    overflowX: "hidden",
+    maxHeight: "auto",
+    color: "#ffffff",
+  },
+  listSection: {
+    backgroundColor: "inherit",
+  },
+  ul: {
+    backgroundColor: "inherit",
+    padding: 0,
   },
   icons: {
     color: "white",
-    fontSize: "25px",
-    verticalAlign: "center",
+    fontSize: "20px",
+    width: "10%",
   },
-  link: {
+  list: {
     textDecoration: "none",
     color: "white",
+    background: "#3393FF",
+    fontSize: 10,
+  },
+  nested: {
+    paddingLeft: theme.spacing(2),
+    width: "100%",
+  },
+  text: {
+    fontSize: "40px",
+    background: "rgba(0,0,0,0.1)",
   },
 }));
 
@@ -40,13 +51,6 @@ const MainListItems = () => {
   const classList = stylesPage();
   const [dataMenu, setDataMenu] = useState([]);
   const [dataSubmenu, setDataSubmenu] = useState([]);
-  const [idSelect, setIdSelect] = useState(null);
-  const [open, setOpen] = useState(false);
-
-  const openList = () => {
-    listSubmenu();
-    setOpen(!open);
-  };
 
   // obteniendo datos de un servidor
   const listMenu = async () => {
@@ -54,7 +58,6 @@ const MainListItems = () => {
       .get(ServUrl + "?rol=" + session.get("id"))
       .then((response) => {
         setDataMenu(response.data);
-        // console.log(response.data);
       })
       .catch((er) => {
         console.log(er);
@@ -62,12 +65,12 @@ const MainListItems = () => {
   };
 
   //obteniendo datos de un servidor
-  const listSubmenu = async () => {
+  const listSubmenu = async (idSelect) => {
     await axios
       .get(ServUrl + "?id=" + idSelect)
       .then((response) => {
         setDataSubmenu(response.data);
-        // console.log(response.data);
+        showSubmenu(idSelect);
       })
       .catch((er) => {
         console.log(er);
@@ -77,6 +80,28 @@ const MainListItems = () => {
   useEffect(() => {
     listMenu();
   });
+
+  const showSubmenu = (id) => {
+    let allMenu = document.querySelectorAll(".sub-menu-options");
+    var i;
+    let menu = document.getElementById(id);
+    let subMenu = menu.nextElementSibling;
+    let icon = menu.lastChild;
+    console.log(allMenu);
+    if (subMenu.classList.contains("sub-menu-options-show")) {
+      subMenu.classList.remove("sub-menu-options-show");
+      icon.classList.replace("zmdi-chevron-down", "zmdi-chevron-left");
+    } else {
+      for (i = 0; i < allMenu.length; i++) {
+        if (allMenu[i].classList.contains("sub-menu-options-show")) {
+          allMenu[i].classList.remove("sub-menu-options-show");
+        }
+      }
+      subMenu.classList.add("sub-menu-options-show");
+      icon.classList.replace("zmdi-chevron-left", "zmdi-chevron-down");
+    }
+    // e.stopPropagation();
+  };
 
   const setDashboard = () => {
     let dash = "";
@@ -102,56 +127,60 @@ const MainListItems = () => {
   };
   // console.log(dataMenu);
   return (
-    <div className={classList.root}>
+    <List className='full-width'>
       <CssBaseline />
-      <List component='nav'>
-        {" "}
-        <List component='ul'>
-          <Link to={setDashboard()} className={classList.link}>
-            <ListItem button>
-              <ListItemIcon className={classList.icons}>
-                <DashboardIcon />
-              </ListItemIcon>
-              <ListItemText primary='Escritorio' />
-            </ListItem>
+      <ul className='full-width list-unstyle menu-principal'>
+        <li className='full-width'>
+          <Link to={setDashboard} className='full-width'>
+            <div className='navLateral-body-cl'>
+              <Tooltip title='Escritorio' placement='right'>
+                <i className='zmdi zmdi-view-dashboard' id='KsvmEscritorio'></i>
+              </Tooltip>
+            </div>
+            <div className='navLateral-body-cr'>ESCRITORIO</div>
           </Link>
-          <Divider />
-          <List component='li'>
-            {dataMenu.map((itemMenu) => (
-              <ListItem
-                button
-                onClick={() => {
-                  setIdSelect(itemMenu.MnuId);
-                }}>
+        </li>
+        <Divider />
+        <li className='full-width divider-menu-h'></li>
+        {dataMenu.map((itemMenu) => (
+          <li
+            key={itemMenu.MnuId}
+            className='full-width'
+            onClick={() => {
+              listSubmenu(itemMenu.MnuId);
+            }}>
+            <Link to='#' className='full-width btn-subMenu' id={itemMenu.MnuId}>
+              <div className='navLateral-body-cl'>
                 <Tooltip title={itemMenu.MnuLeyendMen} placement='right'>
-                  <ListItemIcon className={classList.icons}>
-                    <i className={itemMenu.MnuIconMen} />
-                  </ListItemIcon>
+                  <i className={itemMenu.MnuIconMen}></i>
                 </Tooltip>
-                <ListItemText primary={itemMenu.MnuNomMen} onClick={openList} />
-                {open ? <ExpandLess /> : <ExpandMore />}
-              </ListItem>
-            ))}
-
-            {dataSubmenu.map((itemSubmenu) => (
-              <List component='ul'>
-                <Collapse in={open} timeout='auto' unmountOnExit>
-                  <Link to={itemSubmenu.MnuUrlMen} className={classList.link}>
-                    {" "}
-                    <ListItem button className={classList.nested}>
-                      <ListItemIcon>
-                        <i className={itemSubmenu.MnuIconMen} />
-                      </ListItemIcon>
-                      <ListItemText primary={itemSubmenu.MnuNomMen} />
-                    </ListItem>
+              </div>
+              <div className='navLateral-body-cr'>{itemMenu.MnuNomMen}</div>
+              <span
+                className={`zmdi zmdi-chevron-left ${classList.icons}`}></span>
+            </Link>
+            <ul className='full-width menu-principal sub-menu-options'>
+              {dataSubmenu.map((itemSubmenu) => (
+                <li className='full-width' key={itemSubmenu.MnuId}>
+                  <Link to={itemSubmenu.MnuUrlMen} className='full-width'>
+                    <div className='navLateral-body-cl'>
+                      <Tooltip
+                        title={itemSubmenu.MnuLeyendMen}
+                        placement='right'>
+                        <i className={itemSubmenu.MnuIconMen}></i>
+                      </Tooltip>
+                    </div>
+                    <div className='navLateral-body-cr'>
+                      {itemSubmenu.MnuNomMen}
+                    </div>
                   </Link>
-                </Collapse>
-              </List>
-            ))}
-          </List>
-        </List>
-      </List>
-    </div>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    </List>
   );
 };
 

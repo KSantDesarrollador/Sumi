@@ -6,7 +6,6 @@ import axios from "axios";
 import MaterialTable from "material-table";
 import TextField from "@material-ui/core/TextField";
 import InputLabel from "@material-ui/core/InputLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 // importando los iconos
@@ -64,6 +63,7 @@ const ServUrl = "http://localhost/SUMI/models/menuModel.php";
 const MenuData = () => {
   const classList = stylesPage();
   const [data, setData] = useState([]);
+  const [datalistSelect, setDatalistSelect] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
@@ -77,6 +77,11 @@ const MenuData = () => {
     MnuUrlMen: "",
     MnuLeyendMen: "",
     MnuEstMen: "",
+  });
+
+  const [jerqSelect, setJerqSelect] = useState({
+    MnuId: "",
+    MnuNomMen: "",
   });
   const abrirCerrarModal = () => {
     setShowModal(!showModal);
@@ -104,7 +109,18 @@ const MenuData = () => {
       .get(ServUrl)
       .then((response) => {
         setData(response.data);
-        console.log(response.data);
+      })
+      .catch((er) => {
+        console.log(er);
+      });
+  };
+
+  // llenando select
+  const listSelect = async () => {
+    await axios
+      .get(ServUrl + "?sel=0")
+      .then((response) => {
+        setDatalistSelect(response.data);
       })
       .catch((er) => {
         console.log(er);
@@ -113,7 +129,20 @@ const MenuData = () => {
 
   useEffect(() => {
     listMenu();
+    listSelect();
   }, []);
+
+  // obteniendo datos de un servidor
+  const listJerarquia = async () => {
+    await axios
+      .get(ServUrl + "?jer=" + dataSelect.MnuJerqMen)
+      .then((response) => {
+        setJerqSelect(response.data);
+      })
+      .catch((er) => {
+        console.log(er);
+      });
+  };
 
   // Esta función guarda los datos de un nuevo rol
   const newMenu = async (e) => {
@@ -157,11 +186,11 @@ const MenuData = () => {
         { headers: { "Content-Type": "multipart/form-data" } }
       )
       .then((response) => {
-        console.log(response.data);
         let newData = data;
         newData.map((info) => {
           if (info.MnuId === dataSelect.MnuId) {
             info.MnuJerqMen = dataSelect.MnuJerqMen;
+            info.Jerarquia = dataSelect.Jerarquia;
             info.MnuNomMen = dataSelect.MnuNomMen;
             info.MnuNivelMen = dataSelect.MnuNivelMen;
             info.MnuIconMen = dataSelect.MnuIconMen;
@@ -199,6 +228,7 @@ const MenuData = () => {
   const selectedItem = (menu, type) => {
     setDataSelect(menu);
     if (type === "Edit") {
+      listJerarquia();
       abrirCerrarModalEdit();
     } else {
       abrirCerrarModalDelete();
@@ -213,7 +243,6 @@ const MenuData = () => {
     { title: "NIVEL", field: "MnuNivelMen" },
     { title: "ICONO", field: "MnuIconMen" },
     { title: "URL", field: "MnuUrlMen" },
-    { title: "LEYENDA", field: "MnuLeyendMen" },
     { title: "ESTADO", field: "MnuEstMen" },
   ];
 
@@ -231,7 +260,9 @@ const MenuData = () => {
               <div className='d-grid gap-2 d-md-flex justify-content-md-end'>
                 <button
                   className='btn btn-warning me-md-2'
-                  onClick={() => abrirCerrarModal()}>
+                  onClick={() => {
+                    abrirCerrarModal();
+                  }}>
                   <AddIcon />
                 </button>
               </div>
@@ -265,14 +296,17 @@ const MenuData = () => {
                     color: "#000000",
                     fontWeight: "700",
                     border: "none",
-                    fontSize: "17px",
+                    fontSize: "15px",
                   },
                   actionsCellStyle: {
                     // background: "#96acc0",
                     color: "#000000",
                     borderBottom: "1px solid #96acc0",
                   },
-                  cellStyle: { borderBottom: "1px solid #96acc0" },
+                  cellStyle: {
+                    borderBottom: "1px solid #96acc0",
+                    fontSize: "13px",
+                  },
                 }}
                 localization={{
                   header: {
@@ -328,15 +362,12 @@ const MenuData = () => {
                         name: "MnuJerqMen",
                         id: "outlined-age-native-simple",
                       }}>
-                      <option aria-label='None' value='' />
-                      <option value={1}>Administración</option>
-                      <option value={8}>Auditoría</option>
-                      <option value={2}>Catálogo</option>
-                      <option value={3}>Configuración</option>
-                      <option value={4}>Procesos</option>
-                      <option value={5}>Transacciones</option>
-                      <option value={6}>Usuarios</option>
-                      <option value={7}>Reportes</option>
+                      <option key='0' aria-label='' value='' />
+                      {datalistSelect.map((item, index) => (
+                        <option key={index} value={item.MnuId} label=''>
+                          {item.MnuNomMen}
+                        </option>
+                      ))}
                     </Select>
                   </FormControl>
                   <TextField
@@ -448,17 +479,14 @@ const MenuData = () => {
                         id: "outlined-age-native-simple",
                       }}>
                       <option
-                        label={dataSelect.Jerarquia}
-                        value={dataSelect.MnuJerqMen}
+                        label={jerqSelect.MnuNomMen}
+                        value={jerqSelect.MnuId}
                       />
-                      <option value={1}>Administración</option>
-                      <option value={8}>Auditoría</option>
-                      <option value={2}>Catálogo</option>
-                      <option value={3}>Configuración</option>
-                      <option value={4}>Procesos</option>
-                      <option value={5}>Transacciones</option>
-                      <option value={6}>Usuarios</option>
-                      <option value={7}>Reportes</option>
+                      {datalistSelect.map((item, index) => (
+                        <option key={index} value={item.MnuId} label=''>
+                          {item.MnuNomMen}
+                        </option>
+                      ))}
                     </Select>
                   </FormControl>
                   <TextField

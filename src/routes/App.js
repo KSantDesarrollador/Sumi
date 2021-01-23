@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 import Login from "../pages/login";
 import DashAdmin from "../pages/dashAdmin";
@@ -10,6 +9,7 @@ import DashUser from "../pages/dashUser";
 import MenuData from "../pages/menuData";
 import RolData from "../pages/rolData";
 import UserData from "../pages/userData";
+import ProductData from "../pages/productData";
 
 export default class App extends Component {
   state = {
@@ -28,6 +28,7 @@ export default class App extends Component {
           <Route path='/menus' component={MenuData}></Route>
           <Route path='/roles' component={RolData}></Route>
           <Route path='/users' component={UserData}></Route>
+          <Route path='/products' component={ProductData}></Route>
         </Switch>
       </Router>
     );
