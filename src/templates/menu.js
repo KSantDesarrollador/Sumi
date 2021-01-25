@@ -127,7 +127,7 @@ const session = new Cookies();
 
 const Menu = (props) => {
   const classList = stylesPage();
-  const { window } = props;
+  // const { window } = props;
   const theme = useTheme();
   const [open, setOpen] = useState(false);
 
@@ -148,7 +148,7 @@ const Menu = (props) => {
     if (timeValue === "0") timeValue = 12;
     timeValue += (minutes < 10 ? ":0" : ":") + minutes;
     timeValue += (seconds < 10 ? ":0" : ":") + seconds;
-    timeValue += hours >= 12 ? "     P.M." : "     A.M.";
+    timeValue += hours >= 12 ? "  P.M." : "  A.M.";
     document.clock.hour.value = timeValue;
     timerID = setTimeout(showtime, 1000);
     timerRunning = true;
@@ -179,8 +179,8 @@ const Menu = (props) => {
     startclock();
   });
 
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
+  // const container =
+  //   window !== undefined ? () => window().document.body : undefined;
 
   return (
     <div className={classList.root}>
@@ -226,7 +226,7 @@ const Menu = (props) => {
       <nav>
         <Hidden smUp implementation='css'>
           <Drawer
-            container={container}
+            // container={container}
             open={open}
             variant='temporary'
             anchor={theme.direction === "rtl" ? "right" : "left"}

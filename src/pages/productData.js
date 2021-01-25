@@ -372,157 +372,167 @@ const ProductData = () => {
             </Grid>
           </Grid>
           {/* Modal que muestra un formulario para agregar un nuevo rol */}
-          <Modal isOpen={showModal} className={classList.modal}>
+          <Modal isOpen={showModal} className={classList.modal} size='lg'>
             <ModalHeader>Agregar Producto</ModalHeader>
             <ModalBody>
-              <div>
-                <form
-                  id='formNewData'
-                  encType='multipart/form-data'
-                  onSubmit={(e) => newProduct(e)}>
-                  <FormControl
-                    variant='outlined'
-                    className={classList.formControl}>
-                    <InputLabel htmlFor='outlined-age-native-simple'>
-                      Seleccione una categoría
-                    </InputLabel>
-                    <Select
-                      native
-                      value={dataSelect.CtgId}
-                      onChange={eventinput}
-                      label='Seleccione una categoría'
+              <form
+                id='formNewData'
+                encType='multipart/form-data'
+                onSubmit={(e) => newProduct(e)}>
+                <Grid container spacing={1}>
+                  <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+                    <FormControl
+                      size='small'
+                      variant='outlined'
+                      className={classList.formControl}>
+                      <InputLabel htmlFor='outlined-age-native-simple'>
+                        Seleccione una categoría
+                      </InputLabel>
+                      <Select
+                        native
+                        value={dataSelect.CtgId}
+                        onChange={eventinput}
+                        label='Seleccione una categoría'
+                        required
+                        inputProps={{
+                          name: "CtgId",
+                          id: "outlined-age-native-simple",
+                        }}>
+                        <option aria-label='None' value='' />
+                        <option value={1}>General</option>
+                        <option value={2}>Antídoto</option>
+                        <option value={3}></option>
+                        <option value={4}></option>
+                      </Select>
+                    </FormControl>
+                    &nbsp;
+                    <FormControl
+                      size='small'
+                      variant='outlined'
+                      className={classList.formControl}>
+                      <InputLabel htmlFor='outlined-age-native-simple'>
+                        Nivel de Prescripción
+                      </InputLabel>
+                      <Select
+                        native
+                        value={dataSelect.MdcNivPrescMed}
+                        onChange={eventinput}
+                        label='Nivel de Prescripción'
+                        required
+                        inputProps={{
+                          name: "MdcNivPrescMed",
+                          id: "outlined-age-native-simple",
+                        }}>
+                        <option aria-label='None' value='' />
+                        <option value={"O"}>O</option>
+                        <option value={"P"}>P</option>
+                        <option value={"E"}>E</option>
+                        <option value={"PE"}>PE</option>
+                      </Select>
+                    </FormControl>
+                    <TextField
+                      variant='outlined'
+                      margin='normal'
+                      type='text'
+                      name='MdcCodMed'
+                      size='small'
+                      id='MdcCodMed'
+                      label='Código de Producto'
+                      fullWidth
+                      autoFocus
                       required
-                      inputProps={{
-                        name: "CtgId",
-                        id: "outlined-age-native-simple",
-                      }}>
-                      <option aria-label='None' value='' />
-                      <option value={1}>General</option>
-                      <option value={2}>Antídoto</option>
-                      <option value={3}></option>
-                      <option value={4}></option>
-                    </Select>
-                  </FormControl>
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='MdcCodMed'
-                    size='small'
-                    id='MdcCodMed'
-                    label='Código de Producto'
-                    fullWidth
-                    autoFocus
-                    required
-                    onChange={eventinput}
-                  />
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='MdcDescMed'
-                    size='small'
-                    id='MdcDescMed'
-                    label='Nombre de Producto'
-                    fullWidth
-                    autoFocus
-                    required
-                    onChange={eventinput}
-                  />
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='MdcPresenMed'
-                    size='small'
-                    id='MdcPresenMed'
-                    label='Presentación'
-                    fullWidth
-                    required
-                    onChange={eventinput}
-                  />
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='MdcConcenMed'
-                    size='small'
-                    id='MdcConcenMed'
-                    label='Concentración'
-                    fullWidth
-                    required
-                    onChange={eventinput}
-                  />
-                  <FormControl
-                    variant='outlined'
-                    className={classList.formControl}>
-                    <InputLabel htmlFor='outlined-age-native-simple'>
-                      Nivel de Prescripción
-                    </InputLabel>
-                    <Select
-                      native
-                      value={dataSelect.MdcNivPrescMed}
                       onChange={eventinput}
-                      label='Nivel de Prescripción'
+                    />
+                    <TextField
+                      variant='outlined'
+                      margin='normal'
+                      type='text'
+                      name='MdcPresenMed'
+                      size='small'
+                      id='MdcPresenMed'
+                      label='Presentación'
+                      fullWidth
                       required
-                      inputProps={{
-                        name: "MdcNivPrescMed",
-                        id: "outlined-age-native-simple",
-                      }}>
-                      <option aria-label='None' value='' />
-                      <option value={"O"}>O</option>
-                      <option value={"P"}>P</option>
-                      <option value={"E"}>E</option>
-                      <option value={"PE"}>PE</option>
-                    </Select>
-                  </FormControl>
-                  <FormControl
-                    variant='outlined'
-                    className={classList.formControl}>
-                    <InputLabel htmlFor='outlined-age-native-simple'>
-                      Nivel de Atención
-                    </InputLabel>
-                    <Select
-                      native
-                      value={dataSelect.MdcNivAtencMed}
                       onChange={eventinput}
-                      label='Nivel de Atención'
-                      inputProps={{
-                        name: "MdcNivAtencMed",
-                        id: "outlined-age-native-simple",
-                      }}>
-                      <option aria-label='None' value='' />
-                      <option value={"I"}>Nivel 1</option>
-                      <option value={"II"}>Nivel 2</option>
-                      <option value={"III"}>Nivel 3</option>
-                      <option value={"I-II"}>Nivel 1-2</option>
-                      <option value={"I-III"}>Nivel 1-3</option>
-                      <option value={"I-II-III"}>Nivel 1-2-3</option>
-                      <option value={"II-III"}>Nivel 2-3</option>
-                    </Select>
-                  </FormControl>
-                  <FormControl
-                    variant='outlined'
-                    className={classList.formControl}>
-                    <InputLabel htmlFor='outlined-age-native-simple'>
-                      Vía de administración
-                    </InputLabel>
-                    <Select
-                      native
-                      value={dataSelect.MdcViaAdmMed}
+                    />
+                  </Grid>
+                  <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+                    <FormControl
+                      size='small'
+                      variant='outlined'
+                      className={classList.formControl}>
+                      <InputLabel htmlFor='outlined-age-native-simple'>
+                        Nivel de Atención
+                      </InputLabel>
+                      <Select
+                        native
+                        value={dataSelect.MdcNivAtencMed}
+                        onChange={eventinput}
+                        label='Nivel de Atención'
+                        inputProps={{
+                          name: "MdcNivAtencMed",
+                          id: "outlined-age-native-simple",
+                        }}>
+                        <option aria-label='None' value='' />
+                        <option value={"I"}>Nivel 1</option>
+                        <option value={"II"}>Nivel 2</option>
+                        <option value={"III"}>Nivel 3</option>
+                        <option value={"I-II"}>Nivel 1-2</option>
+                        <option value={"I-III"}>Nivel 1-3</option>
+                        <option value={"I-II-III"}>Nivel 1-2-3</option>
+                        <option value={"II-III"}>Nivel 2-3</option>
+                      </Select>
+                    </FormControl>
+                    &nbsp;
+                    <FormControl
+                      size='small'
+                      variant='outlined'
+                      className={classList.formControl}>
+                      <InputLabel htmlFor='outlined-age-native-simple'>
+                        Vía de administración
+                      </InputLabel>
+                      <Select
+                        native
+                        value={dataSelect.MdcViaAdmMed}
+                        onChange={eventinput}
+                        label='Vía de administración'
+                        inputProps={{
+                          name: "MdcViaAdmMed",
+                          id: "outlined-age-native-simple",
+                        }}>
+                        <option aria-label='None' value='' />
+                        <option value={"O"}>O</option>
+                        <option value={"P"}>P</option>
+                        <option value={"E"}>E</option>
+                        <option value={"PE"}>PE</option>
+                      </Select>
+                    </FormControl>
+                    <TextField
+                      variant='outlined'
+                      margin='normal'
+                      type='text'
+                      name='MdcDescMed'
+                      size='small'
+                      id='MdcDescMed'
+                      label='Nombre de Producto'
+                      fullWidth
+                      autoFocus
+                      required
                       onChange={eventinput}
-                      label='Vía de administración'
-                      inputProps={{
-                        name: "MdcViaAdmMed",
-                        id: "outlined-age-native-simple",
-                      }}>
-                      <option aria-label='None' value='' />
-                      <option value={"O"}>O</option>
-                      <option value={"P"}>P</option>
-                      <option value={"E"}>E</option>
-                      <option value={"PE"}>PE</option>
-                    </Select>
-                  </FormControl>
+                    />
+                    <TextField
+                      variant='outlined'
+                      margin='normal'
+                      type='text'
+                      name='MdcConcenMed'
+                      size='small'
+                      id='MdcConcenMed'
+                      label='Concentración'
+                      fullWidth
+                      required
+                      onChange={eventinput}
+                    />
+                  </Grid>
                   <TextField
                     className={classList.file}
                     variant='standard'
@@ -536,8 +546,8 @@ const ProductData = () => {
                     onChange={eventinput}
                   />
                   <label for='MdcFotoMed'>Imagen de Producto</label>
-                </form>
-              </div>
+                </Grid>
+              </form>
             </ModalBody>
             <ModalFooter>
               <button

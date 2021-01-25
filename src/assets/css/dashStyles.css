@@ -4,6 +4,22 @@ body{
    
 }
 
+.alertHide {
+	display:none;
+	padding-left: 0 10px 0 10px;
+}
+
+.alertShow {
+	display:block;
+	padding-left: 0 10px 0 10px;
+}
+
+.activo{
+	transition: all cubic-bezier(0.19, 1, 0.22, 1) ease-in-out;
+	background-color: blue;
+	color: #000000;
+}
+
 .full-width {
 	margin: 0;
 	padding: 0;
@@ -161,7 +177,7 @@ body{
 	height: 0;
 	overflow-y: hidden;
 	overflow-x: hidden;
-	background: rgba(0, 0, 0, 0.1);
+	background: rgba(0, 0, 0, 0.2);
 	transition: all 0.5s ease-in-out;
 }
 
@@ -177,7 +193,7 @@ body{
 	height: auto !important;
 	overflow-y: auto !important;
    overflow-x: hidden;
-   transition: all 3s ease-in-out;
+   transition: all cubic-bezier(0.19, 1, 0.22, 3) ease-in-out;
 }
 
 /*Tablet*/

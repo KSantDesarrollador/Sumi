@@ -82,25 +82,41 @@ const MainListItems = () => {
   });
 
   const showSubmenu = (id) => {
-    let allMenu = document.querySelectorAll(".sub-menu-options");
-    var i;
     let menu = document.getElementById(id);
     let subMenu = menu.nextElementSibling;
     let icon = menu.lastChild;
-    console.log(allMenu);
+    let allMenu = document.querySelectorAll(".sub-menu-options");
+    let allIcon = document.querySelectorAll(".span");
+    let allContainer = document.querySelectorAll(".btn-subMenu");
+
     if (subMenu.classList.contains("sub-menu-options-show")) {
-      subMenu.classList.remove("sub-menu-options-show");
+      menu.classList.remove("activo");
       icon.classList.replace("zmdi-chevron-down", "zmdi-chevron-left");
+      subMenu.classList.remove("sub-menu-options-show");
     } else {
-      for (i = 0; i < allMenu.length; i++) {
+      for (let i = 0; i < allMenu.length; i++) {
         if (allMenu[i].classList.contains("sub-menu-options-show")) {
           allMenu[i].classList.remove("sub-menu-options-show");
         }
       }
-      subMenu.classList.add("sub-menu-options-show");
+      for (let j = 0; j < allIcon.length; j++) {
+        if (allIcon[j].classList.contains("zmdi-chevron-down")) {
+          allIcon[j].classList.replace(
+            "zmdi-chevron-down",
+            "zmdi-chevron-left"
+          );
+        }
+      }
+      for (let k = 0; k < allContainer.length; k++) {
+        if (allContainer[k].classList.contains("activo")) {
+          allContainer[k].classList.remove("activo");
+        }
+      }
+
+      menu.classList.add("activo");
       icon.classList.replace("zmdi-chevron-left", "zmdi-chevron-down");
+      subMenu.classList.add("sub-menu-options-show");
     }
-    // e.stopPropagation();
   };
 
   const setDashboard = () => {
@@ -157,7 +173,7 @@ const MainListItems = () => {
               </div>
               <div className='navLateral-body-cr'>{itemMenu.MnuNomMen}</div>
               <span
-                className={`zmdi zmdi-chevron-left ${classList.icons}`}></span>
+                className={`zmdi zmdi-chevron-left span ${classList.icons}`}></span>
             </Link>
             <ul className='full-width menu-principal sub-menu-options'>
               {dataSubmenu.map((itemSubmenu) => (
