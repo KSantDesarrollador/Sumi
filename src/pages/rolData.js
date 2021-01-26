@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
-import { makeStyles } from "@material-ui/core/styles";
-import { Grid } from "@material-ui/core";
+import { Modal, ModalBody, ModalFooter, ModalHeader, Button } from "reactstrap";
+import { makeStyles, Grid, TextField, Tooltip } from "@material-ui/core";
 import axios from "axios";
-import MaterialTable from "material-table";
-import TextField from "@material-ui/core/TextField";
-
-// importando los iconos
-import AssistantIcon from "@material-ui/icons/Assistant";
-import AddIcon from "@material-ui/icons/Add";
 // importandom los componentes
 import Menu from "../templates/menu";
 import Footer from "../templates/footer";
+import HeaderPage from "./components/headerPage";
+import DataTable from "./components/dataTable";
+import AllAlerts from "./components/alerts";
 
 const stylesPage = makeStyles((theme) => ({
   root: {
@@ -32,9 +28,6 @@ const stylesPage = makeStyles((theme) => ({
     width: "40px",
     height: "40px",
   },
-  modal: {
-    marginTop: "7%",
-  },
   toolbar: {
     display: "flex",
     alignItems: "center",
@@ -47,6 +40,26 @@ const stylesPage = makeStyles((theme) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
   },
+  modal: {
+    marginTop: "5%",
+    background: "rgba(255,255,255,0.4)",
+    borderRadius: "15px",
+  },
+  modalHeaderNew: {
+    background: "orange",
+    color: "#f5f5f5",
+  },
+  modalHeaderEdit: {
+    background: "#3393FF",
+    color: "#f5f5f5",
+  },
+  modalHeaderDelete: {
+    background: "#EF1146",
+    color: "#f5f5f5",
+  },
+  modalFooter: {
+    justifyContent: "center",
+  },
 }));
 
 const ServUrl = "http://localhost/SUMI/models/rolModel.php";
@@ -57,11 +70,16 @@ const RolData = () => {
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
+  const [alert, setAlert] = useState(null);
   const [dataSelect, setDataSelect] = useState({
     RrlId: "",
     RrlNomRol: "",
     RrlEstRol: "",
   });
+
+  const changeState = () => {
+    setAlert(null);
+  };
 
   const abrirCerrarModal = () => {
     setShowModal(!showModal);
@@ -110,6 +128,7 @@ const RolData = () => {
       .then((response) => {
         setData(data.concat(response.data));
         abrirCerrarModal();
+        setAlert("Registro creado correctamente");
       })
       .catch((er) => {
         console.log(er);
@@ -137,6 +156,7 @@ const RolData = () => {
 
         setData(newData);
         abrirCerrarModalEdit();
+        setAlert("Registro actualizado correctamente");
       })
       .catch((er) => {
         console.log(er);
@@ -152,6 +172,7 @@ const RolData = () => {
       .then((response) => {
         setData(data.filter((rol) => rol.RrlId !== dataSelect.RrlId));
         abrirCerrarModalDelete();
+        setAlert("Registro eliminado correctamente");
       })
       .catch((er) => {
         console.log(er);
@@ -187,98 +208,31 @@ const RolData = () => {
         <Grid container className={classList.content}>
           <div className={classList.toolbar}></div>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-              <h2>
-                Roles <AssistantIcon className={classList.iconPge} />
-              </h2>
-
-              <div className='d-grid gap-2 d-md-flex justify-content-md-end'>
-                <button
-                  className='btn btn-warning btn-sm'
-                  tooltip='Agregar'
-                  onClick={() => abrirCerrarModal()}>
-                  <AddIcon />
-                </button>
-              </div>
-            </Grid>
+            {/* Cabecera de la página */}
+            <HeaderPage
+              AbrirCerrarModal={abrirCerrarModal}
+              title={"Roles"}
+              icon1={"zmdi zmdi-assignment"}
+              icon2={"zmdi zmdi-plus"}
+              alert={alert}
+              changeState={changeState}
+            />
           </Grid>
-          <br />
-
-          {/* Tabla que muestra la información de los roles en bd */}
+          &nbsp;
           <Grid container spacing={2}>
-            <Grid
-              item
-              xs={12}
-              sm={12}
-              md={12}
-              lg={12}
-              xl={12}
-              style={{ textAlign: "center" }}>
-              <MaterialTable
-                columns={columns}
-                data={data}
-                title='Roles habilitados en el sistema'
-                actions={[
-                  {
-                    icon: "edit",
-                    tooltip: "Editar rol",
-                    onClick: (event, rowData) => selectedItem(rowData, "Edit"),
-                  },
-                  {
-                    icon: "delete",
-                    tooltip: "Eliminar rol",
-                    onClick: (event, rowData) =>
-                      selectedItem(rowData, "Delete"),
-                  },
-                ]}
-                options={{
-                  actionsColumnIndex: -1,
-                  headerStyle: {
-                    background: "#4094e2",
-                    color: "#000000",
-                    fontWeight: "700",
-                    border: "none",
-                    fontSize: "18px",
-                  },
-                  actionsCellStyle: {
-                    // background: "#96acc0",
-                    color: "#000000",
-                    borderBottom: "1px solid #96acc0",
-                  },
-                  cellStyle: { borderBottom: "1px solid #96acc0" },
-                }}
-                localization={{
-                  header: {
-                    actions: "ACCIONES",
-                  },
-                  toolbar: {
-                    searchPlaceholder: "Buscar",
-                    searchTooltip: "Buscar",
-                  },
-                  body: {
-                    emptyDataSourceMessage: "No hay registros que mostrar",
-                    filterRow: {
-                      filterTooltip: "Filtrar",
-                    },
-                  },
-                  pagination: {
-                    labelRowsSelect: "registros",
-                    firstTooltip: "primera página",
-                    previousTooltip: "página anterior",
-                    labelRowsPerPage: "Total de registros",
-                    labelDisplayedRows:
-                      "{from} - {to} de {count} regsitros encontrados",
-                    nextTooltip: "página siguiente",
-                    lastTooltip: "última página",
-                  },
-                }}
-              />
-            </Grid>
+            {/* Tabla que muestra la información de los roles en bd */}
+            <DataTable
+              selectedItem={selectedItem}
+              data={data}
+              columns={columns}
+              title={"Roles habilitados en el sistema"}
+            />
           </Grid>
-
           {/* Modal que muestra un formulario para agregar un nuevo rol */}
           <Modal isOpen={showModal} className={classList.modal}>
-            <ModalHeader>Agregar Rol</ModalHeader>
+            <ModalHeader className={classList.modalHeaderNew}>
+              Agregar Rol
+            </ModalHeader>
             <ModalBody>
               <div>
                 <form
@@ -301,25 +255,31 @@ const RolData = () => {
                 </form>
               </div>
             </ModalBody>
-            <ModalFooter>
-              <button
+            <ModalFooter className={classList.modalFooter}>
+              <Button
                 type='submit'
-                className='btn btn-success btn-sm'
+                color='success'
+                size='md'
                 form='formNewData'>
-                {" "}
-                Guardar
-              </button>{" "}
-              <button
-                className='btn btn-danger btn-sm'
+                <Tooltip title='Guardar' placement='left'>
+                  <i className='zmdi zmdi-save' />
+                </Tooltip>
+              </Button>{" "}
+              <Button
+                color='danger'
+                size='md'
                 onClick={() => abrirCerrarModal()}>
-                Cancelar
-              </button>
+                <Tooltip title='Cancelar' placement='right'>
+                  <i className='zmdi zmdi-stop' />
+                </Tooltip>
+              </Button>
             </ModalFooter>
           </Modal>
-
           {/* Modal que muestra los datos del rol a ser editado */}
           <Modal isOpen={showModalEdit} className={classList.modal}>
-            <ModalHeader>Editar Rol</ModalHeader>
+            <ModalHeader className={classList.modalHeaderEdit}>
+              Editar Rol
+            </ModalHeader>
             <ModalBody>
               <div className='mb-3'>
                 <form
@@ -357,48 +317,37 @@ const RolData = () => {
                 </form>
               </div>
             </ModalBody>
-            <ModalFooter>
-              <button
+            <ModalFooter className={classList.modalFooter}>
+              <Button
                 type='submit'
-                className='btn btn-success btn-sm'
+                color='success'
+                size='md'
                 form='formUpdateData'>
-                {" "}
-                Editar
-              </button>{" "}
-              <button
-                className='btn btn-danger btn-sm'
+                <Tooltip title='Guardar' placement='left'>
+                  <i className='zmdi zmdi-save' />
+                </Tooltip>
+              </Button>{" "}
+              <Button
+                color='danger'
+                size='md'
                 onClick={() => abrirCerrarModalEdit()}>
-                Cancelar
-              </button>
+                <Tooltip title='Cancelar' placement='right'>
+                  <i className='zmdi zmdi-stop' />
+                </Tooltip>
+              </Button>
             </ModalFooter>
           </Modal>
-
           {/* Modal para confirmación antes de eliminar un registro */}
-          <Modal isOpen={showModalDelete} className={classList.modal}>
-            <ModalHeader>Eliminar Rol</ModalHeader>
-            <ModalBody>
-              <div className='mb-3'>
-                <p>
-                  Está seguro de eliminar el rol:&nbsp;
-                  <strong>{dataSelect.RrlNomRol}</strong>
-                </p>
-              </div>
-            </ModalBody>
-            <ModalFooter>
-              <button
-                type='submit'
-                className='btn btn-success btn-sm'
-                onClick={() => deleteRol()}>
-                {" "}
-                Aceptar
-              </button>{" "}
-              <button
-                className='btn btn-danger btn-sm'
-                onClick={() => abrirCerrarModalDelete()}>
-                Cancelar
-              </button>
-            </ModalFooter>
-          </Modal>
+          <AllAlerts
+            alertClass={"confirm"}
+            alertType={"warning"}
+            title={"Eliminar Rol"}
+            alertTitle={"¿Está seguro de eliminar el rol:"}
+            alertText={dataSelect.RrlNomRol}
+            showModalDelete={showModalDelete}
+            deleteUser={deleteRol}
+            abrirCerrarModalDelete={abrirCerrarModalDelete}
+          />
         </Grid>
         <Footer />
       </main>

@@ -55,7 +55,7 @@ const AllAlerts = (props) => {
         {/* Modal para confirmación antes de eliminar un registro */}
         <Modal isOpen={props.showModalDelete} className={classList.modal}>
           <ModalHeader className={classList.modalHeaderDelete}>
-            Eliminar Usuario
+            {props.title}
           </ModalHeader>
           <ModalBody>
             <div className='mb-3'>
@@ -71,7 +71,7 @@ const AllAlerts = (props) => {
               color='success'
               size='md'
               onClick={props.deleteUser}>
-              <Tooltip title='Guardar' placement='left'>
+              <Tooltip title='Confirmar' placement='left'>
                 <i className='zmdi zmdi-save' />
               </Tooltip>
             </Button>{" "}

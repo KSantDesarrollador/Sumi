@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid } from "@material-ui/core";
+import { Grid, Tooltip } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Fab from "@material-ui/core/Fab";
 // importando componentes
@@ -41,11 +41,13 @@ const HeaderPage = (props) => {
           />
         </div>
         &nbsp; &nbsp;
-        <Fab color='secondary' onClick={props.AbrirCerrarModal}>
-          <span className={classList.iconPge}>
-            <i className={props.icon2} />
-          </span>
-        </Fab>
+        <Tooltip title='Nuevo registro'>
+          <Fab color='secondary' onClick={props.AbrirCerrarModal}>
+            <span className={classList.iconPge}>
+              <i className={props.icon2} />
+            </span>
+          </Fab>
+        </Tooltip>
       </div>
     </Grid>
   );

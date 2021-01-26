@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
+import { Modal, ModalBody, ModalFooter, ModalHeader, Button } from "reactstrap";
 import { makeStyles, fade } from "@material-ui/core/styles";
 import { Grid } from "@material-ui/core";
 import axios from "axios";
 // importando componentes de material ui
-// import MaterialTable from "material-table";
-import TextField from "@material-ui/core/TextField";
-import InputLabel from "@material-ui/core/InputLabel";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
-import GridList from "@material-ui/core/GridList";
-import GridListTile from "@material-ui/core/GridListTile";
-import GridListTileBar from "@material-ui/core/GridListTileBar";
-import ListSubheader from "@material-ui/core/ListSubheader";
-import Fab from "@material-ui/core/Fab";
+import {
+  TextField,
+  InputLabel,
+  FormControl,
+  Select,
+  GridList,
+  GridListTile,
+  GridListTileBar,
+  ListSubheader,
+  Fab,
+  Tooltip,
+} from "@material-ui/core";
 // importando los iconos
 import ViewComfyIcon from "@material-ui/icons/ViewComfy";
 import AddIcon from "@material-ui/icons/Add";
@@ -24,6 +26,7 @@ import InputBase from "@material-ui/core/InputBase";
 // importandom los componentes
 import Menu from "../templates/menu";
 import Footer from "../templates/footer";
+import AllAlerts from "./components/alerts";
 
 const stylesPage = makeStyles((theme) => ({
   root: {
@@ -38,6 +41,7 @@ const stylesPage = makeStyles((theme) => ({
     padding: "30px 0 10px 0",
     width: "100%",
     height: "auto",
+    fontSize: "12px",
   },
   icon: {
     color: "#41D178",
@@ -57,9 +61,6 @@ const stylesPage = makeStyles((theme) => ({
     marginTop: "auto",
     alignItems: "center",
     paddingTop: "15px",
-  },
-  modal: {
-    marginTop: "5%",
   },
   formControl: {
     margin: theme.spacing(0),
@@ -119,6 +120,29 @@ const stylesPage = makeStyles((theme) => ({
       },
     },
   },
+  modal: {
+    marginTop: "5%",
+    background: "rgba(255,255,255,0.4)",
+    borderRadius: "15px",
+  },
+  modalHeaderNew: {
+    background: "orange",
+    color: "#f5f5f5",
+  },
+  modalHeaderEdit: {
+    background: "#3393FF",
+    color: "#f5f5f5",
+  },
+  modalHeaderDelete: {
+    background: "#EF1146",
+    color: "#f5f5f5",
+  },
+  modalFooter: {
+    justifyContent: "center",
+  },
+  footCard: {
+    fontSize: "12px",
+  },
 }));
 
 const ServUrl = "http://localhost/SUMI/models/productModel.php";
@@ -129,6 +153,7 @@ const ProductData = () => {
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
+  const [alert, setAlert] = useState(null);
   const [dataSelect, setDataSelect] = useState({
     MdcId: "",
     CtgId: "",
@@ -142,6 +167,11 @@ const ProductData = () => {
     MdcFotoMed: "",
     MdcEstMed: "",
   });
+
+  const changeState = () => {
+    setAlert(null);
+  };
+
   const abrirCerrarModal = () => {
     setShowModal(!showModal);
   };
@@ -153,6 +183,11 @@ const ProductData = () => {
   const abrirCerrarModalDelete = () => {
     setShowModalDelete(!showModalDelete);
   };
+
+  if (alert !== null) {
+    let alert = document.getElementById("al");
+    alert.classList.replace("alertHide", "alertShow");
+  }
 
   // obteniendo los datos de las cajas de texto
   const eventinput = (e) => {
@@ -170,7 +205,7 @@ const ProductData = () => {
   };
 
   // obteniendo datos de un servidor
-  const listUser = async () => {
+  const listProduct = async () => {
     await axios
       .get(ServUrl)
       .then((response) => {
@@ -183,7 +218,7 @@ const ProductData = () => {
   };
 
   useEffect(() => {
-    listUser();
+    listProduct();
   }, []);
 
   // Esta función guarda los datos de un nuevo rol
@@ -205,6 +240,7 @@ const ProductData = () => {
       .then((response) => {
         setData(data.concat(response.data));
         abrirCerrarModal();
+        setAlert("Registro creado correctamente");
       })
       .catch((er) => {
         console.log(er);
@@ -254,6 +290,7 @@ const ProductData = () => {
 
         setData(newData);
         abrirCerrarModalEdit();
+        setAlert("Registro actualizado correctamente");
       })
       .catch((er) => {
         console.log(er);
@@ -269,6 +306,7 @@ const ProductData = () => {
       .then((response) => {
         setData(data.filter((product) => product.MdcId !== dataSelect.MdcId));
         abrirCerrarModalDelete();
+        setAlert("Registro eliminado correctamente");
       })
       .catch((er) => {
         console.log(er);
@@ -284,18 +322,6 @@ const ProductData = () => {
       abrirCerrarModalDelete();
     }
   };
-
-  // Formando las columnas de la tabla
-  //   const columns = [
-  //     { title: "ID", field: "MdcId" },
-  //     { title: "FOTO", field: "data:image/png;base64,MdcFotoMed" },
-  //     { title: "CATEG.", field: "CtgNomCat" },
-  //     { title: "CÓD.", field: "MdcCodMed" },
-  //     { title: "DESCRIPCIÓN", field: "MdcDescMed" },
-  //     { title: "PRES.", field: "MdcPresenMed" },
-  //     { title: "CONC.", field: "MdcConcenMed" },
-  //     { title: "ESTADO", field: "MdcEstMed" },
-  //   ];
 
   return (
     <div className={classList.root}>
@@ -315,7 +341,7 @@ const ProductData = () => {
           <Grid container spacing={3}>
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <GridList
-                cellHeight={200}
+                cellHeight={250}
                 className={classList.gridList}
                 cols={4}>
                 <GridListTile
@@ -325,6 +351,14 @@ const ProductData = () => {
                   <ListSubheader
                     component='div'
                     className='d-grid gap-2 d-md-flex justify-content-md-end'>
+                    <div className='alertHide' id='al'>
+                      <AllAlerts
+                        alertClass='info'
+                        alertType='success'
+                        alertText={alert}
+                        changeState={changeState}
+                      />
+                    </div>
                     <div className={classList.search}>
                       <div className={classList.searchIcon}>
                         <SearchIcon />
@@ -339,17 +373,23 @@ const ProductData = () => {
                       />
                     </div>
                     &nbsp; &nbsp;
-                    <Fab color='secondary' onClick={() => abrirCerrarModal()}>
-                      <AddIcon />
-                    </Fab>
+                    <Tooltip title='Nuevo producto' placement='up'>
+                      <Fab color='secondary' onClick={() => abrirCerrarModal()}>
+                        <AddIcon />
+                      </Fab>
+                    </Tooltip>
                   </ListSubheader>
                 </GridListTile>
                 {data.map((item) => (
                   <GridListTile
                     key={item.MdcId}
-                    style={{ width: 258, paddingTop: "35px" }}>
+                    style={{
+                      width: 360,
+                      paddingTop: "35px",
+                    }}>
                     <img src={item.MdcFotoMed} alt={item.MdcDescMed} />
                     <GridListTileBar
+                      className={classList.footcard}
                       title={item.MdcDescMed}
                       subtitle={
                         <div>
@@ -359,11 +399,31 @@ const ProductData = () => {
                         </div>
                       }
                       actionIcon={
-                        <IconButton
-                          aria-label={`detalles ${item.MdcDescMed}`}
-                          className={classList.icon}>
-                          <InfoIcon />
-                        </IconButton>
+                        <div>
+                          <Tooltip title='Detalles' placement='down'>
+                            <IconButton
+                              aria-label={`detalles ${item.MdcDescMed}`}
+                              className={classList.icon}>
+                              <i className='zmdi zmdi-info' />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title='Editar' placement='down'>
+                            <IconButton
+                              aria-label={`detalles ${item.MdcDescMed}`}
+                              className={classList.icon}
+                              onClick={() => selectedItem(item, "Edit")}>
+                              <i className='zmdi zmdi-edit' />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title='Eliminar' placement='down'>
+                            <IconButton
+                              aria-label={`detalles ${item.MdcDescMed}`}
+                              className={classList.icon}
+                              onClick={() => selectedItem(item, "Delete")}>
+                              <i className='zmdi zmdi-delete' />
+                            </IconButton>
+                          </Tooltip>
+                        </div>
                       }
                     />
                   </GridListTile>
@@ -373,7 +433,9 @@ const ProductData = () => {
           </Grid>
           {/* Modal que muestra un formulario para agregar un nuevo rol */}
           <Modal isOpen={showModal} className={classList.modal} size='lg'>
-            <ModalHeader>Agregar Producto</ModalHeader>
+            <ModalHeader className={classList.modalHeaderNew}>
+              Agregar Producto
+            </ModalHeader>
             <ModalBody>
               <form
                 id='formNewData'
@@ -398,7 +460,7 @@ const ProductData = () => {
                           name: "CtgId",
                           id: "outlined-age-native-simple",
                         }}>
-                        <option aria-label='None' value='' />
+                        <option aria-label='' value='' />
                         <option value={1}>General</option>
                         <option value={2}>Antídoto</option>
                         <option value={3}></option>
@@ -549,265 +611,274 @@ const ProductData = () => {
                 </Grid>
               </form>
             </ModalBody>
-            <ModalFooter>
-              <button
+            <ModalFooter className={classList.modalFooter}>
+              <Button
                 type='submit'
-                className='btn btn-success btn-sm'
+                color='success'
+                size='md'
                 form='formNewData'>
-                {" "}
-                Guardar
-              </button>{" "}
-              <button
-                className='btn btn-danger btn-sm'
+                <Tooltip title='Guardar' placement='left'>
+                  <i className='zmdi zmdi-save' />
+                </Tooltip>
+              </Button>{" "}
+              <Button
+                color='danger'
+                size='md'
                 onClick={() => abrirCerrarModal()}>
-                Cancelar
-              </button>
+                <Tooltip title='Cancelar' placement='right'>
+                  <i className='zmdi zmdi-stop' />
+                </Tooltip>
+              </Button>
             </ModalFooter>
           </Modal>
 
           {/* Modal que muestra los datos del rol a ser editado */}
-          <Modal isOpen={showModalEdit} className={classList.modal}>
-            <ModalHeader>Editar Producto</ModalHeader>
+          <Modal isOpen={showModalEdit} className={classList.modal} size='lg'>
+            <ModalHeader className={classList.modalHeaderEdit}>
+              Editar Producto
+            </ModalHeader>
             <ModalBody>
-              <div className='mb-3'>
-                <form
-                  id='formUpdateData'
-                  encType='multipart/form-data'
-                  onSubmit={(e) => updateProduct(e)}>
-                  <input type='hidden' name='MdcId' value={dataSelect.MdcId} />
-                  <FormControl
-                    variant='outlined'
-                    className={classList.formControl}>
-                    <InputLabel htmlFor='outlined-age-native-simple'>
-                      Seleccione una categoría
-                    </InputLabel>
-                    <Select
-                      native
-                      value={dataSelect.CtgId}
-                      onChange={eventinput}
-                      label='Seleccione una categoría'
-                      required
-                      inputProps={{
-                        name: "CtgId",
-                        id: "outlined-age-native-simple",
-                      }}>
-                      <option
-                        aria-label={dataSelect.CtgNomCat}
+              <form
+                id='formUpdateData'
+                encType='multipart/form-data'
+                onSubmit={(e) => updateProduct(e)}>
+                <Grid container spacing={1}>
+                  <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+                    <input
+                      type='hidden'
+                      name='MdcId'
+                      value={dataSelect.MdcId}
+                    />
+                    <FormControl
+                      size='small'
+                      variant='outlined'
+                      className={classList.formControl}>
+                      <InputLabel htmlFor='outlined-age-native-simple'>
+                        Seleccione una categoría
+                      </InputLabel>
+                      <Select
+                        native
                         value={dataSelect.CtgId}
-                      />
-                      <option value={1}>General</option>
-                      <option value={2}>Antídoto</option>
-                      <option value={3}></option>
-                      <option value={4}></option>
-                    </Select>
-                  </FormControl>
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='MdcCodMed'
-                    size='small'
-                    id='MdcCodMed'
-                    label='Código de Producto'
-                    fullWidth
-                    autoFocus
-                    required
-                    value={dataSelect.MdcCodMed}
-                    onChange={eventinput}
-                  />
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='MdcDescMed'
-                    size='small'
-                    id='MdcDescMed'
-                    label='Nombre de Producto'
-                    fullWidth
-                    autoFocus
-                    required
-                    value={dataSelect.MdcDescMed}
-                    onChange={eventinput}
-                  />
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='MdcPresenMed'
-                    size='small'
-                    id='MdcPresenMed'
-                    label='Presentación'
-                    fullWidth
-                    value={dataSelect.MdcPresenMed}
-                    onChange={eventinput}
-                  />
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='MdcConcenMed'
-                    size='small'
-                    id='MdcConcenMed'
-                    label='Concentración'
-                    fullWidth
-                    required
-                    value={dataSelect.MdcConcenMed}
-                    onChange={eventinput}
-                  />
-                  <FormControl
-                    variant='outlined'
-                    className={classList.formControl}>
-                    <InputLabel htmlFor='outlined-age-native-simple'>
-                      Nivel de Prescripción
-                    </InputLabel>
-                    <Select
-                      native
-                      value={dataSelect.MdcNivPrescMed}
-                      onChange={eventinput}
-                      label='Nivel de Prescripción'
-                      required
-                      inputProps={{
-                        name: "MdcNivPrescMed",
-                        id: "outlined-age-native-simple",
-                      }}>
-                      <option
-                        aria-label={dataSelect.MdcNivPrescMed}
+                        onChange={eventinput}
+                        label='Seleccione una categoría'
+                        required
+                        inputProps={{
+                          name: "CtgId",
+                          id: "outlined-age-native-simple",
+                        }}>
+                        <option
+                          label={dataSelect.CtgNomCat}
+                          value={dataSelect.CtgId}
+                        />
+                        <option value={1}>General</option>
+                        <option value={2}>Antídoto</option>
+                        <option value={3}></option>
+                        <option value={4}></option>
+                      </Select>
+                    </FormControl>
+                    &nbsp;
+                    <FormControl
+                      size='small'
+                      variant='outlined'
+                      className={classList.formControl}>
+                      <InputLabel htmlFor='outlined-age-native-simple'>
+                        Nivel de Prescripción
+                      </InputLabel>
+                      <Select
+                        native
                         value={dataSelect.MdcNivPrescMed}
-                      />
-                      <option value={"O"}>O</option>
-                      <option value={"P"}>P</option>
-                      <option value={"E"}>E</option>
-                      <option value={"PE"}>PE</option>
-                    </Select>
-                  </FormControl>
-                  <FormControl
-                    variant='outlined'
-                    className={classList.formControl}>
-                    <InputLabel htmlFor='outlined-age-native-simple'>
-                      Nivel de Atención
-                    </InputLabel>
-                    <Select
-                      native
-                      value={dataSelect.MdcNivAtencMed}
+                        onChange={eventinput}
+                        label='Nivel de Prescripción'
+                        required
+                        inputProps={{
+                          name: "MdcNivPrescMed",
+                          id: "outlined-age-native-simple",
+                        }}>
+                        <option
+                          label={dataSelect.MdcNivPrescMed}
+                          value={dataSelect.MdcNivPrescMed}
+                        />
+                        <option value={"O"}>O</option>
+                        <option value={"P"}>P</option>
+                        <option value={"E"}>E</option>
+                        <option value={"PE"}>PE</option>
+                      </Select>
+                    </FormControl>
+                    <TextField
+                      variant='outlined'
+                      margin='normal'
+                      type='text'
+                      name='MdcCodMed'
+                      size='small'
+                      id='MdcCodMed'
+                      label='Código de Producto'
+                      fullWidth
+                      autoFocus
+                      required
+                      value={dataSelect.MdcCodMed}
                       onChange={eventinput}
-                      label='Nivel de Atención'
-                      inputProps={{
-                        name: "MdcNivAtencMed",
-                        id: "outlined-age-native-simple",
-                      }}>
-                      <option
-                        aria-label={dataSelect.MdcNivAtencMed}
+                    />
+                    <TextField
+                      variant='outlined'
+                      margin='normal'
+                      type='text'
+                      name='MdcPresenMed'
+                      size='small'
+                      id='MdcPresenMed'
+                      label='Presentación'
+                      fullWidth
+                      value={dataSelect.MdcPresenMed}
+                      onChange={eventinput}
+                    />
+                    <TextField
+                      className={classList.file}
+                      variant='standard'
+                      margin='normal'
+                      type='file'
+                      name='MdcFotoMed'
+                      size='small'
+                      id='MdcFotoMed'
+                      fullWidth
+                      accept='image/*'
+                      onChange={eventinput}
+                    />
+                    <label for='MdcFotoMed'>Imagen de Producto</label>
+                    &nbsp;
+                  </Grid>
+                  <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+                    <FormControl
+                      size='small'
+                      variant='outlined'
+                      className={classList.formControl}>
+                      <InputLabel htmlFor='outlined-age-native-simple'>
+                        Nivel de Atención
+                      </InputLabel>
+                      <Select
+                        native
                         value={dataSelect.MdcNivAtencMed}
-                      />
-                      <option value={"I"}>Nivel 1</option>
-                      <option value={"II"}>Nivel 2</option>
-                      <option value={"III"}>Nivel 3</option>
-                      <option value={"I-II"}>Nivel 1-2</option>
-                      <option value={"I-III"}>Nivel 1-3</option>
-                      <option value={"I-II-III"}>Nivel 1-2-3</option>
-                      <option value={"II-III"}>Nivel 2-3</option>
-                    </Select>
-                  </FormControl>
-                  <FormControl
-                    variant='outlined'
-                    className={classList.formControl}>
-                    <InputLabel htmlFor='outlined-age-native-simple'>
-                      Vía de administración
-                    </InputLabel>
-                    <Select
-                      native
-                      value={dataSelect.MdcViaAdmMed}
-                      onChange={eventinput}
-                      label='Vía de administración'
-                      inputProps={{
-                        name: "MdcViaAdmMed",
-                        id: "outlined-age-native-simple",
-                      }}>
-                      <option
-                        aria-label={dataSelect.MdcViaAdmMed}
+                        onChange={eventinput}
+                        label='Nivel de Atención'
+                        inputProps={{
+                          name: "MdcNivAtencMed",
+                          id: "outlined-age-native-simple",
+                        }}>
+                        <option
+                          label={dataSelect.MdcNivAtencMed}
+                          value={dataSelect.MdcNivAtencMed}
+                        />
+                        <option value={"I"}>Nivel 1</option>
+                        <option value={"II"}>Nivel 2</option>
+                        <option value={"III"}>Nivel 3</option>
+                        <option value={"I-II"}>Nivel 1-2</option>
+                        <option value={"I-III"}>Nivel 1-3</option>
+                        <option value={"I-II-III"}>Nivel 1-2-3</option>
+                        <option value={"II-III"}>Nivel 2-3</option>
+                      </Select>
+                    </FormControl>
+                    &nbsp;
+                    <FormControl
+                      size='small'
+                      variant='outlined'
+                      className={classList.formControl}>
+                      <InputLabel htmlFor='outlined-age-native-simple'>
+                        Vía de administración
+                      </InputLabel>
+                      <Select
+                        native
                         value={dataSelect.MdcViaAdmMed}
-                      />
-                      <option value={"O"}>O</option>
-                      <option value={"P"}>P</option>
-                      <option value={"E"}>E</option>
-                      <option value={"PE"}>PE</option>
-                    </Select>
-                  </FormControl>
-                  <TextField
-                    className={classList.file}
-                    variant='standard'
-                    margin='normal'
-                    type='file'
-                    name='MdcFotoMed'
-                    size='small'
-                    id='MdcFotoMed'
-                    fullWidth
-                    accept='image/*'
-                    onChange={eventinput}
-                  />
-                  <label for='MdcFotoMed'>Imagen de Producto</label>
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='MdcEstMed'
-                    size='small'
-                    id='MdcEstMed'
-                    label='Estado'
-                    fullWidth
-                    required
-                    value={dataSelect.MdcEstMed}
-                    onChange={eventinput}
-                  />
-                </form>
-              </div>
+                        onChange={eventinput}
+                        label='Vía de administración'
+                        inputProps={{
+                          name: "MdcViaAdmMed",
+                          id: "outlined-age-native-simple",
+                        }}>
+                        <option
+                          label={dataSelect.MdcViaAdmMed}
+                          value={dataSelect.MdcViaAdmMed}
+                        />
+                        <option value={"O"}>O</option>
+                        <option value={"P"}>P</option>
+                        <option value={"E"}>E</option>
+                        <option value={"PE"}>PE</option>
+                      </Select>
+                    </FormControl>
+                    <TextField
+                      variant='outlined'
+                      margin='normal'
+                      type='text'
+                      name='MdcDescMed'
+                      size='small'
+                      id='MdcDescMed'
+                      label='Nombre de Producto'
+                      fullWidth
+                      autoFocus
+                      required
+                      value={dataSelect.MdcDescMed}
+                      onChange={eventinput}
+                    />
+                    <TextField
+                      variant='outlined'
+                      margin='normal'
+                      type='text'
+                      name='MdcConcenMed'
+                      size='small'
+                      id='MdcConcenMed'
+                      label='Concentración'
+                      fullWidth
+                      required
+                      value={dataSelect.MdcConcenMed}
+                      onChange={eventinput}
+                    />
+                    <TextField
+                      variant='outlined'
+                      margin='normal'
+                      type='text'
+                      name='MdcEstMed'
+                      size='small'
+                      id='MdcEstMed'
+                      label='Estado'
+                      fullWidth
+                      required
+                      value={dataSelect.MdcEstMed}
+                      onChange={eventinput}
+                    />
+                  </Grid>
+                </Grid>
+              </form>
             </ModalBody>
-            <ModalFooter>
-              <button
+            <ModalFooter className={classList.modalFooter}>
+              <Button
                 type='submit'
-                className='btn btn-success btn-sm'
+                color='success'
+                size='md'
                 form='formUpdateData'>
-                {" "}
-                Editar
-              </button>{" "}
-              <button
-                className='btn btn-danger btn-sm'
+                <Tooltip title='Guardar' placement='left'>
+                  <i className='zmdi zmdi-save' />
+                </Tooltip>
+              </Button>{" "}
+              <Button
+                color='danger'
+                size='md'
                 onClick={() => abrirCerrarModalEdit()}>
-                Cancelar
-              </button>
+                <Tooltip title='Cancelar' placement='right'>
+                  <i className='zmdi zmdi-stop' />
+                </Tooltip>
+              </Button>
             </ModalFooter>
           </Modal>
-
           {/* Modal para confirmación antes de eliminar un registro */}
-          <Modal isOpen={showModalDelete} className={classList.modal}>
-            <ModalHeader>Eliminar Producto</ModalHeader>
-            <ModalBody>
-              <div className='mb-3'>
-                <p>
-                  Está seguro de eliminar el Producto:&nbsp;
-                  <strong>{dataSelect.MdcDescMed}</strong>
-                </p>
-              </div>
-            </ModalBody>
-            <ModalFooter>
-              <button
-                type='submit'
-                className='btn btn-success btn-sm'
-                onClick={() => deleteProduct()}>
-                {" "}
-                Aceptar
-              </button>{" "}
-              <button
-                className='btn btn-danger btn-sm'
-                onClick={() => abrirCerrarModalDelete()}>
-                Cancelar
-              </button>
-            </ModalFooter>
-          </Modal>
+          <AllAlerts
+            alertClass={"confirm"}
+            alertType={"warning"}
+            title={"Eliminar Producto"}
+            alertTitle={"¿Está seguro de eliminar el producto:"}
+            alertText={dataSelect.MdcDescMed}
+            showModalDelete={showModalDelete}
+            deleteUser={deleteProduct}
+            abrirCerrarModalDelete={abrirCerrarModalDelete}
+          />
         </Grid>
-        <Grid item xs={0} sm={0} md={0} lg={0} xl={0}>
-          <Footer />
-        </Grid>
+        <Footer />
       </main>
     </div>
   );

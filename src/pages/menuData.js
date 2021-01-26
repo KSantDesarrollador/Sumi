@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
-import { makeStyles } from "@material-ui/core/styles";
-import { Grid } from "@material-ui/core";
+import { Modal, ModalBody, ModalFooter, ModalHeader, Button } from "reactstrap";
+import {
+  makeStyles,
+  Grid,
+  TextField,
+  InputLabel,
+  FormControl,
+  Select,
+  Tooltip,
+} from "@material-ui/core";
 import axios from "axios";
-import MaterialTable from "material-table";
-import TextField from "@material-ui/core/TextField";
-import InputLabel from "@material-ui/core/InputLabel";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
-// importando los iconos
-import PeopleIcon from "@material-ui/icons/People";
-import AddIcon from "@material-ui/icons/Add";
 // importandom los componentes
 import Menu from "../templates/menu";
 import Footer from "../templates/footer";
+import HeaderPage from "./components/headerPage";
+import DataTable from "./components/dataTable";
+import AllAlerts from "./components/alerts";
 
 const stylesPage = makeStyles((theme) => ({
   root: {
@@ -34,9 +36,6 @@ const stylesPage = makeStyles((theme) => ({
     width: "40px",
     height: "40px",
   },
-  modal: {
-    marginTop: "5%",
-  },
   formControl: {
     margin: theme.spacing(0),
     minWidth: "100%",
@@ -56,6 +55,26 @@ const stylesPage = makeStyles((theme) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
   },
+  modal: {
+    marginTop: "5%",
+    background: "rgba(255,255,255,0.4)",
+    borderRadius: "15px",
+  },
+  modalHeaderNew: {
+    background: "orange",
+    color: "#f5f5f5",
+  },
+  modalHeaderEdit: {
+    background: "#3393FF",
+    color: "#f5f5f5",
+  },
+  modalHeaderDelete: {
+    background: "#EF1146",
+    color: "#f5f5f5",
+  },
+  modalFooter: {
+    justifyContent: "center",
+  },
 }));
 
 const ServUrl = "http://localhost/SUMI/models/menuModel.php";
@@ -67,6 +86,7 @@ const MenuData = () => {
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
+  const [alert, setAlert] = useState(null);
   const [dataSelect, setDataSelect] = useState({
     MnuId: "",
     MnuJerqMen: "",
@@ -78,6 +98,10 @@ const MenuData = () => {
     MnuLeyendMen: "",
     MnuEstMen: "",
   });
+
+  const changeState = () => {
+    setAlert(null);
+  };
 
   const [jerqSelect, setJerqSelect] = useState({
     MnuId: "",
@@ -160,6 +184,7 @@ const MenuData = () => {
       .then((response) => {
         setData(data.concat(response.data));
         abrirCerrarModal();
+        setAlert("Registro creado correctamente");
       })
       .catch((er) => {
         console.log(er);
@@ -203,6 +228,7 @@ const MenuData = () => {
 
         setData(newData);
         abrirCerrarModalEdit();
+        setAlert("Registro actualizado correctamente");
       })
       .catch((er) => {
         console.log(er);
@@ -218,6 +244,7 @@ const MenuData = () => {
       .then((response) => {
         setData(data.filter((menu) => menu.MnuId !== dataSelect.MnuId));
         abrirCerrarModalDelete();
+        setAlert("Registro eliminado correctamente");
       })
       .catch((er) => {
         console.log(er);
@@ -253,93 +280,31 @@ const MenuData = () => {
         <Grid container className={classList.content}>
           <div className={classList.toolbar}></div>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-              <h2>
-                Menús <PeopleIcon className={classList.iconPge} />
-              </h2>
-              <div className='d-grid gap-2 d-md-flex justify-content-md-end'>
-                <button
-                  className='btn btn-warning me-md-2'
-                  onClick={() => {
-                    abrirCerrarModal();
-                  }}>
-                  <AddIcon />
-                </button>
-              </div>
-            </Grid>
+            {/* Cabecera de la página */}
+            <HeaderPage
+              AbrirCerrarModal={abrirCerrarModal}
+              title={"Menús"}
+              icon1={"zmdi zmdi-menu"}
+              icon2={"zmdi zmdi-plus"}
+              alert={alert}
+              changeState={changeState}
+            />
           </Grid>
-
-          {/* Tabla que muestra la información de los roles en bd */}
+          &nbsp;
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-              <MaterialTable
-                columns={columns}
-                data={data}
-                title='Lista de menús en el sistema'
-                actions={[
-                  {
-                    icon: "edit",
-                    tooltip: "Editar menú",
-                    onClick: (event, rowData) => selectedItem(rowData, "Edit"),
-                  },
-                  {
-                    icon: "delete",
-                    tooltip: "Eliminar menú",
-                    onClick: (event, rowData) =>
-                      selectedItem(rowData, "Delete"),
-                  },
-                ]}
-                options={{
-                  actionsColumnIndex: -1,
-                  headerStyle: {
-                    background: "#4094e2",
-                    color: "#000000",
-                    fontWeight: "700",
-                    border: "none",
-                    fontSize: "15px",
-                  },
-                  actionsCellStyle: {
-                    // background: "#96acc0",
-                    color: "#000000",
-                    borderBottom: "1px solid #96acc0",
-                  },
-                  cellStyle: {
-                    borderBottom: "1px solid #96acc0",
-                    fontSize: "13px",
-                  },
-                }}
-                localization={{
-                  header: {
-                    actions: "ACCIONES",
-                  },
-                  toolbar: {
-                    searchPlaceholder: "Buscar",
-                    searchTooltip: "Buscar",
-                  },
-                  body: {
-                    emptyDataSourceMessage: "No hay registros que mostrar",
-                    filterRow: {
-                      filterTooltip: "Filtrar",
-                    },
-                  },
-                  pagination: {
-                    labelRowsSelect: "registros",
-                    firstTooltip: "primera página",
-                    previousTooltip: "página anterior",
-                    labelRowsPerPage: "Total de registros",
-                    labelDisplayedRows:
-                      "{from} - {to} de {count} regsitros encontrados",
-                    nextTooltip: "página siguiente",
-                    lastTooltip: "última página",
-                  },
-                }}
-              />
-            </Grid>
+            {/* Tabla que muestra la información de los menús en bd */}
+            <DataTable
+              selectedItem={selectedItem}
+              data={data}
+              columns={columns}
+              title={"Menús habilitados en el sistema"}
+            />
           </Grid>
-
           {/* Modal que muestra un formulario para agregar un nuevo rol */}
           <Modal isOpen={showModal} className={classList.modal}>
-            <ModalHeader>Agregar Usuario</ModalHeader>
+            <ModalHeader className={classList.modalHeaderNew}>
+              Agregar Menú
+            </ModalHeader>
             <ModalBody>
               <div>
                 <form
@@ -347,6 +312,7 @@ const MenuData = () => {
                   encType='multipart/form-data'
                   onSubmit={(e) => newMenu(e)}>
                   <FormControl
+                    size='small'
                     variant='outlined'
                     className={classList.formControl}>
                     <InputLabel htmlFor='outlined-age-native-simple'>
@@ -437,25 +403,31 @@ const MenuData = () => {
                 </form>
               </div>
             </ModalBody>
-            <ModalFooter>
-              <button
+            <ModalFooter className={classList.modalFooter}>
+              <Button
                 type='submit'
-                className='btn btn-success btn-sm'
+                color='success'
+                size='md'
                 form='formNewData'>
-                {" "}
-                Guardar
-              </button>{" "}
-              <button
-                className='btn btn-danger btn-sm'
+                <Tooltip title='Guardar' placement='left'>
+                  <i className='zmdi zmdi-save' />
+                </Tooltip>
+              </Button>{" "}
+              <Button
+                color='danger'
+                size='md'
                 onClick={() => abrirCerrarModal()}>
-                Cancelar
-              </button>
+                <Tooltip title='Cancelar' placement='right'>
+                  <i className='zmdi zmdi-stop' />
+                </Tooltip>
+              </Button>
             </ModalFooter>
           </Modal>
-
           {/* Modal que muestra los datos del rol a ser editado */}
           <Modal isOpen={showModalEdit} className={classList.modal}>
-            <ModalHeader>Editar Menú</ModalHeader>
+            <ModalHeader className={classList.modalHeaderEdit}>
+              Editar Menú
+            </ModalHeader>
             <ModalBody>
               <div className='mb-3'>
                 <form
@@ -464,6 +436,7 @@ const MenuData = () => {
                   onSubmit={(e) => updateMenu(e)}>
                   <input type='hidden' name='MnuId' value={dataSelect.MnuId} />
                   <FormControl
+                    size='small'
                     variant='outlined'
                     className={classList.formControl}>
                     <InputLabel htmlFor='outlined-age-native-simple'>
@@ -571,48 +544,37 @@ const MenuData = () => {
                 </form>
               </div>
             </ModalBody>
-            <ModalFooter>
-              <button
+            <ModalFooter className={classList.modalFooter}>
+              <Button
                 type='submit'
-                className='btn btn-success btn-sm'
+                color='success'
+                size='md'
                 form='formUpdateData'>
-                {" "}
-                Editar
-              </button>{" "}
-              <button
-                className='btn btn-danger btn-sm'
+                <Tooltip title='Guardar' placement='left'>
+                  <i className='zmdi zmdi-save' />
+                </Tooltip>
+              </Button>{" "}
+              <Button
+                color='danger'
+                size='md'
                 onClick={() => abrirCerrarModalEdit()}>
-                Cancelar
-              </button>
+                <Tooltip title='Cancelar' placement='right'>
+                  <i className='zmdi zmdi-stop' />
+                </Tooltip>
+              </Button>
             </ModalFooter>
           </Modal>
-
           {/* Modal para confirmación antes de eliminar un registro */}
-          <Modal isOpen={showModalDelete} className={classList.modal}>
-            <ModalHeader>Eliminar Usuario</ModalHeader>
-            <ModalBody>
-              <div className='mb-3'>
-                <p>
-                  Está seguro de eliminar el usuario:&nbsp;
-                  <strong>{dataSelect.MnuNomMen}</strong>
-                </p>
-              </div>
-            </ModalBody>
-            <ModalFooter>
-              <button
-                type='submit'
-                className='btn btn-success btn-sm'
-                onClick={() => deleteMenu()}>
-                {" "}
-                Aceptar
-              </button>{" "}
-              <button
-                className='btn btn-danger btn-sm'
-                onClick={() => abrirCerrarModalDelete()}>
-                Cancelar
-              </button>
-            </ModalFooter>
-          </Modal>
+          <AllAlerts
+            alertClass={"confirm"}
+            alertType={"warning"}
+            title={"Eliminar Menú"}
+            alertTitle={"¿Está seguro de eliminar el menú:"}
+            alertText={dataSelect.MnuNomMen}
+            showModalDelete={showModalDelete}
+            deleteUser={deleteMenu}
+            abrirCerrarModalDelete={abrirCerrarModalDelete}
+          />
         </Grid>
         <Footer />
       </main>

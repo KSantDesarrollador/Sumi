@@ -86,7 +86,6 @@ const stylesPage = makeStyles((theme) => ({
 }));
 
 const ServUrl = "http://localhost/SUMI/models/userModel.php";
-let counter = null;
 
 const UserData = () => {
   const classList = stylesPage();
@@ -282,8 +281,8 @@ const UserData = () => {
             />
           </Grid>
           &nbsp;
-          {/* Tabla que muestra la información de los roles en bd */}
           <Grid container spacing={2}>
+            {/* Tabla que muestra la información de los usuarios en bd */}
             <DataTable
               selectedItem={selectedItem}
               data={data}
@@ -303,6 +302,7 @@ const UserData = () => {
                   encType='multipart/form-data'
                   onSubmit={(e) => newUser(e)}>
                   <FormControl
+                    size='small'
                     variant='outlined'
                     className={classList.formControl}>
                     <InputLabel htmlFor='outlined-age-native-simple'>
@@ -423,6 +423,7 @@ const UserData = () => {
                   onSubmit={(e) => updateUser(e)}>
                   <input type='hidden' name='UsrId' value={dataSelect.UsrId} />
                   <FormControl
+                    size='small'
                     variant='outlined'
                     className={classList.formControl}>
                     <InputLabel htmlFor='outlined-age-native-simple'>
@@ -548,9 +549,11 @@ const UserData = () => {
               </Button>
             </ModalFooter>
           </Modal>
+          {/* Modal para confirmación antes de eliminar un registro */}
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
+            title={"Eliminar Usuario"}
             alertTitle={"¿Está seguro de eliminar el usuario:"}
             alertText={dataSelect.UsrNomUsu}
             showModalDelete={showModalDelete}
