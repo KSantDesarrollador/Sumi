@@ -86,6 +86,9 @@ const MenuData = () => {
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
+  const [showModalSave, setShowModalSave] = useState(false);
+  const [showModalActual, setShowModalActual] = useState(false);
+  const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
   const [dataSelect, setDataSelect] = useState({
     MnuId: "",
@@ -113,6 +116,16 @@ const MenuData = () => {
 
   const abrirCerrarModalEdit = () => {
     setShowModalEdit(!showModalEdit);
+  };
+
+  const abrirCerrarModalSave = (e) => {
+    e.preventDefault();
+    setShowModalSave(!showModalSave);
+  };
+
+  const abrirCerrarModalActual = (e) => {
+    e.preventDefault();
+    setShowModalActual(!showModalActual);
   };
 
   const abrirCerrarModalDelete = () => {
@@ -183,11 +196,15 @@ const MenuData = () => {
       .post(ServUrl, f, { headers: { "Content-Type": "multipart/form-data" } })
       .then((response) => {
         setData(data.concat(response.data));
+        abrirCerrarModalSave(e);
         abrirCerrarModal();
+        setType("success");
         setAlert("Registro creado correctamente");
       })
       .catch((er) => {
         console.log(er);
+        setType("error");
+        setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
 
@@ -227,11 +244,15 @@ const MenuData = () => {
         });
 
         setData(newData);
+        abrirCerrarModalActual(e);
         abrirCerrarModalEdit();
+        setType("success");
         setAlert("Registro actualizado correctamente");
       })
       .catch((er) => {
         console.log(er);
+        setType("error");
+        setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
 
@@ -244,10 +265,13 @@ const MenuData = () => {
       .then((response) => {
         setData(data.filter((menu) => menu.MnuId !== dataSelect.MnuId));
         abrirCerrarModalDelete();
+        setType("success");
         setAlert("Registro eliminado correctamente");
       })
       .catch((er) => {
         console.log(er);
+        setType("error");
+        setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
 
@@ -286,6 +310,7 @@ const MenuData = () => {
               title={"Menús"}
               icon1={"zmdi zmdi-menu"}
               icon2={"zmdi zmdi-plus"}
+              type={type}
               alert={alert}
               changeState={changeState}
             />
@@ -564,16 +589,38 @@ const MenuData = () => {
               </Button>
             </ModalFooter>
           </Modal>
+          {/* Modal para confirmación antes de guardar un registro */}
+          <AllAlerts
+            alertClass={"confirm"}
+            alertType={"warning"}
+            title={"Guardar menú"}
+            alertTitle={"¿Está seguro de crear el menú:"}
+            alertText={dataSelect.MnuNomMen}
+            showModal={showModalSave}
+            actionUser={(e) => newMenu(e)}
+            abrirCerrarModal={abrirCerrarModalSave}
+          />
+          {/* Modal para confirmación antes de actualizar un registro */}
+          <AllAlerts
+            alertClass={"confirm"}
+            alertType={"warning"}
+            title={"Actualizar menú"}
+            alertTitle={"¿Está seguro de actualizar el menú a:"}
+            alertText={dataSelect.MnuNomMen}
+            showModal={showModalActual}
+            actionUser={(e) => updateMenu(e)}
+            abrirCerrarModal={abrirCerrarModalActual}
+          />
           {/* Modal para confirmación antes de eliminar un registro */}
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Eliminar Menú"}
+            title={"Eliminar menú"}
             alertTitle={"¿Está seguro de eliminar el menú:"}
             alertText={dataSelect.MnuNomMen}
-            showModalDelete={showModalDelete}
-            deleteUser={deleteMenu}
-            abrirCerrarModalDelete={abrirCerrarModalDelete}
+            showModal={showModalDelete}
+            actionUser={deleteMenu}
+            abrirCerrarModal={abrirCerrarModalDelete}
           />
         </Grid>
         <Footer />

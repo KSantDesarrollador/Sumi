@@ -90,9 +90,13 @@ const ServUrl = "http://localhost/SUMI/models/userModel.php";
 const UserData = () => {
   const classList = stylesPage();
   const [data, setData] = useState([]);
+  const [datalistSelectRol, setDatalistSelectRol] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
+  const [showModalSave, setShowModalSave] = useState(false);
+  const [showModalActual, setShowModalActual] = useState(false);
+  const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
   const [dataSelect, setDataSelect] = useState({
     UsrId: "",
@@ -116,6 +120,16 @@ const UserData = () => {
 
   const abrirCerrarModalEdit = () => {
     setShowModalEdit(!showModalEdit);
+  };
+
+  const abrirCerrarModalSave = (e) => {
+    e.preventDefault();
+    setShowModalSave(!showModalSave);
+  };
+
+  const abrirCerrarModalActual = (e) => {
+    e.preventDefault();
+    setShowModalActual(!showModalActual);
   };
 
   const abrirCerrarModalDelete = () => {
@@ -149,8 +163,21 @@ const UserData = () => {
       });
   };
 
+  // llenando select rol
+  const listSelectRol = async () => {
+    await axios
+      .get(ServUrl + "?rol=0")
+      .then((response) => {
+        setDatalistSelectRol(response.data);
+      })
+      .catch((er) => {
+        console.log(er);
+      });
+  };
+
   useEffect(() => {
     listUser();
+    listSelectRol();
   }, []);
 
   // Esta función guarda los datos de un nuevo rol
@@ -168,11 +195,15 @@ const UserData = () => {
       .post(ServUrl, f, { headers: { "Content-Type": "multipart/form-data" } })
       .then((response) => {
         setData(data.concat(response.data));
+        abrirCerrarModalSave(e);
         abrirCerrarModal();
+        setType("success");
         setAlert("Registro creado correctamente");
       })
       .catch((er) => {
         console.log(er);
+        setType("error");
+        setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
 
@@ -218,11 +249,15 @@ const UserData = () => {
         });
 
         setData(newData);
+        abrirCerrarModalActual(e);
         abrirCerrarModalEdit();
+        setType("success");
         setAlert("Registro actualizado correctamente");
       })
       .catch((er) => {
         console.log(er);
+        setType("error");
+        setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
 
@@ -235,10 +270,13 @@ const UserData = () => {
       .then((response) => {
         setData(data.filter((user) => user.UsrId !== dataSelect.UsrId));
         abrirCerrarModalDelete();
+        setType("success");
         setAlert("Registro eliminado correctamente");
       })
       .catch((er) => {
         console.log(er);
+        setType("error");
+        setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
 
@@ -276,6 +314,7 @@ const UserData = () => {
               title={"Usuarios"}
               icon1={"zmdi zmdi-male-female"}
               icon2={"zmdi zmdi-plus"}
+              type={type}
               alert={alert}
               changeState={changeState}
             />
@@ -306,23 +345,24 @@ const UserData = () => {
                     variant='outlined'
                     className={classList.formControl}>
                     <InputLabel htmlFor='outlined-age-native-simple'>
-                      Seleccione un Rol
+                      Rol contenedor
                     </InputLabel>
                     <Select
                       native
                       value={dataSelect.RrlId}
                       onChange={eventinput}
-                      label='Seleccione un Rol'
+                      label='Rol contenedor'
                       required
                       inputProps={{
-                        name: "RrlId",
+                        name: "RrlNomRol",
                         id: "outlined-age-native-simple",
                       }}>
-                      <option aria-label='' value='' />
-                      <option value={2}>Supervisor</option>
-                      <option value={3}>Técnico</option>
-                      <option value={4}>Usuario</option>
-                      <option value={5}>Invitado</option>
+                      <option key='0' aria-label='' value='' />
+                      {datalistSelectRol.map((item, index) => (
+                        <option key={index} value={item.RrlId} label=''>
+                          {item.RrlNomRol}
+                        </option>
+                      ))}
                     </Select>
                   </FormControl>
                   <TextField
@@ -427,25 +467,28 @@ const UserData = () => {
                     variant='outlined'
                     className={classList.formControl}>
                     <InputLabel htmlFor='outlined-age-native-simple'>
-                      Seleccione un Rol
+                      Rol contenedor
                     </InputLabel>
                     <Select
                       native
                       value={dataSelect.RrlId}
                       onChange={eventinput}
-                      label='Seleccione un Rol'
+                      label='Rol contenedor'
+                      required
                       inputProps={{
-                        name: "RrlId",
+                        name: "RrlNomRol",
                         id: "outlined-age-native-simple",
                       }}>
                       <option
+                        key='0'
                         label={dataSelect.RrlNomRol}
                         value={dataSelect.RrlId}
                       />
-                      <option value={2}>Supervisor</option>
-                      <option value={3}>Técnico</option>
-                      <option value={4}>Usuario</option>
-                      <option value={5}>Invitado</option>
+                      {datalistSelectRol.map((item, index) => (
+                        <option key={index} value={item.RrlId} label=''>
+                          {item.RrlNomRol}
+                        </option>
+                      ))}
                     </Select>
                   </FormControl>
                   <TextField
@@ -549,16 +592,38 @@ const UserData = () => {
               </Button>
             </ModalFooter>
           </Modal>
+          {/* Modal para confirmación antes de guardar un registro */}
+          <AllAlerts
+            alertClass={"confirm"}
+            alertType={"warning"}
+            title={"Guardar usuario"}
+            alertTitle={"¿Está seguro de crear el usuario:"}
+            alertText={dataSelect.UsrNomUsu}
+            showModal={showModalSave}
+            actionUser={(e) => newUser(e)}
+            abrirCerrarModal={abrirCerrarModalSave}
+          />
+          {/* Modal para confirmación antes de actualizar un registro */}
+          <AllAlerts
+            alertClass={"confirm"}
+            alertType={"warning"}
+            title={"Actualizar usuario"}
+            alertTitle={"¿Está seguro de actualizar el usuario a:"}
+            alertText={dataSelect.UsrNomUsu}
+            showModal={showModalActual}
+            actionUser={(e) => updateUser(e)}
+            abrirCerrarModal={abrirCerrarModalActual}
+          />
           {/* Modal para confirmación antes de eliminar un registro */}
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Eliminar Usuario"}
+            title={"Eliminar usuario"}
             alertTitle={"¿Está seguro de eliminar el usuario:"}
             alertText={dataSelect.UsrNomUsu}
-            showModalDelete={showModalDelete}
-            deleteUser={deleteUser}
-            abrirCerrarModalDelete={abrirCerrarModalDelete}
+            showModal={showModalDelete}
+            actionUser={deleteUser}
+            abrirCerrarModal={abrirCerrarModalDelete}
           />
         </Grid>
         <Footer />

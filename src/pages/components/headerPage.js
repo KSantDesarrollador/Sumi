@@ -35,7 +35,7 @@ const HeaderPage = (props) => {
         <div className='alertHide' id='al'>
           <AllAlerts
             alertClass='info'
-            alertType='success'
+            alertType={props.type}
             alertText={props.alert}
             changeState={props.changeState}
           />

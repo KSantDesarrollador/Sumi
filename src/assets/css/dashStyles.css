@@ -15,10 +15,12 @@ body{
 }
 
 .activo{
-	transition: all cubic-bezier(0.19, 1, 0.22, 1) ease-in-out;
-	background-color: blue;
+	transition: 1s;
+	background: blue;
 	color: #000000;
+	/* animation: activo 1s; */
 }
+
 
 .full-width {
 	margin: 0;
@@ -174,12 +176,14 @@ body{
 }
 
 .sub-menu-options {
-	height: 0;
-	overflow-y: hidden;
-	overflow-x: hidden;
+	overflow: hidden;
 	background: rgba(0, 0, 0, 0.2);
-	transition: all 0.5s ease-in-out;
+	transition: .2s;
+	overflow-y: hidden;
+	/* animation: sub-menu-options 3s; */
+	height: 0;
 }
+
 
 .sub-menu-options li a {
 	border-left: 15px solid transparent;
@@ -190,11 +194,13 @@ body{
 }
 
 .sub-menu-options-show {
-	height: auto !important;
-	overflow-y: auto !important;
-   overflow-x: hidden;
-   transition: all cubic-bezier(0.19, 1, 0.22, 3) ease-in-out;
+	height: 100%;
+	overflow: hidden;
+	transition: .5s;
+	/* animation: sub-menu-options-show .5s; */
+
 }
+
 
 /*Tablet*/
 @media (min-width: 380px) and (max-width: 839px) {

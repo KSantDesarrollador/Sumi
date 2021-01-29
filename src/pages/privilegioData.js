@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Modal, ModalBody, ModalFooter, ModalHeader, Button } from "reactstrap";
-import { makeStyles, Grid, TextField, Tooltip } from "@material-ui/core";
+import {
+  makeStyles,
+  Grid,
+  TextField,
+  Tooltip,
+  FormControl,
+  InputLabel,
+  Select,
+} from "@material-ui/core";
 import axios from "axios";
 // importandom los componentes
 import Menu from "../templates/menu";
@@ -27,6 +35,13 @@ const stylesPage = makeStyles((theme) => ({
     color: "black",
     width: "40px",
     height: "40px",
+  },
+  formControl: {
+    margin: theme.spacing(0),
+    minWidth: "100%",
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
   },
   toolbar: {
     display: "flex",
@@ -62,11 +77,13 @@ const stylesPage = makeStyles((theme) => ({
   },
 }));
 
-const ServUrl = "http://localhost/SUMI/models/rolModel.php";
+const ServUrl = "http://localhost/SUMI/models/privilegioModel.php";
 
-const RolData = () => {
+const PrivilegioData = () => {
   const classList = stylesPage();
   const [data, setData] = useState([]);
+  const [datalistSelectRol, setDatalistSelectRol] = useState([]);
+  const [datalistSelectMenu, setDatalistSelectMenu] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
@@ -75,9 +92,9 @@ const RolData = () => {
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
   const [dataSelect, setDataSelect] = useState({
+    MxRId: "",
     RrlId: "",
-    RrlNomRol: "",
-    RrlEstRol: "",
+    MnuId: "",
   });
 
   const changeState = () => {
@@ -115,7 +132,7 @@ const RolData = () => {
   };
 
   // obteniendo datos de un servidor
-  const listRol = async () => {
+  const listPrivilegio = async () => {
     await axios
       .get(ServUrl)
       .then((response) => {
@@ -126,15 +143,42 @@ const RolData = () => {
       });
   };
 
+  // llenando select rol
+  const listSelectRol = async () => {
+    await axios
+      .get(ServUrl + "?rol=0")
+      .then((response) => {
+        setDatalistSelectRol(response.data);
+      })
+      .catch((er) => {
+        console.log(er);
+      });
+  };
+
+  // llenando select menú
+  const listSelectMenu = async () => {
+    await axios
+      .get(ServUrl + "?menu=1")
+      .then((response) => {
+        setDatalistSelectMenu(response.data);
+      })
+      .catch((er) => {
+        console.log(er);
+      });
+  };
+
   useEffect(() => {
-    listRol();
+    listPrivilegio();
+    listSelectRol();
+    listSelectMenu();
   }, []);
 
   // Esta función guarda los datos de un nuevo rol
-  const newRol = async (e) => {
+  const newPrivilegio = async (e) => {
     e.preventDefault();
     let f = new FormData();
-    f.append("RrlNomRol", dataSelect.RrlNomRol);
+    f.append("RrlId", dataSelect.RrlId);
+    f.append("MnuId", dataSelect.MnuId);
     f.append("METHOD", "POST");
     await axios
       .post(ServUrl, f)
@@ -153,20 +197,20 @@ const RolData = () => {
   };
 
   // Esta función actualiza los datos del rol selecionado
-  const updateRol = async (e) => {
+  const updatePrivilegio = async (e) => {
     e.preventDefault();
     let f = new FormData();
-    f.append("RrlNomRol", dataSelect.RrlNomRol);
-    f.append("RrlEstRol", dataSelect.RrlEstRol);
+    f.append("RrlId", dataSelect.RrlId);
+    f.append("MnuId", dataSelect.MnuId);
     f.append("METHOD", "PUT");
     await axios
-      .post(ServUrl, f, { params: { id: dataSelect.RrlId } })
+      .post(ServUrl, f, { params: { id: dataSelect.MxRId } })
       .then((response) => {
         let newData = data;
         newData.map((info) => {
-          if (info.RrlId === dataSelect.RrlId) {
-            info.RrlNomRol = dataSelect.RrlNomRol;
-            info.RrlEstRol = dataSelect.RrlEstRol;
+          if (info.MxRId === dataSelect.MxRId) {
+            info.RrlId = dataSelect.RrlId;
+            info.MnuId = dataSelect.MnuId;
           }
           return info;
         });
@@ -185,13 +229,13 @@ const RolData = () => {
   };
 
   // Esta función elimina los datos del rol seleccionado
-  const deleteRol = async () => {
+  const deletePrivilegio = async () => {
     let f = new FormData();
     f.append("METHOD", "DELETE");
     await axios
-      .post(ServUrl, f, { params: { id: dataSelect.RrlId } })
+      .post(ServUrl, f, { params: { id: dataSelect.MxRId } })
       .then((response) => {
-        setData(data.filter((rol) => rol.RrlId !== dataSelect.RrlId));
+        setData(data.filter((rol) => rol.MxRId !== dataSelect.MxRId));
         abrirCerrarModalDelete();
         setType("success");
         setAlert("Registro eliminado correctamente");
@@ -215,11 +259,11 @@ const RolData = () => {
 
   // Formando las columnas de la tabla
   const columns = [
-    { title: "ID", field: "RrlId" },
+    { title: "ID", field: "MxRId" },
     { title: "", field: "" },
     { title: "ROL", field: "RrlNomRol" },
     { title: "", field: "" },
-    { title: "ESTADO", field: "RrlEstRol" },
+    { title: "MENÚ", field: "MnuNomMen" },
     { title: "", field: "" },
     { title: "", field: "" },
     { title: "", field: "" },
@@ -235,7 +279,7 @@ const RolData = () => {
             {/* Cabecera de la página */}
             <HeaderPage
               AbrirCerrarModal={abrirCerrarModal}
-              title={"Roles"}
+              title={"Privilegios"}
               icon1={"zmdi zmdi-assignment"}
               icon2={"zmdi zmdi-plus"}
               type={type}
@@ -250,13 +294,13 @@ const RolData = () => {
               selectedItem={selectedItem}
               data={data}
               columns={columns}
-              title={"Roles habilitados en el sistema"}
+              title={"Privilegios de usuario"}
             />
           </Grid>
           {/* Modal que muestra un formulario para agregar un nuevo rol */}
           <Modal isOpen={showModal} className={classList.modal}>
             <ModalHeader className={classList.modalHeaderNew}>
-              Agregar Rol
+              Agregar Privilegio
             </ModalHeader>
             <ModalBody>
               <div>
@@ -264,19 +308,57 @@ const RolData = () => {
                   id='formNewData'
                   encType='multipart/form-data'
                   onSubmit={(e) => abrirCerrarModalSave(e)}>
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='RrlNomRol'
+                  <FormControl
                     size='small'
-                    id='RrlNomRol'
-                    label='Nombre del Rol'
-                    fullWidth
-                    autoFocus
-                    required
-                    onChange={eventinput}
-                  />
+                    variant='outlined'
+                    className={classList.formControl}>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Rol contenedor
+                    </InputLabel>
+                    <Select
+                      native
+                      value={dataSelect.RrlId}
+                      onChange={eventinput}
+                      label='Rol contenedor'
+                      required
+                      inputProps={{
+                        name: "RrlNomRol",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option key='0' aria-label='' value='' />
+                      {datalistSelectRol.map((item, index) => (
+                        <option key={index} value={item.RrlId} label=''>
+                          {item.RrlNomRol}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  &nbsp;
+                  <FormControl
+                    size='small'
+                    variant='outlined'
+                    className={classList.formControl}>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Menú contenedor
+                    </InputLabel>
+                    <Select
+                      native
+                      value={dataSelect.MnuId}
+                      onChange={eventinput}
+                      label='Menú contenedor'
+                      required
+                      inputProps={{
+                        name: "MnuNomMen",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option key='0' aria-label='' value='' />
+                      {datalistSelectMenu.map((item, index) => (
+                        <option key={index} value={item.MnuId} label=''>
+                          {item.MnuNomMen}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </form>
               </div>
             </ModalBody>
@@ -303,7 +385,7 @@ const RolData = () => {
           {/* Modal que muestra los datos del rol a ser editado */}
           <Modal isOpen={showModalEdit} className={classList.modal}>
             <ModalHeader className={classList.modalHeaderEdit}>
-              Editar Rol
+              Editar Privilegio
             </ModalHeader>
             <ModalBody>
               <div className='mb-3'>
@@ -311,34 +393,66 @@ const RolData = () => {
                   id='formUpdateData'
                   encType='multipart/form-data'
                   onSubmit={(e) => abrirCerrarModalActual(e)}>
-                  <input type='hidden' name='RrlId' value={dataSelect.RrlId} />
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='RrlNomRol'
+                  <input type='hidden' name='MxRId' value={dataSelect.MxRId} />
+                  <FormControl
                     size='small'
-                    id='RrlNomRol'
-                    label='Nombre del Rol'
-                    fullWidth
-                    autoFocus
-                    required
-                    value={dataSelect.RrlNomRol}
-                    onChange={eventinput}
-                  />
-                  <TextField
                     variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='RrlEstRol'
+                    className={classList.formControl}>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Rol contenedor
+                    </InputLabel>
+                    <Select
+                      native
+                      value={dataSelect.RrlId}
+                      onChange={eventinput}
+                      label='Rol contenedor'
+                      required
+                      inputProps={{
+                        name: "RrlNomRol",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option
+                        key='0'
+                        label={dataSelect.RrlNomRol}
+                        value={dataSelect.RrlId}
+                      />
+                      {datalistSelectRol.map((item, index) => (
+                        <option key={index} value={item.RrlId} label=''>
+                          {item.RrlNomRol}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  &nbsp;
+                  <FormControl
                     size='small'
-                    id='RrlEstRol'
-                    label='Estado'
-                    fullWidth
-                    required
-                    value={dataSelect.RrlEstRol}
-                    onChange={eventinput}
-                  />
+                    variant='outlined'
+                    className={classList.formControl}>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Menú contenedor
+                    </InputLabel>
+                    <Select
+                      native
+                      value={dataSelect.MnuId}
+                      onChange={eventinput}
+                      label='Menú contenedor'
+                      required
+                      inputProps={{
+                        name: "MnuNomMen",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option
+                        key='0'
+                        label={dataSelect.MnuNomMen}
+                        value={dataSelect.MnuId}
+                      />
+                      {datalistSelectMenu.map((item, index) => (
+                        <option key={index} value={item.MnuId} label=''>
+                          {item.MnuNomMen}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </form>
               </div>
             </ModalBody>
@@ -366,33 +480,33 @@ const RolData = () => {
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Guardar Rol"}
-            alertTitle={"¿Está seguro de crear el rol:"}
-            alertText={dataSelect.RrlNomRol}
+            title={"Guardar privilegio"}
+            alertTitle={"¿Está seguro de crear el privilegio:"}
+            alertText={dataSelect.MnuNomMen}
             showModal={showModalSave}
-            actionUser={(e) => newRol(e)}
+            actionUser={(e) => newPrivilegio(e)}
             abrirCerrarModal={abrirCerrarModalSave}
           />
           {/* Modal para confirmación antes de actualizar un registro */}
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Actualizar Rol"}
-            alertTitle={"¿Está seguro de actualizar el rol a:"}
+            title={"Actualizar privilegio"}
+            alertTitle={"¿Está seguro de actualizar el privilegio a:"}
             alertText={dataSelect.RrlNomRol}
             showModal={showModalActual}
-            actionUser={(e) => updateRol(e)}
+            actionUser={(e) => updatePrivilegio(e)}
             abrirCerrarModal={abrirCerrarModalActual}
           />
           {/* Modal para confirmación antes de eliminar un registro */}
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Eliminar Rol"}
-            alertTitle={"¿Está seguro de eliminar el rol:"}
-            alertText={dataSelect.RrlNomRol}
+            title={"Eliminar privilegio"}
+            alertTitle={"¿Está seguro de eliminar el privilegio:"}
+            alertText={dataSelect.MnuNomMen}
             showModal={showModalDelete}
-            actionUser={deleteRol}
+            actionUser={deletePrivilegio}
             abrirCerrarModal={abrirCerrarModalDelete}
           />
         </Grid>
@@ -402,4 +516,4 @@ const RolData = () => {
   );
 };
 
-export default RolData;
+export default PrivilegioData;

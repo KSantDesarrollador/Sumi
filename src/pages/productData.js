@@ -150,9 +150,13 @@ const ServUrl = "http://localhost/SUMI/models/productModel.php";
 const ProductData = () => {
   const classList = stylesPage();
   const [data, setData] = useState([]);
+  const [datalistSelectCat, setDatalistSelectCat] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
+  const [showModalSave, setShowModalSave] = useState(false);
+  const [showModalActual, setShowModalActual] = useState(false);
+  const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
   const [dataSelect, setDataSelect] = useState({
     MdcId: "",
@@ -178,6 +182,16 @@ const ProductData = () => {
 
   const abrirCerrarModalEdit = () => {
     setShowModalEdit(!showModalEdit);
+  };
+
+  const abrirCerrarModalSave = (e) => {
+    e.preventDefault();
+    setShowModalSave(!showModalSave);
+  };
+
+  const abrirCerrarModalActual = (e) => {
+    e.preventDefault();
+    setShowModalActual(!showModalActual);
   };
 
   const abrirCerrarModalDelete = () => {
@@ -217,8 +231,21 @@ const ProductData = () => {
       });
   };
 
+  // llenando select categoría
+  const listSelectCategory = async () => {
+    await axios
+      .get(ServUrl + "?rol=0")
+      .then((response) => {
+        setDatalistSelectCat(response.data);
+      })
+      .catch((er) => {
+        console.log(er);
+      });
+  };
+
   useEffect(() => {
     listProduct();
+    listSelectCategory();
   }, []);
 
   // Esta función guarda los datos de un nuevo rol
@@ -239,11 +266,15 @@ const ProductData = () => {
       .post(ServUrl, f, { headers: { "Content-Type": "multipart/form-data" } })
       .then((response) => {
         setData(data.concat(response.data));
+        abrirCerrarModalSave(e);
         abrirCerrarModal();
+        setType("success");
         setAlert("Registro creado correctamente");
       })
       .catch((er) => {
         console.log(er);
+        setType("error");
+        setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
 
@@ -289,11 +320,15 @@ const ProductData = () => {
         });
 
         setData(newData);
+        abrirCerrarModalActual(e);
         abrirCerrarModalEdit();
+        setType("success");
         setAlert("Registro actualizado correctamente");
       })
       .catch((er) => {
         console.log(er);
+        setType("error");
+        setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
 
@@ -306,10 +341,13 @@ const ProductData = () => {
       .then((response) => {
         setData(data.filter((product) => product.MdcId !== dataSelect.MdcId));
         abrirCerrarModalDelete();
+        setType("success");
         setAlert("Registro eliminado correctamente");
       })
       .catch((er) => {
         console.log(er);
+        setType("error");
+        setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
 
@@ -354,7 +392,7 @@ const ProductData = () => {
                     <div className='alertHide' id='al'>
                       <AllAlerts
                         alertClass='info'
-                        alertType='success'
+                        alertType={type}
                         alertText={alert}
                         changeState={changeState}
                       />
@@ -448,23 +486,24 @@ const ProductData = () => {
                       variant='outlined'
                       className={classList.formControl}>
                       <InputLabel htmlFor='outlined-age-native-simple'>
-                        Seleccione una categoría
+                        Categoría contenedor
                       </InputLabel>
                       <Select
                         native
                         value={dataSelect.CtgId}
                         onChange={eventinput}
-                        label='Seleccione una categoría'
+                        label='Categoría contenedor'
                         required
                         inputProps={{
-                          name: "CtgId",
+                          name: "CtgNomCat",
                           id: "outlined-age-native-simple",
                         }}>
-                        <option aria-label='' value='' />
-                        <option value={1}>General</option>
-                        <option value={2}>Antídoto</option>
-                        <option value={3}></option>
-                        <option value={4}></option>
+                        <option key='0' aria-label='' value='' />
+                        {datalistSelectCat.map((item, index) => (
+                          <option key={index} value={item.CtgId} label=''>
+                            {item.CtgNomCat}
+                          </option>
+                        ))}
                       </Select>
                     </FormControl>
                     &nbsp;
@@ -654,26 +693,28 @@ const ProductData = () => {
                       variant='outlined'
                       className={classList.formControl}>
                       <InputLabel htmlFor='outlined-age-native-simple'>
-                        Seleccione una categoría
+                        Categoría contenedor
                       </InputLabel>
                       <Select
                         native
                         value={dataSelect.CtgId}
                         onChange={eventinput}
-                        label='Seleccione una categoría'
+                        label='Categoría contenedor'
                         required
                         inputProps={{
-                          name: "CtgId",
+                          name: "RrlNomRol",
                           id: "outlined-age-native-simple",
                         }}>
                         <option
+                          key='0'
                           label={dataSelect.CtgNomCat}
                           value={dataSelect.CtgId}
                         />
-                        <option value={1}>General</option>
-                        <option value={2}>Antídoto</option>
-                        <option value={3}></option>
-                        <option value={4}></option>
+                        {datalistSelectCat.map((item, index) => (
+                          <option key={index} value={item.CtgId} label=''>
+                            {item.CtgNomCat}
+                          </option>
+                        ))}
                       </Select>
                     </FormControl>
                     &nbsp;
@@ -866,16 +907,38 @@ const ProductData = () => {
               </Button>
             </ModalFooter>
           </Modal>
+          {/* Modal para confirmación antes de guardar un registro */}
+          <AllAlerts
+            alertClass={"confirm"}
+            alertType={"warning"}
+            title={"Guardar producto"}
+            alertTitle={"¿Está seguro de crear el producto:"}
+            alertText={dataSelect.MdcDescMed}
+            showModal={showModalSave}
+            actionUser={(e) => newProduct(e)}
+            abrirCerrarModal={abrirCerrarModalSave}
+          />
+          {/* Modal para confirmación antes de actualizar un registro */}
+          <AllAlerts
+            alertClass={"confirm"}
+            alertType={"warning"}
+            title={"Actualizar producto"}
+            alertTitle={"¿Está seguro de actualizar el producto a:"}
+            alertText={dataSelect.MdcDescMed}
+            showModal={showModalActual}
+            actionUser={(e) => updateProduct(e)}
+            abrirCerrarModal={abrirCerrarModalActual}
+          />
           {/* Modal para confirmación antes de eliminar un registro */}
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Eliminar Producto"}
+            title={"Eliminar producto"}
             alertTitle={"¿Está seguro de eliminar el producto:"}
             alertText={dataSelect.MdcDescMed}
-            showModalDelete={showModalDelete}
-            deleteUser={deleteProduct}
-            abrirCerrarModalDelete={abrirCerrarModalDelete}
+            showModal={showModalDelete}
+            actionUser={deleteProduct}
+            abrirCerrarModal={abrirCerrarModalDelete}
           />
         </Grid>
         <Footer />
