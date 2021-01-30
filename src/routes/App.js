@@ -11,6 +11,8 @@ import RolData from "../pages/rolData";
 import UserData from "../pages/userData";
 import ProductData from "../pages/productData";
 import PrivilegioData from "../pages/privilegioData";
+import CategoryData from "../pages/categoryData";
+import ProviderData from "../pages/providerData";
 
 export default class App extends Component {
   state = {
@@ -31,6 +33,8 @@ export default class App extends Component {
           <Route path='/users' component={UserData}></Route>
           <Route path='/products' component={ProductData}></Route>
           <Route path='/privilegios' component={PrivilegioData}></Route>
+          <Route path='/categories' component={CategoryData}></Route>
+          <Route path='/providers' component={ProviderData}></Route>
         </Switch>
       </Router>
     );

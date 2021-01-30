@@ -125,7 +125,7 @@ const stylesPage = makeStyles((theme) => ({
 
 const session = new Cookies();
 
-const Menu = (props) => {
+const Menu = () => {
   const classList = stylesPage();
   // const { window } = props;
   const theme = useTheme();
@@ -322,14 +322,6 @@ const Menu = (props) => {
       </nav>
     </div>
   );
-};
-
-Menu.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * You won't need it on your project.
-   */
-  window: PropTypes.func,
 };
 
 export default Menu;

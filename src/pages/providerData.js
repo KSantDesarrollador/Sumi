@@ -31,10 +31,17 @@ const stylesPage = makeStyles((theme) => ({
     width: "40px",
     height: "40px",
   },
-  iconPge: {
-    color: "black",
-    width: "40px",
-    height: "40px",
+
+  image: {
+    borderRadius: "30px",
+    width: "25px",
+    height: "25px",
+  },
+  file: { display: "block" },
+  contain: {
+    marginTop: "auto",
+    alignItems: "center",
+    paddingTop: "15px",
   },
   formControl: {
     margin: theme.spacing(0),
@@ -77,39 +84,36 @@ const stylesPage = makeStyles((theme) => ({
   },
 }));
 
-const ServUrl = "http://localhost/SUMI/models/menuModel.php";
+const ServUrl = "http://localhost/SUMI/models/providerModel.php";
 
-const MenuData = () => {
+const ProviderData = () => {
   const classList = stylesPage();
   const [data, setData] = useState([]);
-  const [datalistSelect, setDatalistSelect] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalSave, setShowModalSave] = useState(false);
   const [showModalActual, setShowModalActual] = useState(false);
+  const [dataType, setDataType] = useState(null);
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
   const [dataSelect, setDataSelect] = useState({
-    MnuId: "",
-    MnuJerqMen: "",
-    Jerarquia: "",
-    MnuNomMen: "",
-    MnuNivelMen: "",
-    MnuIconMen: "",
-    MnuUrlMen: "",
-    MnuLeyendMen: "",
-    MnuEstMen: "",
+    PvdId: "",
+    PvdTipProv: "",
+    PvdIdentProv: "",
+    PvdRazSocProv: "",
+    PvdTelfProv: "",
+    PvdDirProv: "",
+    PvdEmailProv: "",
+    PvdPerContProv: "",
+    PvdCarContProv: "",
+    PvdEstProv: "",
   });
 
   const changeState = () => {
     setAlert(null);
   };
 
-  const [jerqSelect, setJerqSelect] = useState({
-    MnuId: "",
-    MnuNomMen: "",
-  });
   const abrirCerrarModal = () => {
     setShowModal(!showModal);
   };
@@ -132,6 +136,15 @@ const MenuData = () => {
     setShowModalDelete(!showModalDelete);
   };
 
+  // seleccionando el tipo
+  const providerType = () => {
+    if (dataSelect.PvdTipProv === "N") {
+      setDataType("Natural");
+    } else {
+      setDataType("Jurídico");
+    }
+  };
+
   // obteniendo los datos de las cajas de texto
   const eventinput = (e) => {
     setDataSelect((prevState) => ({
@@ -141,7 +154,7 @@ const MenuData = () => {
   };
 
   // obteniendo datos de un servidor
-  const listMenu = async () => {
+  const listProvider = async () => {
     await axios
       .get(ServUrl)
       .then((response) => {
@@ -152,45 +165,22 @@ const MenuData = () => {
       });
   };
 
-  // llenando select
-  const listSelect = async () => {
-    await axios
-      .get(ServUrl + "?sel=0")
-      .then((response) => {
-        setDatalistSelect(response.data);
-      })
-      .catch((er) => {
-        console.log(er);
-      });
-  };
-
   useEffect(() => {
-    listMenu();
-    listSelect();
+    listProvider();
   }, []);
 
-  // obteniendo datos de un servidor
-  const listJerarquia = async () => {
-    await axios
-      .get(ServUrl + "?jer=" + dataSelect.MnuJerqMen)
-      .then((response) => {
-        setJerqSelect(response.data);
-      })
-      .catch((er) => {
-        console.log(er);
-      });
-  };
-
   // Esta función guarda los datos de un nuevo rol
-  const newMenu = async (e) => {
+  const newProvider = async (e) => {
     e.preventDefault();
     let f = new FormData();
-    f.append("MnuJerqMen", dataSelect.MnuJerqMen);
-    f.append("MnuNomMen", dataSelect.MnuNomMen);
-    f.append("MnuNivelMen", dataSelect.MnuNivelMen);
-    f.append("MnuIconMen", dataSelect.MnuIconMen);
-    f.append("MnuUrlMen", dataSelect.MnuUrlMen);
-    f.append("MnuLeyendMen", dataSelect.MnuLeyendMen);
+    f.append("PvdTipProv", dataSelect.PvdTipProv);
+    f.append("PvdIdentProv", dataSelect.PvdIdentProv);
+    f.append("PvdRazSocProv", dataSelect.PvdRazSocProv);
+    f.append("PvdTelfProv", dataSelect.PvdTelfProv);
+    f.append("PvdDirProv", dataSelect.PvdDirProv);
+    f.append("PvdEmailProv", dataSelect.PvdEmailProv);
+    f.append("PvdPerContProv", dataSelect.PvdPerContProv);
+    f.append("PvdCarContProv", dataSelect.PvdCarContProv);
     f.append("METHOD", "POST");
     await axios
       .post(ServUrl, f, { headers: { "Content-Type": "multipart/form-data" } })
@@ -209,36 +199,40 @@ const MenuData = () => {
   };
 
   // Esta función actualiza los datos del rol selecionado
-  const updateMenu = async (e) => {
+  const updateProvider = async (e) => {
     e.preventDefault();
     let f = new FormData();
-    f.append("MnuJerqMen", dataSelect.MnuJerqMen);
-    f.append("MnuNomMen", dataSelect.MnuNomMen);
-    f.append("MnuNivelMen", dataSelect.MnuNivelMen);
-    f.append("MnuIconMen", dataSelect.MnuIconMen);
-    f.append("MnuUrlMen", dataSelect.MnuUrlMen);
-    f.append("MnuLeyendMen", dataSelect.MnuLeyendMen);
-    f.append("MnuEstMen", dataSelect.MnuEstMen);
+    f.append("PvdTipProv", dataSelect.PvdTipProv);
+    f.append("PvdIdentProv", dataSelect.PvdIdentProv);
+    f.append("PvdRazSocProv", dataSelect.PvdRazSocProv);
+    f.append("PvdTelfProv", dataSelect.PvdTelfProv);
+    f.append("PvdDirProv", dataSelect.PvdDirProv);
+    f.append("PvdEmailProv", dataSelect.PvdEmailProv);
+    f.append("PvdPerContProv", dataSelect.PvdPerContProv);
+    f.append("PvdCarContProv", dataSelect.PvdCarContProv);
+    f.append("PvdEstProv", dataSelect.PvdEstProv);
     f.append("METHOD", "PUT");
     await axios
       .post(
         ServUrl,
         f,
-        { params: { id: dataSelect.MnuId } },
+        { params: { id: dataSelect.PvdId } },
         { headers: { "Content-Type": "multipart/form-data" } }
       )
       .then((response) => {
+        console.log(response.data);
         let newData = data;
         newData.map((info) => {
-          if (info.MnuId === dataSelect.MnuId) {
-            info.MnuJerqMen = dataSelect.MnuJerqMen;
-            info.Jerarquia = dataSelect.Jerarquia;
-            info.MnuNomMen = dataSelect.MnuNomMen;
-            info.MnuNivelMen = dataSelect.MnuNivelMen;
-            info.MnuIconMen = dataSelect.MnuIconMen;
-            info.MnuUrlMen = dataSelect.MnuUrlMen;
-            info.MnuLeyendMen = dataSelect.MnuLeyendMen;
-            info.MnuEstMen = dataSelect.MnuEstMen;
+          if (info.PvdId === dataSelect.PvdId) {
+            info.PvdTipProv = dataSelect.PvdTipProv;
+            info.PvdIdentProv = dataSelect.PvdIdentProv;
+            info.PvdRazSocProv = dataSelect.PvdRazSocProv;
+            info.PvdTelfProv = dataSelect.PvdTelfProv;
+            info.PvdDirProv = dataSelect.PvdDirProv;
+            info.PvdEmailProv = dataSelect.PvdEmailProv;
+            info.PvdPerContProv = dataSelect.PvdPerContProv;
+            info.PvdCarContProv = dataSelect.PvdCarContProv;
+            info.PvdEstProv = dataSelect.PvdEstProv;
           }
           return info;
         });
@@ -257,13 +251,13 @@ const MenuData = () => {
   };
 
   // Esta función elimina los datos del rol seleccionado
-  const deleteMenu = async () => {
+  const deleteProvider = async () => {
     let f = new FormData();
     f.append("METHOD", "DELETE");
     await axios
-      .post(ServUrl, f, { params: { id: dataSelect.MnuId } })
+      .post(ServUrl, f, { params: { id: dataSelect.PvdId } })
       .then((response) => {
-        setData(data.filter((menu) => menu.MnuId !== dataSelect.MnuId));
+        setData(data.filter((user) => user.PvdId !== dataSelect.PvdId));
         abrirCerrarModalDelete();
         setType("success");
         setAlert("Registro eliminado correctamente");
@@ -276,10 +270,10 @@ const MenuData = () => {
   };
 
   // Esta función permite elegir el modal que se abrirá y guaerda los datos en el estado
-  const selectedItem = (menu, type) => {
-    setDataSelect(menu);
+  const selectedItem = (prov, type) => {
+    setDataSelect(prov);
+    providerType();
     if (type === "Edit") {
-      listJerarquia();
       abrirCerrarModalEdit();
     } else {
       abrirCerrarModalDelete();
@@ -288,13 +282,13 @@ const MenuData = () => {
 
   // Formando las columnas de la tabla
   const columns = [
-    { title: "ID", field: "MnuId" },
-    { title: "PADRE", field: "MnuJerqMen" },
-    { title: "NOMBRE", field: "MnuNomMen" },
-    { title: "NIVEL", field: "MnuNivelMen" },
-    { title: "ICONO", field: "MnuIconMen" },
-    { title: "URL", field: "MnuUrlMen" },
-    { title: "ESTADO", field: "MnuEstMen" },
+    { title: "ID", field: "PvdId" },
+    { title: "RUC", field: "PvdIdentProv" },
+    { title: "NOMBRE", field: "PvdRazSocProv" },
+    { title: "DIRECCIÓN", field: "PvdDirProv" },
+    { title: "TELF", field: "PvdTelfProv" },
+    { title: "EMAIL", field: "PvdEmailProv" },
+    { title: "ESTADO", field: "PvdEstProv" },
   ];
 
   return (
@@ -307,8 +301,8 @@ const MenuData = () => {
             {/* Cabecera de la página */}
             <HeaderPage
               AbrirCerrarModal={abrirCerrarModal}
-              title={"Menús"}
-              icon1={"zmdi zmdi-menu"}
+              title={"Proveedores"}
+              icon1={"zmdi zmdi-truck"}
               icon2={"zmdi zmdi-plus"}
               type={type}
               alert={alert}
@@ -317,18 +311,18 @@ const MenuData = () => {
           </Grid>
           &nbsp;
           <Grid container spacing={2}>
-            {/* Tabla que muestra la información de los menús en bd */}
+            {/* Tabla que muestra la información de los usuarios en bd */}
             <DataTable
               selectedItem={selectedItem}
               data={data}
               columns={columns}
-              title={"Menús habilitados en el sistema"}
+              title={"Proveedores habilitados en el sistema"}
             />
           </Grid>
           {/* Modal que muestra un formulario para agregar un nuevo rol */}
           <Modal isOpen={showModal} className={classList.modal}>
             <ModalHeader className={classList.modalHeaderNew}>
-              Agregar Menú
+              Agregar Proveedor
             </ModalHeader>
             <ModalBody>
               <div>
@@ -341,33 +335,30 @@ const MenuData = () => {
                     variant='outlined'
                     className={classList.formControl}>
                     <InputLabel htmlFor='outlined-age-native-simple'>
-                      Menú contenedor
+                      Tipo de Identificación
                     </InputLabel>
                     <Select
                       native
                       onChange={eventinput}
-                      label='Menú contenedor'
+                      label='Tipo de Identificación'
                       required
                       inputProps={{
-                        name: "MnuJerqMen",
+                        name: "PvdTipProv",
                         id: "outlined-age-native-simple",
                       }}>
                       <option key='0' aria-label='' value='' />
-                      {datalistSelect.map((item, index) => (
-                        <option key={index} value={item.MnuId} label=''>
-                          {item.MnuNomMen}
-                        </option>
-                      ))}
+                      <option key='1' value='N' label='Natural' />
+                      <option key='2' value='J' label='Jurídico' />
                     </Select>
                   </FormControl>
                   <TextField
                     variant='outlined'
                     margin='normal'
                     type='text'
-                    name='MnuNomMen'
+                    name='PvdIdentProv'
                     size='small'
-                    id='MnuNomMen'
-                    label='Nombre del menú'
+                    id='PvdIdentProv'
+                    label='Identificación'
                     fullWidth
                     autoFocus
                     required
@@ -376,13 +367,23 @@ const MenuData = () => {
                   <TextField
                     variant='outlined'
                     margin='normal'
-                    type='number'
-                    name='MnuNivelMen'
+                    type='text'
+                    name='PvdRazSocProv'
                     size='small'
-                    id='MnuNivelMen'
-                    label='Nivel'
-                    minimum='0'
-                    maximum='1'
+                    id='PvdRazSocProv'
+                    label='Razón Social'
+                    fullWidth
+                    required
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='telf'
+                    name='PvdTelfProv'
+                    size='small'
+                    id='PvdTelfProv'
+                    label='Teléfono'
                     fullWidth
                     required
                     onChange={eventinput}
@@ -391,10 +392,22 @@ const MenuData = () => {
                     variant='outlined'
                     margin='normal'
                     type='text'
-                    name='MnuIconMen'
+                    name='PvdDirProv'
                     size='small'
-                    id='MnuIconMen'
-                    label='Icono'
+                    id='PvdDirProv'
+                    label='Dirección'
+                    fullWidth
+                    required
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='email'
+                    name='PvdEmailProv'
+                    size='small'
+                    id='PvdEmailProv'
+                    label='Email'
                     fullWidth
                     required
                     onChange={eventinput}
@@ -403,23 +416,22 @@ const MenuData = () => {
                     variant='outlined'
                     margin='normal'
                     type='text'
-                    name='MnuUrlMen'
+                    name='PvdPerContProv'
                     size='small'
-                    id='MnuUrlMen'
-                    label='Url'
+                    id='PvdPerContProv'
+                    label='Persona de contacto'
                     fullWidth
                     required
                     onChange={eventinput}
                   />
                   <TextField
-                    className={classList.file}
                     variant='outlined'
                     margin='normal'
                     type='text'
-                    name='MnuLeyendMen'
+                    name='PvdCarContProv'
                     size='small'
-                    id='MnuLeyendMen'
-                    label='Leyenda'
+                    id='PvdCarContProv'
+                    label='Cargo del contacto'
                     fullWidth
                     required
                     onChange={eventinput}
@@ -450,7 +462,7 @@ const MenuData = () => {
           {/* Modal que muestra los datos del rol a ser editado */}
           <Modal isOpen={showModalEdit} className={classList.modal}>
             <ModalHeader className={classList.modalHeaderEdit}>
-              Editar Menú
+              Editar Usuario
             </ModalHeader>
             <ModalBody>
               <div className='mb-3'>
@@ -458,83 +470,95 @@ const MenuData = () => {
                   id='formUpdateData'
                   encType='multipart/form-data'
                   onSubmit={(e) => abrirCerrarModalActual(e)}>
-                  <input type='hidden' name='MnuId' value={dataSelect.MnuId} />
+                  <input type='hidden' name='PvdId' value={dataSelect.PvdId} />
                   <FormControl
                     size='small'
                     variant='outlined'
                     className={classList.formControl}>
                     <InputLabel htmlFor='outlined-age-native-simple'>
-                      Menú contenedor
+                      Tipo de Identificación
                     </InputLabel>
                     <Select
                       native
                       onChange={eventinput}
-                      label='Menú contenedor'
+                      label='Tipo de Identificación'
+                      required
                       inputProps={{
-                        name: "MnuJerqMen",
+                        name: "PvdTipProv",
                         id: "outlined-age-native-simple",
                       }}>
                       <option
-                        label={jerqSelect.MnuNomMen}
-                        value={jerqSelect.MnuId}
+                        key='0'
+                        label={dataType}
+                        value={dataSelect.PvdTipProv}
                       />
-                      {datalistSelect.map((item, index) => (
-                        <option key={index} value={item.MnuId} label=''>
-                          {item.MnuNomMen}
-                        </option>
-                      ))}
+                      <option key='1' value='N' label='Natural' />
+                      <option key='2' value='J' label='Jurídico' />
                     </Select>
                   </FormControl>
                   <TextField
                     variant='outlined'
                     margin='normal'
                     type='text'
-                    name='MnuNomMen'
+                    name='PvdIdentProv'
                     size='small'
-                    id='MnuNomMen'
-                    label='Nombre del menú'
+                    id='PvdIdentProv'
+                    label='Identificación'
                     fullWidth
                     autoFocus
                     required
-                    value={dataSelect.MnuNomMen}
-                    onChange={eventinput}
-                  />
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='number'
-                    name='MnuNivelMen'
-                    size='small'
-                    id='MnuNivelMen'
-                    label='Nivel'
-                    fullWidth
-                    required
-                    value={dataSelect.MnuNivelMen}
+                    value={dataSelect.PvdIdentProv}
                     onChange={eventinput}
                   />
                   <TextField
                     variant='outlined'
                     margin='normal'
                     type='text'
-                    name='MnuIconMen'
+                    name='PvdRazSocProv'
                     size='small'
-                    id='MnuIconMen'
-                    label='Icono'
+                    id='PvdRazSocProv'
+                    label='Razón Social'
                     fullWidth
                     required
-                    value={dataSelect.MnuIconMen}
+                    value={dataSelect.PvdRazSocProv}
                     onChange={eventinput}
                   />
                   <TextField
                     variant='outlined'
                     margin='normal'
-                    type='text'
-                    name='MnuUrlMen'
+                    type='telf'
+                    name='PvdTelfProv'
                     size='small'
-                    id='MnuUrlMen'
-                    label='Url'
+                    id='PvdTelfProv'
+                    label='Teléfono'
                     fullWidth
-                    value={dataSelect.MnuUrlMen}
+                    required
+                    value={dataSelect.PvdTelfProv}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='text'
+                    name='PvdDirProv'
+                    size='small'
+                    id='PvdDirProv'
+                    label='Dirección'
+                    fullWidth
+                    required
+                    value={dataSelect.PvdDirProv}
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='email'
+                    name='PvdEmailProv'
+                    size='small'
+                    id='PvdEmailProv'
+                    label='Email'
+                    fullWidth
+                    required
+                    value={dataSelect.PvdEmailProv}
                     onChange={eventinput}
                   />
                   <TextField
@@ -542,26 +566,40 @@ const MenuData = () => {
                     variant='outlined'
                     margin='normal'
                     type='text'
-                    name='MnuLeyendMen'
+                    name='PvdPerContProv'
                     size='small'
-                    id='MnuLeyendMen'
-                    label='Leyenda'
+                    id='PvdPerContProv'
+                    label='Persona de contacto'
                     fullWidth
                     required
-                    value={dataSelect.MnuLeyendMen}
+                    value={dataSelect.PvdPerContProv}
+                    onChange={eventinput}
+                  />
+                  <TextField
+                    className={classList.file}
+                    variant='outlined'
+                    margin='normal'
+                    type='text'
+                    name='PvdCarContProv'
+                    size='small'
+                    id='PvdCarContProv'
+                    label='Cargo del contacto'
+                    fullWidth
+                    required
+                    value={dataSelect.PvdCarContProv}
                     onChange={eventinput}
                   />
                   <TextField
                     variant='outlined'
                     margin='normal'
                     type='text'
-                    name='MnuEstMen'
+                    name='PvdEstProv'
                     size='small'
-                    id='MnuEstMen'
+                    id='PvdEstProv'
                     label='Estado'
                     fullWidth
                     required
-                    value={dataSelect.MnuEstMen}
+                    value={dataSelect.PvdEstProv}
                     onChange={eventinput}
                   />
                 </form>
@@ -591,33 +629,33 @@ const MenuData = () => {
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Guardar menú"}
-            alertTitle={"¿Está seguro de crear el menú:"}
-            alertText={dataSelect.MnuNomMen}
+            title={"Guardar proveedor"}
+            alertTitle={"¿Está seguro de crear el proveedor:"}
+            alertText={dataSelect.PvdRazSocProv}
             showModal={showModalSave}
-            actionUser={(e) => newMenu(e)}
+            actionUser={(e) => newProvider(e)}
             abrirCerrarModal={abrirCerrarModalSave}
           />
           {/* Modal para confirmación antes de actualizar un registro */}
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Actualizar menú"}
-            alertTitle={"¿Está seguro de actualizar el menú a:"}
-            alertText={dataSelect.MnuNomMen}
+            title={"Actualizar proveedor"}
+            alertTitle={"¿Está seguro de actualizar el proveedor:"}
+            alertText={dataSelect.PvdRazSocProv}
             showModal={showModalActual}
-            actionUser={(e) => updateMenu(e)}
+            actionUser={(e) => updateProvider(e)}
             abrirCerrarModal={abrirCerrarModalActual}
           />
           {/* Modal para confirmación antes de eliminar un registro */}
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Eliminar menú"}
-            alertTitle={"¿Está seguro de eliminar el menú:"}
-            alertText={dataSelect.MnuNomMen}
+            title={"Eliminar proveedor"}
+            alertTitle={"¿Está seguro de eliminar el proveedor:"}
+            alertText={dataSelect.PvdRazSocProv}
             showModal={showModalDelete}
-            actionUser={deleteMenu}
+            actionUser={deleteProvider}
             abrirCerrarModal={abrirCerrarModalDelete}
           />
         </Grid>
@@ -627,4 +665,4 @@ const MenuData = () => {
   );
 };
 
-export default MenuData;
+export default ProviderData;

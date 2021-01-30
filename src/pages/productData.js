@@ -20,7 +20,6 @@ import {
 import ViewComfyIcon from "@material-ui/icons/ViewComfy";
 import AddIcon from "@material-ui/icons/Add";
 import IconButton from "@material-ui/core/IconButton";
-import InfoIcon from "@material-ui/icons/Info";
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
 // importandom los componentes
@@ -234,7 +233,7 @@ const ProductData = () => {
   // llenando select categoría
   const listSelectCategory = async () => {
     await axios
-      .get(ServUrl + "?rol=0")
+      .get(ServUrl + "?cat=0")
       .then((response) => {
         setDatalistSelectCat(response.data);
       })
@@ -478,7 +477,7 @@ const ProductData = () => {
               <form
                 id='formNewData'
                 encType='multipart/form-data'
-                onSubmit={(e) => newProduct(e)}>
+                onSubmit={(e) => abrirCerrarModalSave(e)}>
                 <Grid container spacing={1}>
                   <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
                     <FormControl
@@ -490,7 +489,6 @@ const ProductData = () => {
                       </InputLabel>
                       <Select
                         native
-                        value={dataSelect.CtgId}
                         onChange={eventinput}
                         label='Categoría contenedor'
                         required
@@ -516,7 +514,6 @@ const ProductData = () => {
                       </InputLabel>
                       <Select
                         native
-                        value={dataSelect.MdcNivPrescMed}
                         onChange={eventinput}
                         label='Nivel de Prescripción'
                         required
@@ -524,7 +521,7 @@ const ProductData = () => {
                           name: "MdcNivPrescMed",
                           id: "outlined-age-native-simple",
                         }}>
-                        <option aria-label='None' value='' />
+                        <option aria-label='' value='' />
                         <option value={"O"}>O</option>
                         <option value={"P"}>P</option>
                         <option value={"E"}>E</option>
@@ -567,14 +564,13 @@ const ProductData = () => {
                       </InputLabel>
                       <Select
                         native
-                        value={dataSelect.MdcNivAtencMed}
                         onChange={eventinput}
                         label='Nivel de Atención'
                         inputProps={{
                           name: "MdcNivAtencMed",
                           id: "outlined-age-native-simple",
                         }}>
-                        <option aria-label='None' value='' />
+                        <option aria-label='' value='' />
                         <option value={"I"}>Nivel 1</option>
                         <option value={"II"}>Nivel 2</option>
                         <option value={"III"}>Nivel 3</option>
@@ -594,14 +590,13 @@ const ProductData = () => {
                       </InputLabel>
                       <Select
                         native
-                        value={dataSelect.MdcViaAdmMed}
                         onChange={eventinput}
                         label='Vía de administración'
                         inputProps={{
                           name: "MdcViaAdmMed",
                           id: "outlined-age-native-simple",
                         }}>
-                        <option aria-label='None' value='' />
+                        <option aria-label='' value='' />
                         <option value={"O"}>O</option>
                         <option value={"P"}>P</option>
                         <option value={"E"}>E</option>
@@ -680,7 +675,7 @@ const ProductData = () => {
               <form
                 id='formUpdateData'
                 encType='multipart/form-data'
-                onSubmit={(e) => updateProduct(e)}>
+                onSubmit={(e) => abrirCerrarModalActual(e)}>
                 <Grid container spacing={1}>
                   <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
                     <input
@@ -697,12 +692,11 @@ const ProductData = () => {
                       </InputLabel>
                       <Select
                         native
-                        value={dataSelect.CtgId}
                         onChange={eventinput}
                         label='Categoría contenedor'
                         required
                         inputProps={{
-                          name: "RrlNomRol",
+                          name: "CtgNomCat",
                           id: "outlined-age-native-simple",
                         }}>
                         <option
@@ -727,7 +721,6 @@ const ProductData = () => {
                       </InputLabel>
                       <Select
                         native
-                        value={dataSelect.MdcNivPrescMed}
                         onChange={eventinput}
                         label='Nivel de Prescripción'
                         required
@@ -796,7 +789,6 @@ const ProductData = () => {
                       </InputLabel>
                       <Select
                         native
-                        value={dataSelect.MdcNivAtencMed}
                         onChange={eventinput}
                         label='Nivel de Atención'
                         inputProps={{
@@ -826,7 +818,6 @@ const ProductData = () => {
                       </InputLabel>
                       <Select
                         native
-                        value={dataSelect.MdcViaAdmMed}
                         onChange={eventinput}
                         label='Vía de administración'
                         inputProps={{

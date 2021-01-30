@@ -3,11 +3,11 @@ import { Modal, ModalBody, ModalFooter, ModalHeader, Button } from "reactstrap";
 import {
   makeStyles,
   Grid,
+  TextField,
   Tooltip,
-  FormControl,
-  InputLabel,
-  Select,
+  Popover,
 } from "@material-ui/core";
+import SketchPicker from "react-color";
 import axios from "axios";
 // importandom los componentes
 import Menu from "../templates/menu";
@@ -34,13 +34,6 @@ const stylesPage = makeStyles((theme) => ({
     color: "black",
     width: "40px",
     height: "40px",
-  },
-  formControl: {
-    margin: theme.spacing(0),
-    minWidth: "100%",
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
   },
   toolbar: {
     display: "flex",
@@ -76,15 +69,11 @@ const stylesPage = makeStyles((theme) => ({
   },
 }));
 
-const ServUrl = "http://localhost/SUMI/models/privilegeModel.php";
+const ServUrl = "http://localhost/SUMI/models/categoryModel.php";
 
-const PrivilegioData = () => {
+const CategoryData = () => {
   const classList = stylesPage();
   const [data, setData] = useState([]);
-  const [datalistSelectRol, setDatalistSelectRol] = useState([]);
-  const [datalistSelectMenu, setDatalistSelectMenu] = useState([]);
-  const [dataRol, setDataRol] = useState([]);
-  const [dataMenu, setDataMenu] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
@@ -92,10 +81,12 @@ const PrivilegioData = () => {
   const [showModalActual, setShowModalActual] = useState(false);
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
+  const [open, setOpen] = useState(null);
   const [dataSelect, setDataSelect] = useState({
-    MxRId: "",
-    RrlId: "",
-    MnuId: "",
+    CtgId: "",
+    CtgNomCat: "",
+    CtgColorCat: "",
+    CtgEstCat: "",
   });
 
   const changeState = () => {
@@ -112,34 +103,48 @@ const PrivilegioData = () => {
 
   const abrirCerrarModalSave = (e) => {
     e.preventDefault();
-    listRolName();
-    listMenuName();
     setShowModalSave(!showModalSave);
   };
 
   const abrirCerrarModalActual = (e) => {
     e.preventDefault();
-    listRolName();
-    listMenuName();
     setShowModalActual(!showModalActual);
   };
 
   const abrirCerrarModalDelete = () => {
-    listRolName();
-    listMenuName();
     setShowModalDelete(!showModalDelete);
   };
+
+  // abrir y cerrar el picker de color
+  const openPicker = (event) => {
+    setOpen(event.currentTarget);
+  };
+
+  const closePicker = () => {
+    setOpen(null);
+  };
+
+  const opened = Boolean(open);
+  const id = opened ? "simple-popover" : undefined;
 
   // obteniendo los datos de las cajas de texto
   const eventinput = (e) => {
     setDataSelect((prevState) => ({
       ...prevState,
-      [e.target.name]: e.target.value,
+      [e.target.name]: [e.target.value],
+    }));
+  };
+
+  // obteniendo el color
+  const eventcolor = (color) => {
+    setDataSelect((prevState) => ({
+      ...prevState,
+      CtgColorCat: color.hex,
     }));
   };
 
   // obteniendo datos de un servidor
-  const listPrivilegio = async () => {
+  const listCategory = async () => {
     await axios
       .get(ServUrl)
       .then((response) => {
@@ -150,71 +155,21 @@ const PrivilegioData = () => {
       });
   };
 
-  // llenando select rol
-  const listSelectRol = async () => {
-    await axios
-      .get(ServUrl + "?rol=0")
-      .then((response) => {
-        setDatalistSelectRol(response.data);
-      })
-      .catch((er) => {
-        console.log(er);
-      });
-  };
-
-  // llenando select rol
-  const listRolName = async () => {
-    await axios
-      .get(ServUrl + "?rol=" + dataSelect.RrlId)
-      .then((response) => {
-        setDataRol(response.data);
-      })
-      .catch((er) => {
-        console.log(er);
-      });
-  };
-
-  // llenando select menú
-  const listSelectMenu = async () => {
-    await axios
-      .get(ServUrl + "?menu=0")
-      .then((response) => {
-        setDatalistSelectMenu(response.data);
-      })
-      .catch((er) => {
-        console.log(er);
-      });
-  };
-
-  // llenando select menú
-  const listMenuName = async () => {
-    await axios
-      .get(ServUrl + "?menu=" + dataSelect.MnuId)
-      .then((response) => {
-        setDataMenu(response.data);
-      })
-      .catch((er) => {
-        console.log(er);
-      });
-  };
-
   useEffect(() => {
-    listPrivilegio();
-    listSelectRol();
-    listSelectMenu();
+    listCategory();
   }, []);
 
   // Esta función guarda los datos de un nuevo rol
-  const newPrivilegio = async (e) => {
+  const newCategory = async (e) => {
     e.preventDefault();
     let f = new FormData();
-    f.append("RrlId", dataSelect.RrlId);
-    f.append("MnuId", dataSelect.MnuId);
+    f.append("CtgNomCat", dataSelect.CtgNomCat);
+    f.append("CtgColorCat", dataSelect.CtgColorCat);
     f.append("METHOD", "POST");
     await axios
       .post(ServUrl, f)
       .then((response) => {
-        listPrivilegio();
+        setData(data.concat(response.data));
         abrirCerrarModalSave(e);
         abrirCerrarModal();
         setType("success");
@@ -228,20 +183,23 @@ const PrivilegioData = () => {
   };
 
   // Esta función actualiza los datos del rol selecionado
-  const updatePrivilegio = async (e) => {
+  const updateCategory = async (e) => {
     e.preventDefault();
     let f = new FormData();
-    f.append("RrlId", dataSelect.RrlId);
-    f.append("MnuId", dataSelect.MnuId);
+    f.append("CtgNomCat", dataSelect.CtgNomCat);
+    f.append("CtgColorCat", dataSelect.CtgColorCat);
+    f.append("CtgEstCat", dataSelect.CtgEstCat);
     f.append("METHOD", "PUT");
     await axios
-      .post(ServUrl, f, { params: { id: dataSelect.MxRId } })
+      .post(ServUrl, f, { params: { id: dataSelect.CtgId } })
       .then((response) => {
         let newData = data;
         newData.map((info) => {
-          if (info.MxRId === dataSelect.MxRId) {
-            info.RrlId = dataSelect.RrlId;
-            info.MnuId = dataSelect.MnuId;
+          if (info.CtgId === dataSelect.CtgId) {
+            info.CtgNomCat = dataSelect.CtgNomCat;
+            info.CtgColorCat = dataSelect.CtgColorCat;
+            info.CtgDescCat = dataSelect.CtgDescCat;
+            info.CtgEstCat = dataSelect.CtgEstCat;
           }
           return info;
         });
@@ -260,13 +218,13 @@ const PrivilegioData = () => {
   };
 
   // Esta función elimina los datos del rol seleccionado
-  const deletePrivilegio = async () => {
+  const deleteCategory = async () => {
     let f = new FormData();
     f.append("METHOD", "DELETE");
     await axios
-      .post(ServUrl, f, { params: { id: dataSelect.MxRId } })
+      .post(ServUrl, f, { params: { id: dataSelect.CtgId } })
       .then((response) => {
-        setData(data.filter((priv) => priv.MxRId !== dataSelect.MxRId));
+        setData(data.filter((rol) => rol.CtgId !== dataSelect.CtgId));
         abrirCerrarModalDelete();
         setType("success");
         setAlert("Registro eliminado correctamente");
@@ -279,8 +237,8 @@ const PrivilegioData = () => {
   };
 
   // Esta función permite elegir el modal que se abrirá y guaerda los datos en el estado
-  const selectedItem = (priv, type) => {
-    setDataSelect(priv);
+  const selectedItem = (category, type) => {
+    setDataSelect(category);
     if (type === "Edit") {
       abrirCerrarModalEdit();
     } else {
@@ -290,13 +248,13 @@ const PrivilegioData = () => {
 
   // Formando las columnas de la tabla
   const columns = [
-    { title: "ID", field: "MxRId" },
-    { title: "", field: "" },
-    { title: "ROL", field: "RrlNomRol" },
-    { title: "", field: "" },
-    { title: "MENÚ", field: "MnuNomMen" },
-    { title: "", field: "" },
-    { title: "", field: "" },
+    { title: "ID", field: "CtgId" },
+    { title: "NOMBRE", field: "CtgNomCat" },
+    {
+      title: "COLOR",
+      field: "CtgColorCat",
+    },
+    { title: "ESTADO", field: "CtgEstCat" },
     { title: "", field: "" },
   ];
 
@@ -310,7 +268,7 @@ const PrivilegioData = () => {
             {/* Cabecera de la página */}
             <HeaderPage
               AbrirCerrarModal={abrirCerrarModal}
-              title={"Privilegios"}
+              title={"Categorías"}
               icon1={"zmdi zmdi-assignment"}
               icon2={"zmdi zmdi-plus"}
               type={type}
@@ -325,13 +283,13 @@ const PrivilegioData = () => {
               selectedItem={selectedItem}
               data={data}
               columns={columns}
-              title={"Privilegios de usuario"}
+              title={"Categoría de productos habilitadas"}
             />
           </Grid>
           {/* Modal que muestra un formulario para agregar un nuevo rol */}
           <Modal isOpen={showModal} className={classList.modal}>
             <ModalHeader className={classList.modalHeaderNew}>
-              Agregar Privilegio
+              Agregar Categoría
             </ModalHeader>
             <ModalBody>
               <div>
@@ -339,57 +297,46 @@ const PrivilegioData = () => {
                   id='formNewData'
                   encType='multipart/form-data'
                   onSubmit={(e) => abrirCerrarModalSave(e)}>
-                  <FormControl
-                    size='small'
+                  <TextField
                     variant='outlined'
-                    className={classList.formControl}>
-                    <InputLabel htmlFor='outlined-age-native-simple'>
-                      Rol contenedor
-                    </InputLabel>
-                    <Select
-                      native
-                      onChange={eventinput}
-                      label='Rol contenedor'
-                      name='RrlId'
-                      required
-                      inputProps={{
-                        name: "RrlId",
-                        id: "outlined-age-native-simple",
-                      }}>
-                      <option key='0' aria-label='' value='' />
-                      {datalistSelectRol.map((item, index) => (
-                        <option key={index} value={item.RrlId} label=''>
-                          {item.RrlNomRol}
-                        </option>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  &nbsp;
-                  <FormControl
+                    margin='normal'
+                    type='text'
+                    name='CtgNomCat'
                     size='small'
-                    variant='outlined'
-                    className={classList.formControl}>
-                    <InputLabel htmlFor='outlined-age-native-simple'>
-                      Menú contenedor
-                    </InputLabel>
-                    <Select
-                      native
-                      onChange={eventinput}
-                      label='Menú contenedor'
-                      name='MnuId'
+                    id='CtgNomCat'
+                    label='Nombre de la categoría'
+                    fullWidth
+                    autoFocus
+                    required
+                    onChange={eventinput}
+                  />
+                  <TextField fullWidth></TextField>
+                  <Button
+                    aria-label={id}
+                    variant='contained'
+                    color='info'
+                    onClick={openPicker}>
+                    Seleccione un color
+                  </Button>
+                  <Popover
+                    id={id}
+                    open={opened}
+                    anchorEl={open}
+                    onClose={closePicker}
+                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                    transformOrigin={{
+                      vertical: "left",
+                      horizontal: "left",
+                    }}>
+                    <SketchPicker
+                      id='CtgColorCat'
+                      label='Color de la categoría'
+                      fullWidth
+                      color={dataSelect.CtgColorCat}
                       required
-                      inputProps={{
-                        name: "MnuId",
-                        id: "outlined-age-native-simple",
-                      }}>
-                      <option key='1' aria-label='' value='' />
-                      {datalistSelectMenu.map((item, index) => (
-                        <option key={index} value={item.MnuId} label=''>
-                          {item.MnuNomMen}
-                        </option>
-                      ))}
-                    </Select>
-                  </FormControl>
+                      onChange={eventcolor}
+                    />
+                  </Popover>
                 </form>
               </div>
             </ModalBody>
@@ -416,7 +363,7 @@ const PrivilegioData = () => {
           {/* Modal que muestra los datos del rol a ser editado */}
           <Modal isOpen={showModalEdit} className={classList.modal}>
             <ModalHeader className={classList.modalHeaderEdit}>
-              Editar Privilegio
+              Editar Categoría
             </ModalHeader>
             <ModalBody>
               <div className='mb-3'>
@@ -424,64 +371,61 @@ const PrivilegioData = () => {
                   id='formUpdateData'
                   encType='multipart/form-data'
                   onSubmit={(e) => abrirCerrarModalActual(e)}>
-                  <input type='hidden' name='MxRId' value={dataSelect.MxRId} />
-                  <FormControl
-                    size='small'
+                  <input type='hidden' name='CtgId' value={dataSelect.CtgId} />
+                  <TextField
                     variant='outlined'
-                    className={classList.formControl}>
-                    <InputLabel htmlFor='outlined-age-native-simple'>
-                      Rol contenedor
-                    </InputLabel>
-                    <Select
-                      native
-                      onChange={eventinput}
-                      label='Rol contenedor'
-                      required
-                      inputProps={{
-                        name: "RrlId",
-                        id: "outlined-age-native-simple",
-                      }}>
-                      <option
-                        key='0'
-                        label={dataSelect.RrlNomRol}
-                        value={dataSelect.RrlId}
-                      />
-                      {datalistSelectRol.map((item, index) => (
-                        <option key={index} value={item.RrlId} label=''>
-                          {item.RrlNomRol}
-                        </option>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  &nbsp;
-                  <FormControl
+                    margin='normal'
+                    type='text'
+                    name='CtgNomCat'
                     size='small'
-                    variant='outlined'
-                    className={classList.formControl}>
-                    <InputLabel htmlFor='outlined-age-native-simple'>
-                      Menú contenedor
-                    </InputLabel>
-                    <Select
-                      native
-                      onChange={eventinput}
-                      label='Menú contenedor'
+                    id='CtgNomCat'
+                    label='Nombre de la categoría'
+                    fullWidth
+                    autoFocus
+                    required
+                    value={dataSelect.CtgNomCat}
+                    onChange={eventinput}
+                  />
+                  <TextField fullWidth></TextField>
+                  <Button
+                    aria-label={id}
+                    variant='contained'
+                    color='info'
+                    onClick={openPicker}>
+                    Seleccione un color
+                  </Button>
+                  <Popover
+                    id={id}
+                    open={opened}
+                    anchorEl={open}
+                    onClose={closePicker}
+                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                    transformOrigin={{
+                      vertical: "left",
+                      horizontal: "left",
+                    }}>
+                    <SketchPicker
+                      id='CtgColorCat'
+                      label='Color de la categoría'
+                      fullWidth
+                      color={dataSelect.CtgColorCat}
                       required
-                      inputProps={{
-                        name: "MnuId",
-                        id: "outlined-age-native-simple",
-                      }}>
-                      <option
-                        key='1'
-                        label={dataSelect.MnuNomMen}
-                        value={dataSelect.MnuId}
-                      />
-                      {datalistSelectMenu.map((item, index) => (
-                        <option key={index} value={item.MnuId} label=''>
-                          {item.MnuNomMen}
-                        </option>
-                      ))}
-                    </Select>
-                  </FormControl>
+                      onChange={eventcolor}
+                    />
+                  </Popover>
+                  <TextField
+                    variant='outlined'
+                    margin='normal'
+                    type='text'
+                    name='CtgEstCat'
+                    size='small'
+                    id='CtgEstCat'
+                    label='Estado'
+                    fullWidth
+                    required
+                    value={dataSelect.CtgEstCat}
+                    onChange={eventinput}
+                  />
                 </form>
               </div>
             </ModalBody>
@@ -509,33 +453,33 @@ const PrivilegioData = () => {
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Guardar privilegio"}
-            alertTitle={"¿Está seguro de asignar el privilegio:"}
-            alertText={dataRol.RrlNomRol + " " + "a" + " " + dataMenu.MnuNomMen}
+            title={"Guardar Categoría"}
+            alertTitle={"¿Está seguro de crear el Categoría:"}
+            alertText={dataSelect.CtgNomCat}
             showModal={showModalSave}
-            actionUser={(e) => newPrivilegio(e)}
+            actionUser={(e) => newCategory(e)}
             abrirCerrarModal={abrirCerrarModalSave}
           />
           {/* Modal para confirmación antes de actualizar un registro */}
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Actualizar privilegio"}
-            alertTitle={"¿Está seguro de asignar el privilegio:"}
-            alertText={dataRol.RrlNomRol + " " + "a" + " " + dataMenu.MnuNomMen}
+            title={"Actualizar Categoría"}
+            alertTitle={"¿Está seguro de actualizar la Categoría a:"}
+            alertText={dataSelect.CtgNomCat}
             showModal={showModalActual}
-            actionUser={(e) => updatePrivilegio(e)}
+            actionUser={(e) => updateCategory(e)}
             abrirCerrarModal={abrirCerrarModalActual}
           />
           {/* Modal para confirmación antes de eliminar un registro */}
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Eliminar privilegio"}
-            alertTitle={"¿Está seguro de eliminar el privilegio:"}
-            alertText={dataRol.RrlNomRol + " " + "a" + " " + dataMenu.MnuNomMen}
+            title={"Eliminar Categoría"}
+            alertTitle={"¿Está seguro de eliminar la Categoría:"}
+            alertText={dataSelect.CtgNomCat}
             showModal={showModalDelete}
-            actionUser={deletePrivilegio}
+            actionUser={deleteCategory}
             abrirCerrarModal={abrirCerrarModalDelete}
           />
         </Grid>
@@ -545,4 +489,4 @@ const PrivilegioData = () => {
   );
 };
 
-export default PrivilegioData;
+export default CategoryData;

@@ -339,7 +339,7 @@ const UserData = () => {
                 <form
                   id='formNewData'
                   encType='multipart/form-data'
-                  onSubmit={(e) => newUser(e)}>
+                  onSubmit={(e) => abrirCerrarModalSave(e)}>
                   <FormControl
                     size='small'
                     variant='outlined'
@@ -349,7 +349,6 @@ const UserData = () => {
                     </InputLabel>
                     <Select
                       native
-                      value={dataSelect.RrlId}
                       onChange={eventinput}
                       label='Rol contenedor'
                       required
@@ -460,7 +459,7 @@ const UserData = () => {
                 <form
                   id='formUpdateData'
                   encType='multipart/form-data'
-                  onSubmit={(e) => updateUser(e)}>
+                  onSubmit={(e) => abrirCerrarModalActual(e)}>
                   <input type='hidden' name='UsrId' value={dataSelect.UsrId} />
                   <FormControl
                     size='small'
@@ -471,7 +470,6 @@ const UserData = () => {
                     </InputLabel>
                     <Select
                       native
-                      value={dataSelect.RrlId}
                       onChange={eventinput}
                       label='Rol contenedor'
                       required
@@ -485,9 +483,11 @@ const UserData = () => {
                         value={dataSelect.RrlId}
                       />
                       {datalistSelectRol.map((item, index) => (
-                        <option key={index} value={item.RrlId} label=''>
-                          {item.RrlNomRol}
-                        </option>
+                        <option
+                          key={index}
+                          value={item.RrlId}
+                          label={item.RrlNomRol}
+                        />
                       ))}
                     </Select>
                   </FormControl>
