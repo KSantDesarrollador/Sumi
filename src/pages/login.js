@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
+import {
+  makeStyles,
+  Avatar,
+  Button,
+  CssBaseline,
+  TextField,
+  Grid,
+  Box,
+  Typography,
+  Container,
+} from "@material-ui/core";
 import axios from "axios";
 import Cookies from "universal-cookie";
 import md5 from "md5";
 // importando componenetes de materialUI
-import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import TextField from "@material-ui/core/TextField";
-import Grid from "@material-ui/core/Grid";
-import Box from "@material-ui/core/Box";
 import LockIcon from "@material-ui/icons/Lock";
-import Typography from "@material-ui/core/Typography";
-
-import Container from "@material-ui/core/Container";
+// importando componentes
+import AllAlerts from "./components/alerts";
 
 function Copyright() {
   return (
@@ -69,10 +72,18 @@ const Login = () => {
   const classList = useStyles();
 
   // const [resp, setResp] = useState(null);
+  const [type, setType] = useState("");
+  const [alert, setAlert] = useState(null);
+  const [show, setShow] = useState("alertHide");
   const [dataSelect, setDataSelect] = useState({
     UsrEmailUsu: "",
     UsrContraUsu: "",
   });
+
+  const changeState = () => {
+    setShow("alertHide");
+    setAlert(null);
+  };
 
   // obteniendo los datos de las cajas de texto
   const eventinput = (e) => {
@@ -81,6 +92,8 @@ const Login = () => {
       [e.target.name]: e.target.value,
     }));
   };
+
+  console.log(dataSelect.UsrContraUsu);
 
   // Esta función guarda los datos de un nuevo rol
   const login = async (e) => {
@@ -98,11 +111,10 @@ const Login = () => {
         if (response.length > 0) {
           let res = response[0];
           session.set("id", res.RrlId, { path: "/" });
+          session.set("user", res.UsrId, { path: "/" });
           session.set("name", res.UsrNomUsu, { path: "/" });
           session.set("email", res.UsrEmailUsu, { path: "/" });
           session.set("rol", res.RrlNomRol, { path: "/" });
-          session.set("image", res.UsrImgUsu, { path: "/" });
-          // alert(`Bienvenido ${res.UsrNomUsu}`);
           let deskRol = session.get("id");
           console.log(deskRol);
           switch (deskRol) {
@@ -123,11 +135,19 @@ const Login = () => {
               break;
           }
         } else {
-          alert("No existe el usuario");
+          setType("error");
+          setShow("alertShow");
+          setAlert(
+            `....Ops! El usuario no existe,\n
+              Por favor revise los datos`
+          );
         }
       })
       .catch((er) => {
         console.log(er);
+        setType("error");
+        setShow("alertShow");
+        setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
 
@@ -188,7 +208,7 @@ const Login = () => {
               label='Contraseña'
               type='password'
               id='UsrContraUsu'
-              autoComplete='current-password'
+              // autoComplete='current-password'
               onChange={eventinput}
             />
             {/* <Link to='/dashboard'/> */}
@@ -213,6 +233,15 @@ const Login = () => {
         <Box mt={8}>
           <Copyright />
         </Box>
+        <br />
+        {/* Modal para confirmación antes de guardar un registro */}
+        <AllAlerts
+          alertClass='info'
+          alertType={type}
+          alertText={alert}
+          show={show}
+          changeState={changeState}
+        />
       </Container>
     </Grid>
   );

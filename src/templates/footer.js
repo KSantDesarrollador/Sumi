@@ -10,6 +10,7 @@ const useStyles = makeStyles((theme) => ({
   link: {
     textDecoration: "none",
     right: 0,
+    fontSize: "13px",
   },
   icon: {
     marginRight: theme.spacing(0.5),
@@ -24,8 +25,7 @@ const useStyles = makeStyles((theme) => ({
     color: "#000000",
     backgroundColor: "rgba(255,255,255,0.8)",
     textAlign: "center",
-    paddingTop: "8px",
-    paddingBottom: "8px",
+    padding: "4px 0",
     bottom: 0,
   },
 }));

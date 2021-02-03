@@ -23,7 +23,7 @@ import IconButton from "@material-ui/core/IconButton";
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
 // importandom los componentes
-import Menu from "../templates/menu";
+import MenuBar from "../templates/menu";
 import Footer from "../templates/footer";
 import AllAlerts from "./components/alerts";
 
@@ -34,7 +34,7 @@ const stylesPage = makeStyles((theme) => ({
     overflow: "auto",
     backgroundPosition: "top",
     width: "100%",
-    height: "95vh",
+    height: "96vh",
   },
   gridList: {
     padding: "30px 0 10px 0",
@@ -68,6 +68,7 @@ const stylesPage = makeStyles((theme) => ({
   selectEmpty: {
     marginTop: theme.spacing(2),
   },
+  category: { height: "30px", background: "#000000" },
   toolbar: {
     display: "flex",
     alignItems: "center",
@@ -78,7 +79,7 @@ const stylesPage = makeStyles((theme) => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3),
+    padding: theme.spacing(2),
   },
   search: {
     position: "relative",
@@ -140,7 +141,7 @@ const stylesPage = makeStyles((theme) => ({
     justifyContent: "center",
   },
   footCard: {
-    fontSize: "12px",
+    fontSize: "8px",
   },
 }));
 
@@ -152,14 +153,17 @@ const ProductData = () => {
   const [datalistSelectCat, setDatalistSelectCat] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
+  const [showModalDetail, setShowModalDetail] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalSave, setShowModalSave] = useState(false);
   const [showModalActual, setShowModalActual] = useState(false);
+  const [show, setShow] = useState("alertHide");
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
   const [dataSelect, setDataSelect] = useState({
     MdcId: "",
     CtgId: "",
+    CtgNomCat: "",
     MdcCodMed: "",
     MdcDescMed: "",
     MdcPresenMed: "",
@@ -172,6 +176,7 @@ const ProductData = () => {
   });
 
   const changeState = () => {
+    setShow("alertHide");
     setAlert(null);
   };
 
@@ -181,6 +186,10 @@ const ProductData = () => {
 
   const abrirCerrarModalEdit = () => {
     setShowModalEdit(!showModalEdit);
+  };
+
+  const abrirCerrarModalDetail = () => {
+    setShowModalDetail(!showModalDetail);
   };
 
   const abrirCerrarModalSave = (e) => {
@@ -202,13 +211,28 @@ const ProductData = () => {
     alert.classList.replace("alertHide", "alertShow");
   }
 
+  // convirtiendo a base 64
+  const base64Convert = (images) => {
+    Array.from(images).forEach((image) => {
+      let reader = new FileReader();
+      reader.readAsDataURL(image);
+      reader.onload = function () {
+        let arrayAux = [];
+        let base64 = reader.result;
+        arrayAux = base64.split(",");
+        // console.log(arrayAux[1]);
+        setDataSelect((prevState) => ({
+          ...prevState,
+          MdcFotoMed: arrayAux[1],
+        }));
+      };
+    });
+  };
+
   // obteniendo los datos de las cajas de texto
   const eventinput = (e) => {
     if (e.target.name === "MdcFotoMed") {
-      setDataSelect((prevState) => ({
-        ...prevState,
-        [e.target.name]: e.target.files[0],
-      }));
+      base64Convert(e.target.files);
     } else {
       setDataSelect((prevState) => ({
         ...prevState,
@@ -222,8 +246,7 @@ const ProductData = () => {
     await axios
       .get(ServUrl)
       .then((response) => {
-        setData(response.data);
-        console.log(response.data);
+        setData(JSON.parse(response.data.split("<", 1)));
       })
       .catch((er) => {
         console.log(er);
@@ -247,6 +270,7 @@ const ProductData = () => {
     listSelectCategory();
   }, []);
 
+  console.log(dataSelect);
   // Esta función guarda los datos de un nuevo rol
   const newProduct = async (e) => {
     e.preventDefault();
@@ -268,11 +292,13 @@ const ProductData = () => {
         abrirCerrarModalSave(e);
         abrirCerrarModal();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro creado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -322,11 +348,13 @@ const ProductData = () => {
         abrirCerrarModalActual(e);
         abrirCerrarModalEdit();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro actualizado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -341,20 +369,25 @@ const ProductData = () => {
         setData(data.filter((product) => product.MdcId !== dataSelect.MdcId));
         abrirCerrarModalDelete();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro eliminado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
 
   // Esta función permite elegir el modal que se abrirá y guaerda los datos en el estado
   const selectedItem = (product, type) => {
-    setDataSelect(product);
     if (type === "Edit") {
+      setDataSelect(product);
       abrirCerrarModalEdit();
+    } else if (type === "Detail") {
+      setDataSelect(product);
+      abrirCerrarModalDetail();
     } else {
       abrirCerrarModalDelete();
     }
@@ -362,7 +395,7 @@ const ProductData = () => {
 
   return (
     <div className={classList.root}>
-      <Menu />
+      <MenuBar />
       <main>
         <Grid container className={classList.content}>
           <div className={classList.toolbar}></div>
@@ -378,7 +411,7 @@ const ProductData = () => {
           <Grid container spacing={3}>
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <GridList
-                cellHeight={250}
+                cellHeight={230}
                 className={classList.gridList}
                 cols={4}>
                 <GridListTile
@@ -393,6 +426,7 @@ const ProductData = () => {
                         alertClass='info'
                         alertType={type}
                         alertText={alert}
+                        show={show}
                         changeState={changeState}
                       />
                     </div>
@@ -410,60 +444,75 @@ const ProductData = () => {
                       />
                     </div>
                     &nbsp; &nbsp;
-                    <Tooltip title='Nuevo producto' placement='up'>
+                    <Tooltip title='Nuevo producto' placement='top'>
                       <Fab color='secondary' onClick={() => abrirCerrarModal()}>
                         <AddIcon />
                       </Fab>
                     </Tooltip>
                   </ListSubheader>
                 </GridListTile>
-                {data.map((item) => (
-                  <GridListTile
-                    key={item.MdcId}
-                    style={{
-                      width: 360,
-                      paddingTop: "35px",
-                    }}>
-                    <img src={item.MdcFotoMed} alt={item.MdcDescMed} />
-                    <GridListTileBar
-                      className={classList.footcard}
-                      title={item.MdcDescMed}
-                      subtitle={
-                        <div>
-                          <span> {item.MdcPresenMed}</span>
-                          &nbsp;
-                          <span> {item.MdcConcenMed}</span>
-                        </div>
-                      }
-                      actionIcon={
-                        <div>
-                          <Tooltip title='Detalles' placement='down'>
-                            <IconButton
-                              aria-label={`detalles ${item.MdcDescMed}`}
-                              className={classList.icon}>
-                              <i className='zmdi zmdi-info' />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title='Editar' placement='down'>
-                            <IconButton
-                              aria-label={`detalles ${item.MdcDescMed}`}
-                              className={classList.icon}
-                              onClick={() => selectedItem(item, "Edit")}>
-                              <i className='zmdi zmdi-edit' />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title='Eliminar' placement='down'>
-                            <IconButton
-                              aria-label={`detalles ${item.MdcDescMed}`}
-                              className={classList.icon}
-                              onClick={() => selectedItem(item, "Delete")}>
-                              <i className='zmdi zmdi-delete' />
-                            </IconButton>
-                          </Tooltip>
-                        </div>
-                      }
-                    />
-                  </GridListTile>
+
+                {data.map((item, index) => (
+                  <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+                    <GridListTile
+                      key={index}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        paddingTop: "15px",
+                      }}>
+                      <div
+                        style={{
+                          background: `${item.CtgColorCat}`,
+                          height: "30px",
+                          textAlign: "center",
+                          padding: "5px 0",
+                          fontSize: "15px",
+                        }}>
+                        {item.CtgNomCat}
+                      </div>
+                      <img
+                        style={{
+                          display: "flex",
+                          width: "100%",
+                          height: "100%",
+                        }}
+                        src={`data:image/jpeg;base64,${item.MdcFotoMed}`}
+                        alt={item.MdcDescMed}
+                      />
+                      <GridListTileBar
+                        className={classList.footcard}
+                        title={item.MdcDescMed}
+                        subtitle={
+                          <div>
+                            <span> {item.MdcPresenMed}</span>
+                            &nbsp;
+                            <span> {item.MdcConcenMed}</span>
+                          </div>
+                        }
+                        actionIcon={
+                          <div>
+                            <Tooltip title='Detalles' placement='bottom'>
+                              <IconButton
+                                aria-label={`detalles ${item.MdcDescMed}`}
+                                className={classList.icon}
+                                onClick={() => selectedItem(item, "Detail")}>
+                                <i className='zmdi zmdi-info' />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title='Editar' placement='bottom'>
+                              <IconButton
+                                aria-label={`detalles ${item.MdcDescMed}`}
+                                className={classList.icon}
+                                onClick={() => selectedItem(item, "Edit")}>
+                                <i className='zmdi zmdi-edit' />
+                              </IconButton>
+                            </Tooltip>
+                          </div>
+                        }
+                      />
+                    </GridListTile>
+                  </Grid>
                 ))}
               </GridList>
             </Grid>
@@ -493,7 +542,7 @@ const ProductData = () => {
                         label='Categoría contenedor'
                         required
                         inputProps={{
-                          name: "CtgNomCat",
+                          name: "CtgId",
                           id: "outlined-age-native-simple",
                         }}>
                         <option key='0' aria-label='' value='' />
@@ -660,7 +709,7 @@ const ProductData = () => {
                 size='md'
                 onClick={() => abrirCerrarModal()}>
                 <Tooltip title='Cancelar' placement='right'>
-                  <i className='zmdi zmdi-stop' />
+                  <i className='zmdi zmdi-close' />
                 </Tooltip>
               </Button>
             </ModalFooter>
@@ -696,7 +745,7 @@ const ProductData = () => {
                         label='Categoría contenedor'
                         required
                         inputProps={{
-                          name: "CtgNomCat",
+                          name: "CtgId",
                           id: "outlined-age-native-simple",
                         }}>
                         <option
@@ -893,7 +942,152 @@ const ProductData = () => {
                 size='md'
                 onClick={() => abrirCerrarModalEdit()}>
                 <Tooltip title='Cancelar' placement='right'>
-                  <i className='zmdi zmdi-stop' />
+                  <i className='zmdi zmdi-close' />
+                </Tooltip>
+              </Button>
+            </ModalFooter>
+          </Modal>
+          {/* Modal que muestra los datos del producto */}
+          <Modal isOpen={showModalDetail} className={classList.modal} size='lg'>
+            <ModalHeader className={classList.modalHeaderEdit}>
+              Detalles Producto
+            </ModalHeader>
+            <ModalBody>
+              <Grid container spacing={1}>
+                <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+                  <input type='hidden' name='MdcId' value={dataSelect.MdcId} />
+                  <img
+                    alt=''
+                    src={`data:image/jpeg;base64,${dataSelect.MdcFotoMed}`}
+                    width='80%'
+                    height='208px'
+                    variant='standard'
+                    margin='normal'
+                    size='small'
+                    id='MdcFotoMed'
+                    fullWidth
+                  />
+                  <TextField
+                    disabled
+                    variant='standard'
+                    margin='normal'
+                    type='text'
+                    size='small'
+                    id='CtgNomCat'
+                    label='Categoría del Producto'
+                    fullWidth
+                    value={dataSelect.CtgNomCat}
+                  />
+                  <TextField
+                    disabled
+                    variant='standard'
+                    margin='normal'
+                    type='text'
+                    size='small'
+                    id='MdcCodMed'
+                    label='Código de Producto'
+                    fullWidth
+                    value={dataSelect.MdcCodMed}
+                  />
+                  <TextField
+                    disabled
+                    variant='standard'
+                    margin='normal'
+                    type='text'
+                    size='small'
+                    id='MdcDescMed'
+                    label='Nombre de Producto'
+                    fullWidth
+                    value={dataSelect.MdcDescMed}
+                  />
+                </Grid>
+                <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+                  <TextField
+                    disabled
+                    variant='standard'
+                    margin='normal'
+                    type='text'
+                    size='small'
+                    id='MdcNivPrescMed'
+                    label='Nivel de Prescripción'
+                    fullWidth
+                    value={dataSelect.MdcNivPrescMed}
+                  />
+                  <TextField
+                    disabled
+                    variant='standard'
+                    margin='normal'
+                    type='text'
+                    size='small'
+                    id='MdcNivAtencMed'
+                    label='Nivel de Atención'
+                    fullWidth
+                    value={dataSelect.MdcNivAtencMed}
+                  />
+                  <TextField
+                    disabled
+                    variant='standard'
+                    margin='normal'
+                    type='text'
+                    size='small'
+                    id='MdcViaAdmMed'
+                    label='Vía de administración'
+                    fullWidth
+                    value={dataSelect.MdcViaAdmMed}
+                  />
+                  <TextField
+                    disabled
+                    variant='standard'
+                    margin='normal'
+                    type='text'
+                    size='small'
+                    id='MdcPresenMed'
+                    label='Presentación'
+                    fullWidth
+                    value={dataSelect.MdcPresenMed}
+                  />
+
+                  <TextField
+                    disabled
+                    variant='standard'
+                    margin='normal'
+                    type='text'
+                    size='small'
+                    id='MdcConcenMed'
+                    label='Concentración'
+                    fullWidth
+                    value={dataSelect.MdcConcenMed}
+                  />
+                  <TextField
+                    disabled
+                    variant='standard'
+                    margin='normal'
+                    type='text'
+                    size='small'
+                    id='MdcEstMed'
+                    label='Estado'
+                    fullWidth
+                    value={dataSelect.MdcEstMed}
+                  />
+                </Grid>
+              </Grid>
+            </ModalBody>
+            <ModalFooter className={classList.modalFooter}>
+              <Button
+                type='submit'
+                color='success'
+                size='md'
+                onClick={() => selectedItem(0, "Delete")}>
+                <Tooltip title='Eliminar' placement='left'>
+                  <i className='zmdi zmdi-delete' />
+                </Tooltip>
+              </Button>{" "}
+              <Button
+                color='danger'
+                size='md'
+                onClick={() => abrirCerrarModalDetail()}>
+                <Tooltip title='Cancelar' placement='right'>
+                  <i className='zmdi zmdi-close' />
                 </Tooltip>
               </Button>
             </ModalFooter>

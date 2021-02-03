@@ -79,7 +79,7 @@ const MainListItems = () => {
 
   useEffect(() => {
     listMenu();
-  });
+  }, []);
 
   const showSubmenu = (id) => {
     let menu = document.getElementById(id);
@@ -158,9 +158,9 @@ const MainListItems = () => {
         </li>
         <Divider />
         <li className='full-width divider-menu-h'></li>
-        {dataMenu.map((itemMenu) => (
+        {dataMenu.map((itemMenu, index) => (
           <li
-            key={itemMenu.MnuId}
+            key={index}
             className='full-width'
             onClick={() => {
               listSubmenu(itemMenu.MnuId);
@@ -176,8 +176,8 @@ const MainListItems = () => {
                 className={`zmdi zmdi-chevron-left span ${classList.icons}`}></span>
             </Link>
             <ul className='full-width menu-principal sub-menu-options'>
-              {dataSubmenu.map((itemSubmenu) => (
-                <li className='full-width' key={itemSubmenu.MnuId}>
+              {dataSubmenu.map((itemSubmenu, index) => (
+                <li className='full-width' key={index}>
                   <Link to={itemSubmenu.MnuUrlMen} className='full-width'>
                     <div className='navLateral-body-cl'>
                       <Tooltip

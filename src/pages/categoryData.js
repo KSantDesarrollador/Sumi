@@ -10,7 +10,7 @@ import {
 import SketchPicker from "react-color";
 import axios from "axios";
 // importandom los componentes
-import Menu from "../templates/menu";
+import MenuBar from "../templates/menu";
 import Footer from "../templates/footer";
 import HeaderPage from "./components/headerPage";
 import DataTable from "./components/dataTable";
@@ -45,7 +45,7 @@ const stylesPage = makeStyles((theme) => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3),
+    padding: theme.spacing(2),
   },
   modal: {
     marginTop: "5%",
@@ -79,6 +79,7 @@ const CategoryData = () => {
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalSave, setShowModalSave] = useState(false);
   const [showModalActual, setShowModalActual] = useState(false);
+  const [show, setShow] = useState("alertHide");
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
   const [open, setOpen] = useState(null);
@@ -90,6 +91,7 @@ const CategoryData = () => {
   });
 
   const changeState = () => {
+    setShow("alertHide");
     setAlert(null);
   };
 
@@ -173,11 +175,13 @@ const CategoryData = () => {
         abrirCerrarModalSave(e);
         abrirCerrarModal();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro creado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -208,11 +212,13 @@ const CategoryData = () => {
         abrirCerrarModalActual(e);
         abrirCerrarModalEdit();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro actualizado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -227,11 +233,13 @@ const CategoryData = () => {
         setData(data.filter((rol) => rol.CtgId !== dataSelect.CtgId));
         abrirCerrarModalDelete();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro eliminado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -255,12 +263,11 @@ const CategoryData = () => {
       field: "CtgColorCat",
     },
     { title: "ESTADO", field: "CtgEstCat" },
-    { title: "", field: "" },
   ];
 
   return (
     <div className={classList.root}>
-      <Menu />
+      <MenuBar />
       <main>
         <Grid container className={classList.content}>
           <div className={classList.toolbar}></div>
@@ -273,6 +280,7 @@ const CategoryData = () => {
               icon2={"zmdi zmdi-plus"}
               type={type}
               alert={alert}
+              show={show}
               changeState={changeState}
             />
           </Grid>

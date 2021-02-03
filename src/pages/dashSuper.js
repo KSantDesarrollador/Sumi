@@ -2,7 +2,7 @@ import React from "react";
 import { Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 // importandom los componentes
-import Menu from "../templates/menu";
+import MenuBar from "../templates/menu";
 import CardsInfo from "../templates/cardsInfo";
 import CardsAdmin from "../templates/cardsAdmin";
 import Graphics from "../templates/graphics";
@@ -67,7 +67,7 @@ const Dashboard = () => {
 
   return (
     <div className={classList.root}>
-      <Menu />
+      <MenuBar />
       <main>
         <Grid container className={classList.content}>
           <div className={classList.toolbar}></div>

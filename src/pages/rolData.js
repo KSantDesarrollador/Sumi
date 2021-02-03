@@ -3,7 +3,7 @@ import { Modal, ModalBody, ModalFooter, ModalHeader, Button } from "reactstrap";
 import { makeStyles, Grid, TextField, Tooltip } from "@material-ui/core";
 import axios from "axios";
 // importandom los componentes
-import Menu from "../templates/menu";
+import MenuBar from "../templates/menu";
 import Footer from "../templates/footer";
 import HeaderPage from "./components/headerPage";
 import DataTable from "./components/dataTable";
@@ -38,7 +38,7 @@ const stylesPage = makeStyles((theme) => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3),
+    padding: theme.spacing(2, 6),
   },
   modal: {
     marginTop: "5%",
@@ -72,6 +72,7 @@ const RolData = () => {
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalSave, setShowModalSave] = useState(false);
   const [showModalActual, setShowModalActual] = useState(false);
+  const [show, setShow] = useState("alertHide");
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
   const [dataSelect, setDataSelect] = useState({
@@ -81,6 +82,7 @@ const RolData = () => {
   });
 
   const changeState = () => {
+    setShow("alertHide");
     setAlert(null);
   };
 
@@ -119,6 +121,7 @@ const RolData = () => {
     await axios
       .get(ServUrl)
       .then((response) => {
+        console.log(response.data);
         setData(response.data);
       })
       .catch((er) => {
@@ -143,11 +146,13 @@ const RolData = () => {
         abrirCerrarModalSave(e);
         abrirCerrarModal();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro creado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -175,11 +180,13 @@ const RolData = () => {
         abrirCerrarModalActual(e);
         abrirCerrarModalEdit();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro actualizado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -194,11 +201,13 @@ const RolData = () => {
         setData(data.filter((rol) => rol.RrlId !== dataSelect.RrlId));
         abrirCerrarModalDelete();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro eliminado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -216,22 +225,17 @@ const RolData = () => {
   // Formando las columnas de la tabla
   const columns = [
     { title: "ID", field: "RrlId" },
-    { title: "", field: "" },
     { title: "ROL", field: "RrlNomRol" },
-    { title: "", field: "" },
     { title: "ESTADO", field: "RrlEstRol" },
-    { title: "", field: "" },
-    { title: "", field: "" },
-    { title: "", field: "" },
   ];
 
   return (
     <div className={classList.root}>
-      <Menu />
+      <MenuBar />
       <main>
         <Grid container className={classList.content}>
           <div className={classList.toolbar}></div>
-          <Grid container spacing={2}>
+          <Grid container spacing={1}>
             {/* Cabecera de la página */}
             <HeaderPage
               AbrirCerrarModal={abrirCerrarModal}
@@ -240,11 +244,12 @@ const RolData = () => {
               icon2={"zmdi zmdi-plus"}
               type={type}
               alert={alert}
+              show={show}
               changeState={changeState}
             />
           </Grid>
           &nbsp;
-          <Grid container spacing={2}>
+          <Grid container spacing={1}>
             {/* Tabla que muestra la información de los roles en bd */}
             <DataTable
               selectedItem={selectedItem}

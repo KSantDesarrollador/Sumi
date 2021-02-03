@@ -12,6 +12,7 @@ const stylesPage = makeStyles((theme) => ({
     "& > * + *": {
       marginTop: theme.spacing(2),
     },
+    borderRadius: "10px",
   },
   modal: {
     marginTop: "20%",
@@ -39,8 +40,6 @@ const AllAlerts = (props) => {
   };
 
   const closeAlert = () => {
-    let alert = document.getElementById("al");
-    alert.classList.replace("alertShow", "alertHide");
     props.changeState();
   };
 
@@ -51,7 +50,7 @@ const AllAlerts = (props) => {
 
   if (props.alertClass === "info") {
     return (
-      <div className={`${classList.root} alertShow`} id='al'>
+      <div className={`${classList.root} ${props.show}`}>
         <Alert
           variant='filled'
           severity={props.alertType}
@@ -65,11 +64,6 @@ const AllAlerts = (props) => {
       </div>
     );
   } else {
-    // console.log(props.showModal);
-    // if (props.showModal) {
-    //   setShow("alertHide");
-    // }
-
     return (
       <div className={classList.root}>
         {/* Modal para confirmación antes de eliminar un registro */}
@@ -93,12 +87,12 @@ const AllAlerts = (props) => {
           <ModalFooter className={classList.modalFooter}>
             <Button type='submit' color='success' size='md' onClick={showBar}>
               <Tooltip title='Confirmar' placement='left'>
-                <i className='zmdi zmdi-save' />
+                <i className='zmdi zmdi-check' />
               </Tooltip>
             </Button>{" "}
             <Button color='danger' size='md' onClick={closeBar}>
               <Tooltip title='Cancelar' placement='right'>
-                <i className='zmdi zmdi-stop' />
+                <i className='zmdi zmdi-close' />
               </Tooltip>
             </Button>
           </ModalFooter>

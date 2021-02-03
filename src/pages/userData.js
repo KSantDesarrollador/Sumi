@@ -12,7 +12,7 @@ import {
 import axios from "axios";
 import md5 from "md5";
 // importandom los componentes
-import Menu from "../templates/menu";
+import MenuBar from "../templates/menu";
 import Footer from "../templates/footer";
 import HeaderPage from "./components/headerPage";
 import DataTable from "./components/dataTable";
@@ -61,7 +61,7 @@ const stylesPage = makeStyles((theme) => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3),
+    padding: theme.spacing(2),
   },
   modal: {
     marginTop: "5%",
@@ -93,9 +93,11 @@ const UserData = () => {
   const [datalistSelectRol, setDatalistSelectRol] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
+  const [showModalDetail, setShowModalDetail] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalSave, setShowModalSave] = useState(false);
   const [showModalActual, setShowModalActual] = useState(false);
+  const [show, setShow] = useState("alertHide");
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
   const [dataSelect, setDataSelect] = useState({
@@ -111,6 +113,7 @@ const UserData = () => {
   });
 
   const changeState = () => {
+    setShow("alertHide");
     setAlert(null);
   };
 
@@ -120,6 +123,10 @@ const UserData = () => {
 
   const abrirCerrarModalEdit = () => {
     setShowModalEdit(!showModalEdit);
+  };
+
+  const abrirCerrarModalDetail = () => {
+    setShowModalDetail(!showModalDetail);
   };
 
   const abrirCerrarModalSave = (e) => {
@@ -136,13 +143,28 @@ const UserData = () => {
     setShowModalDelete(!showModalDelete);
   };
 
+  // convirtiendo a base 64
+  const base64Convert = (images) => {
+    Array.from(images).forEach((image) => {
+      let reader = new FileReader();
+      reader.readAsDataURL(image);
+      reader.onload = function () {
+        let arrayAux = [];
+        let base64 = reader.result;
+        arrayAux = base64.split(",");
+        // console.log(arrayAux[1]);
+        setDataSelect((prevState) => ({
+          ...prevState,
+          UsrImgUsu: arrayAux[1],
+        }));
+      };
+    });
+  };
+
   // obteniendo los datos de las cajas de texto
   const eventinput = (e) => {
     if (e.target.name === "UsrImgUsu") {
-      setDataSelect((prevState) => ({
-        ...prevState,
-        [e.target.name]: e.target.files[0],
-      }));
+      base64Convert(e.target.files);
     } else {
       setDataSelect((prevState) => ({
         ...prevState,
@@ -156,7 +178,7 @@ const UserData = () => {
     await axios
       .get(ServUrl)
       .then((response) => {
-        setData(response.data);
+        setData(JSON.parse(response.data.split("<", 1)));
       })
       .catch((er) => {
         console.log(er);
@@ -198,11 +220,13 @@ const UserData = () => {
         abrirCerrarModalSave(e);
         abrirCerrarModal();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro creado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -252,11 +276,13 @@ const UserData = () => {
         abrirCerrarModalActual(e);
         abrirCerrarModalEdit();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro actualizado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -271,20 +297,25 @@ const UserData = () => {
         setData(data.filter((user) => user.UsrId !== dataSelect.UsrId));
         abrirCerrarModalDelete();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro eliminado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
 
   // Esta función permite elegir el modal que se abrirá y guaerda los datos en el estado
   const selectedItem = (user, type) => {
-    setDataSelect(user);
     if (type === "Edit") {
+      setDataSelect(user);
       abrirCerrarModalEdit();
+    } else if (type === "Detail") {
+      setDataSelect(user);
+      abrirCerrarModalDetail();
     } else {
       abrirCerrarModalDelete();
     }
@@ -293,17 +324,15 @@ const UserData = () => {
   // Formando las columnas de la tabla
   const columns = [
     { title: "ID", field: "UsrId" },
-    { title: "FOTO", field: "data:image/png;base64,UsrImgUsu" },
     { title: "ROL", field: "RrlNomRol" },
     { title: "USUARIO", field: "UsrNomUsu" },
     { title: "EMAIL", field: "UsrEmailUsu" },
     { title: "TELÉFONO", field: "UsrTelfUsu" },
-    { title: "ESTADO", field: "UsrEstUsu" },
   ];
 
   return (
     <div className={classList.root}>
-      <Menu />
+      <MenuBar />
       <main>
         <Grid container className={classList.content}>
           <div className={classList.toolbar}></div>
@@ -316,6 +345,7 @@ const UserData = () => {
               icon2={"zmdi zmdi-plus"}
               type={type}
               alert={alert}
+              show={show}
               changeState={changeState}
             />
           </Grid>
@@ -353,7 +383,7 @@ const UserData = () => {
                       label='Rol contenedor'
                       required
                       inputProps={{
-                        name: "RrlNomRol",
+                        name: "RrlId",
                         id: "outlined-age-native-simple",
                       }}>
                       <option key='0' aria-label='' value='' />
@@ -444,7 +474,7 @@ const UserData = () => {
                 size='md'
                 onClick={() => abrirCerrarModal()}>
                 <Tooltip title='Cancelar' placement='right'>
-                  <i className='zmdi zmdi-stop' />
+                  <i className='zmdi zmdi-close' />
                 </Tooltip>
               </Button>
             </ModalFooter>
@@ -474,7 +504,7 @@ const UserData = () => {
                       label='Rol contenedor'
                       required
                       inputProps={{
-                        name: "RrlNomRol",
+                        name: "RrlId",
                         id: "outlined-age-native-simple",
                       }}>
                       <option
@@ -587,8 +617,122 @@ const UserData = () => {
                 size='md'
                 onClick={() => abrirCerrarModalEdit()}>
                 <Tooltip title='Cancelar' placement='right'>
-                  <i className='zmdi zmdi-stop' />
+                  <i className='zmdi zmdi-close' />
                 </Tooltip>
+              </Button>
+            </ModalFooter>
+          </Modal>
+          {/* Modal que muestra los datos del rol */}
+          <Modal isOpen={showModalDetail} className={classList.modal} size='lg'>
+            <ModalHeader className={classList.modalHeaderEdit}>
+              Detalles Usuario
+            </ModalHeader>
+            <ModalBody>
+              <Grid container spacing={1}>
+                <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+                  <input type='hidden' name='UsrId' value={dataSelect.UsrId} />
+                  <img
+                    alt=''
+                    src={`data:image/jpeg;base64,${dataSelect.UsrImgUsu}`}
+                    width='90%'
+                    height='400px'
+                    variant='standard'
+                    margin='normal'
+                    size='small'
+                    id='UsrImgUsu'
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+                  <TextField
+                    disabled
+                    variant='standard'
+                    margin='normal'
+                    type='text'
+                    size='small'
+                    id='RrlNomRol'
+                    label='Rol de Usuario'
+                    fullWidth
+                    value={dataSelect.RrlNomRol}
+                  />
+                  <TextField
+                    disabled
+                    variant='standard'
+                    margin='normal'
+                    type='text'
+                    size='small'
+                    id='UsrNomUsu'
+                    label='Nombre de Usuario'
+                    fullWidth
+                    value={dataSelect.UsrNomUsu}
+                  />
+                  <TextField
+                    disabled
+                    variant='standard'
+                    margin='normal'
+                    type='password'
+                    size='small'
+                    id='UsrContraUsu'
+                    label='Contraseña'
+                    fullWidth
+                    placeholder='********'
+                  />
+                  <TextField
+                    disabled
+                    variant='standard'
+                    margin='normal'
+                    type='email'
+                    size='small'
+                    id='UsrEmailUsu'
+                    label='Email'
+                    fullWidth
+                    value={dataSelect.UsrEmailUsu}
+                  />
+                  <TextField
+                    disabled
+                    variant='standard'
+                    margin='normal'
+                    type='telf'
+                    size='small'
+                    id='UsrTelfUsu'
+                    label='Teléfono'
+                    fullWidth
+                    value={dataSelect.UsrTelfUsu}
+                  />
+
+                  <TextField
+                    disabled
+                    variant='standard'
+                    margin='normal'
+                    type='text'
+                    size='small'
+                    id='UsrEstUsu'
+                    label='Estado'
+                    fullWidth
+                    value={dataSelect.UsrEstUsu}
+                  />
+                </Grid>
+              </Grid>
+            </ModalBody>
+            <ModalFooter className={classList.modalFooter}>
+              <Button
+                type='submit'
+                color='success'
+                size='md'
+                onClick={() => selectedItem(0, "Delete")}>
+                <Tooltip title='Eliminar' placement='left'>
+                  <i className='zmdi zmdi-delete' />
+                </Tooltip>
+              </Button>{" "}
+              <Button
+                color='danger'
+                size='md'
+                onClick={() => abrirCerrarModalDetail()}>
+                <span>
+                  <Tooltip title='Cerrar' placement='right'>
+                    <i className='zmdi zmdi-close' />
+                  </Tooltip>
+                </span>
               </Button>
             </ModalFooter>
           </Modal>

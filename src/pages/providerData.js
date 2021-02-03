@@ -11,7 +11,7 @@ import {
 } from "@material-ui/core";
 import axios from "axios";
 // importandom los componentes
-import Menu from "../templates/menu";
+import MenuBar from "../templates/menu";
 import Footer from "../templates/footer";
 import HeaderPage from "./components/headerPage";
 import DataTable from "./components/dataTable";
@@ -60,7 +60,7 @@ const stylesPage = makeStyles((theme) => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3),
+    padding: theme.spacing(2),
   },
   modal: {
     marginTop: "5%",
@@ -95,6 +95,7 @@ const ProviderData = () => {
   const [showModalSave, setShowModalSave] = useState(false);
   const [showModalActual, setShowModalActual] = useState(false);
   const [dataType, setDataType] = useState(null);
+  const [show, setShow] = useState("alertHide");
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
   const [dataSelect, setDataSelect] = useState({
@@ -111,6 +112,7 @@ const ProviderData = () => {
   });
 
   const changeState = () => {
+    setShow("alertHide");
     setAlert(null);
   };
 
@@ -189,11 +191,13 @@ const ProviderData = () => {
         abrirCerrarModalSave(e);
         abrirCerrarModal();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro creado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -241,11 +245,13 @@ const ProviderData = () => {
         abrirCerrarModalActual(e);
         abrirCerrarModalEdit();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro actualizado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -257,14 +263,16 @@ const ProviderData = () => {
     await axios
       .post(ServUrl, f, { params: { id: dataSelect.PvdId } })
       .then((response) => {
-        setData(data.filter((user) => user.PvdId !== dataSelect.PvdId));
+        setData(data.filter((prov) => prov.PvdId !== dataSelect.PvdId));
         abrirCerrarModalDelete();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro eliminado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -285,15 +293,13 @@ const ProviderData = () => {
     { title: "ID", field: "PvdId" },
     { title: "RUC", field: "PvdIdentProv" },
     { title: "NOMBRE", field: "PvdRazSocProv" },
-    { title: "DIRECCIÓN", field: "PvdDirProv" },
     { title: "TELF", field: "PvdTelfProv" },
     { title: "EMAIL", field: "PvdEmailProv" },
-    { title: "ESTADO", field: "PvdEstProv" },
   ];
 
   return (
     <div className={classList.root}>
-      <Menu />
+      <MenuBar />
       <main>
         <Grid container className={classList.content}>
           <div className={classList.toolbar}></div>
@@ -306,6 +312,7 @@ const ProviderData = () => {
               icon2={"zmdi zmdi-plus"}
               type={type}
               alert={alert}
+              show={show}
               changeState={changeState}
             />
           </Grid>
@@ -462,7 +469,7 @@ const ProviderData = () => {
           {/* Modal que muestra los datos del rol a ser editado */}
           <Modal isOpen={showModalEdit} className={classList.modal}>
             <ModalHeader className={classList.modalHeaderEdit}>
-              Editar Usuario
+              Editar Proveedor
             </ModalHeader>
             <ModalBody>
               <div className='mb-3'>
@@ -534,6 +541,7 @@ const ProviderData = () => {
                     fullWidth
                     required
                     value={dataSelect.PvdTelfProv}
+                    onChange={eventinput}
                   />
                   <TextField
                     variant='outlined'

@@ -11,7 +11,7 @@ import {
 } from "@material-ui/core";
 import axios from "axios";
 // importandom los componentes
-import Menu from "../templates/menu";
+import MenuBar from "../templates/menu";
 import Footer from "../templates/footer";
 import HeaderPage from "./components/headerPage";
 import DataTable from "./components/dataTable";
@@ -53,7 +53,7 @@ const stylesPage = makeStyles((theme) => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3),
+    padding: theme.spacing(2),
   },
   modal: {
     marginTop: "5%",
@@ -88,6 +88,7 @@ const MenuData = () => {
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalSave, setShowModalSave] = useState(false);
   const [showModalActual, setShowModalActual] = useState(false);
+  const [show, setShow] = useState("alertHide");
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
   const [dataSelect, setDataSelect] = useState({
@@ -103,6 +104,7 @@ const MenuData = () => {
   });
 
   const changeState = () => {
+    setShow("alertHide");
     setAlert(null);
   };
 
@@ -199,11 +201,13 @@ const MenuData = () => {
         abrirCerrarModalSave(e);
         abrirCerrarModal();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro creado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -247,11 +251,13 @@ const MenuData = () => {
         abrirCerrarModalActual(e);
         abrirCerrarModalEdit();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro actualizado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -266,11 +272,13 @@ const MenuData = () => {
         setData(data.filter((menu) => menu.MnuId !== dataSelect.MnuId));
         abrirCerrarModalDelete();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro eliminado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -294,12 +302,11 @@ const MenuData = () => {
     { title: "NIVEL", field: "MnuNivelMen" },
     { title: "ICONO", field: "MnuIconMen" },
     { title: "URL", field: "MnuUrlMen" },
-    { title: "ESTADO", field: "MnuEstMen" },
   ];
 
   return (
     <div className={classList.root}>
-      <Menu />
+      <MenuBar />
       <main>
         <Grid container className={classList.content}>
           <div className={classList.toolbar}></div>
@@ -312,6 +319,7 @@ const MenuData = () => {
               icon2={"zmdi zmdi-plus"}
               type={type}
               alert={alert}
+              show={show}
               changeState={changeState}
             />
           </Grid>
@@ -323,6 +331,7 @@ const MenuData = () => {
               data={data}
               columns={columns}
               title={"Menús habilitados en el sistema"}
+              dataTree={"menu"}
             />
           </Grid>
           {/* Modal que muestra un formulario para agregar un nuevo rol */}

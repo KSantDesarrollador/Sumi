@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import axios from "axios";
 // importandom los componentes
-import Menu from "../templates/menu";
+import MenuBar from "../templates/menu";
 import Footer from "../templates/footer";
 import HeaderPage from "./components/headerPage";
 import DataTable from "./components/dataTable";
@@ -52,7 +52,7 @@ const stylesPage = makeStyles((theme) => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3),
+    padding: theme.spacing(2, 4),
   },
   modal: {
     marginTop: "5%",
@@ -90,6 +90,7 @@ const PrivilegioData = () => {
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalSave, setShowModalSave] = useState(false);
   const [showModalActual, setShowModalActual] = useState(false);
+  const [show, setShow] = useState("alertHide");
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
   const [dataSelect, setDataSelect] = useState({
@@ -99,6 +100,7 @@ const PrivilegioData = () => {
   });
 
   const changeState = () => {
+    setShow("alertHide");
     setAlert(null);
   };
 
@@ -218,11 +220,13 @@ const PrivilegioData = () => {
         abrirCerrarModalSave(e);
         abrirCerrarModal();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro creado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -250,11 +254,13 @@ const PrivilegioData = () => {
         abrirCerrarModalActual(e);
         abrirCerrarModalEdit();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro actualizado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -269,11 +275,13 @@ const PrivilegioData = () => {
         setData(data.filter((priv) => priv.MxRId !== dataSelect.MxRId));
         abrirCerrarModalDelete();
         setType("success");
+        setShow("alertShow");
         setAlert("Registro eliminado correctamente");
       })
       .catch((er) => {
         console.log(er);
         setType("error");
+        setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
       });
   };
@@ -291,18 +299,13 @@ const PrivilegioData = () => {
   // Formando las columnas de la tabla
   const columns = [
     { title: "ID", field: "MxRId" },
-    { title: "", field: "" },
     { title: "ROL", field: "RrlNomRol" },
-    { title: "", field: "" },
     { title: "MENÚ", field: "MnuNomMen" },
-    { title: "", field: "" },
-    { title: "", field: "" },
-    { title: "", field: "" },
   ];
 
   return (
     <div className={classList.root}>
-      <Menu />
+      <MenuBar />
       <main>
         <Grid container className={classList.content}>
           <div className={classList.toolbar}></div>
@@ -315,6 +318,7 @@ const PrivilegioData = () => {
               icon2={"zmdi zmdi-plus"}
               type={type}
               alert={alert}
+              show={show}
               changeState={changeState}
             />
           </Grid>
@@ -511,7 +515,7 @@ const PrivilegioData = () => {
             alertType={"warning"}
             title={"Guardar privilegio"}
             alertTitle={"¿Está seguro de asignar el privilegio:"}
-            alertText={dataRol.RrlNomRol + " " + "a" + " " + dataMenu.MnuNomMen}
+            alertText={dataRol.RrlNomRol + "  a  " + dataMenu.MnuNomMen}
             showModal={showModalSave}
             actionUser={(e) => newPrivilegio(e)}
             abrirCerrarModal={abrirCerrarModalSave}
@@ -522,7 +526,7 @@ const PrivilegioData = () => {
             alertType={"warning"}
             title={"Actualizar privilegio"}
             alertTitle={"¿Está seguro de asignar el privilegio:"}
-            alertText={dataRol.RrlNomRol + " " + "a" + " " + dataMenu.MnuNomMen}
+            alertText={dataRol.RrlNomRol + "  a  " + dataMenu.MnuNomMen}
             showModal={showModalActual}
             actionUser={(e) => updatePrivilegio(e)}
             abrirCerrarModal={abrirCerrarModalActual}
@@ -533,7 +537,7 @@ const PrivilegioData = () => {
             alertType={"warning"}
             title={"Eliminar privilegio"}
             alertTitle={"¿Está seguro de eliminar el privilegio:"}
-            alertText={dataRol.RrlNomRol + " " + "a" + " " + dataMenu.MnuNomMen}
+            alertText={dataRol.RrlNomRol + "  a  " + dataMenu.MnuNomMen}
             showModal={showModalDelete}
             actionUser={deletePrivilegio}
             abrirCerrarModal={abrirCerrarModalDelete}

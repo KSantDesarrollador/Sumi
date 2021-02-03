@@ -1,15 +1,27 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
-import { Avatar } from "@material-ui/core";
+// import PropTypes from "prop-types";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-import Badge from "@material-ui/core/Badge";
-import { AppBar, Toolbar, IconButton, Typography } from "@material-ui/core";
-import Divider from "@material-ui/core/Divider";
-import Drawer from "@material-ui/core/Drawer";
+import {
+  Avatar,
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  Tooltip,
+  Divider,
+  Drawer,
+  CssBaseline,
+  Hidden,
+  Badge,
+  Menu,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from "@material-ui/core";
 import MainListItems from "./lateralMenu";
 import clsx from "clsx";
-import { CssBaseline, Hidden } from "@material-ui/core";
 import Cookies from "universal-cookie";
+import axios from "axios";
 
 // importando los iconos
 import MenuIcon from "@material-ui/icons/Menu";
@@ -61,6 +73,7 @@ const stylesPage = makeStyles((theme) => ({
       width: `calc(100% - ${drawerWidth}px)`,
       marginLeft: drawerWidth,
     },
+    height: "50px",
   },
 
   appBarShift: {
@@ -109,6 +122,7 @@ const stylesPage = makeStyles((theme) => ({
     padding: theme.spacing(0, 3),
     // necessary for content to be below app bar
     ...theme.mixins.toolbar,
+    height: "50px",
   },
   infoUser: {
     display: "flex",
@@ -116,30 +130,35 @@ const stylesPage = makeStyles((theme) => ({
     padding: theme.spacing(0, 2),
     // necessary for content to be below app bar
     ...theme.mixins.toolbar,
+    height: "50px",
   },
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
   },
+  icons: { color: "#f5f5f5", fontSize: "20px" },
 }));
 
+const ServUrl = "http://localhost/SUMI/models/userModel.php";
 const session = new Cookies();
 
-const Menu = () => {
+const MenuBar = () => {
   const classList = stylesPage();
   // const { window } = props;
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+  const [image, setImage] = useState({});
+  const [options, setOptions] = useState(null);
 
   let timerID = null;
   let timerRunning = false;
 
-  const stopclock = () => {
+  const stopClock = () => {
     if (timerRunning) clearTimeout(timerID);
     timerRunning = false;
   };
 
-  const showtime = () => {
+  const showTime = () => {
     let now = new Date();
     let hours = now.getHours();
     let minutes = now.getMinutes();
@@ -150,13 +169,28 @@ const Menu = () => {
     timeValue += (seconds < 10 ? ":0" : ":") + seconds;
     timeValue += hours >= 12 ? "  P.M." : "  A.M.";
     document.clock.hour.value = timeValue;
-    timerID = setTimeout(showtime, 1000);
+    timerID = setTimeout(showTime, 1000);
     timerRunning = true;
   };
 
-  const startclock = () => {
-    stopclock();
-    showtime();
+  const openOptions = (event) => {
+    setOptions(event.currentTarget);
+  };
+
+  const closeOptions = () => {
+    setOptions(null);
+  };
+
+  // obteniendo datos de un servidor
+  const showImage = async () => {
+    await axios
+      .get(ServUrl + "?id=" + session.get("id"))
+      .then((response) => {
+        setImage(JSON.parse(response.data.split("<", 1)));
+      })
+      .catch((er) => {
+        console.log(er);
+      });
   };
 
   const handleDrawerOpen = () => {
@@ -168,16 +202,19 @@ const Menu = () => {
     session.remove("email", { path: "/" });
     session.remove("name", { path: "/" });
     session.remove("rol", { path: "/" });
-    session.remove("image", { path: "/" });
+    // session.remove("image", { path: "/" });
     window.location.href = "/";
   };
 
   useEffect(() => {
     if (!session.get("name")) {
       window.location.href = "/";
+    } else {
+      stopClock();
+      showTime();
+      showImage();
     }
-    startclock();
-  });
+  }, []);
 
   // const container =
   //   window !== undefined ? () => window().document.body : undefined;
@@ -186,7 +223,7 @@ const Menu = () => {
     <div className={classList.root}>
       <CssBaseline />
       <AppBar position='fixed' className={classList.appBar}>
-        <Toolbar>
+        <Toolbar style={{ verticalAlign: "center", paddingBottom: "10px" }}>
           <IconButton
             edge='start'
             color='inherit'
@@ -214,13 +251,47 @@ const Menu = () => {
             </Badge>
           </IconButton>
           <IconButton color='inherit' edge='end'>
-            <Avatar
-              src={process.env.PUBLIC_URL + "/img/avatar-male.png"}
-              alt=''
-              className={classList.image}
-              onClick={() => closeSession()}
-            />
+            <Tooltip title='Opciones de usuario'>
+              <Avatar
+                src={`data:image/jpeg;base64,${image.UsrImgUsu}`}
+                alt=''
+                className={classList.image}
+                onClick={openOptions}
+              />
+            </Tooltip>
           </IconButton>
+          <Menu
+            id='customized-menu'
+            elevation={0}
+            anchorEl={options}
+            keepMounted
+            open={Boolean(options)}
+            onClose={closeOptions}
+            getContentAnchorEl={null}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "center",
+            }}>
+            <ListItem className='menu-options'>
+              <ListItemIcon>
+                <i
+                  className={`zmdi zmdi-edit ${classList.icons}`}
+                  fontSize='small'
+                />
+              </ListItemIcon>
+              <ListItemText primary='Editar perfil' />
+            </ListItem>
+            <ListItem className='menu-options' onClick={closeSession}>
+              <ListItemIcon>
+                <i
+                  className={`zmdi zmdi-power ${classList.icons}`}
+                  fontSize='small'
+                />
+              </ListItemIcon>
+              <ListItemText primary='Cerrar sesión' />
+            </ListItem>
+          </Menu>
         </Toolbar>
       </AppBar>
       <nav>
@@ -244,7 +315,7 @@ const Menu = () => {
             <div className={classList.toolbar}>
               <IconButton color='inherit' edge='start'>
                 <Avatar
-                  src={process.env.PUBLIC_URL + "/img/avatar-male.png"}
+                  src={`data:image/jpeg;base64,${image.UsrImgUsu}`}
                   alt=''
                   className={classList.image}
                 />
@@ -294,7 +365,7 @@ const Menu = () => {
             <div className={classList.infoUser}>
               <IconButton color='inherit' edge='start'>
                 <Avatar
-                  src={process.env.PUBLIC_URL + "/img/avatar-male.png"}
+                  src={`data:image/jpeg;base64,${image.UsrImgUsu}`}
                   alt=''
                   className={classList.image}
                 />
@@ -324,4 +395,4 @@ const Menu = () => {
   );
 };
 
-export default Menu;
+export default MenuBar;

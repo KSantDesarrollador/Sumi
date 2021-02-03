@@ -18,11 +18,6 @@ const stylesPage = makeStyles((theme) => ({
 const HeaderPage = (props) => {
   const classList = stylesPage();
 
-  if (props.alert !== null) {
-    let alert = document.getElementById("al");
-    alert.classList.replace("alertHide", "alertShow");
-  }
-
   return (
     <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
       <h2 className={classList.header}>
@@ -32,16 +27,17 @@ const HeaderPage = (props) => {
         </span>
       </h2>
       <div className='d-grid gap-2 d-md-flex justify-content-md-end'>
-        <div className='alertHide' id='al'>
+        <div>
           <AllAlerts
             alertClass='info'
             alertType={props.type}
             alertText={props.alert}
+            show={props.show}
             changeState={props.changeState}
           />
         </div>
         &nbsp; &nbsp;
-        <Tooltip title='Nuevo registro'>
+        <Tooltip title='Nuevo registro' placement='top'>
           <Fab color='secondary' onClick={props.AbrirCerrarModal}>
             <span className={classList.iconPge}>
               <i className={props.icon2} />
