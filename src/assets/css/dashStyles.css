@@ -43,6 +43,24 @@ body{
 	font-weight: 700;
 }
 
+.errorHide{
+	display: none;
+}
+
+.errorShow{
+	display: block;
+	animation: errorShow 1s;
+}
+
+@keyframes errorShow{
+	0%{
+      transform: scaleX(0);
+	}
+	100%{
+		transform: scaleX(100px);
+	}
+}
+
 .full-width {
 	margin: 0;
 	padding: 0;
@@ -75,8 +93,6 @@ body{
 }
 
 .navLateral-body {
-	background: linear-gradient(top, blue, white);
-	/* background-image: url('../assets/img/menu.jpg'); */
 	z-index: 82;
 	left: 0;
 	padding-bottom: 30px;

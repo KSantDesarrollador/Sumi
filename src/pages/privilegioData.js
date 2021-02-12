@@ -7,6 +7,7 @@ import {
   FormControl,
   InputLabel,
   Select,
+  TextField,
 } from "@material-ui/core";
 import axios from "axios";
 // importandom los componentes
@@ -87,6 +88,7 @@ const PrivilegioData = () => {
   const [dataMenu, setDataMenu] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
+  const [showModalDetail, setShowModalDetail] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalSave, setShowModalSave] = useState(false);
   const [showModalActual, setShowModalActual] = useState(false);
@@ -112,6 +114,10 @@ const PrivilegioData = () => {
     setShowModalEdit(!showModalEdit);
   };
 
+  const abrirCerrarModalDetail = () => {
+    setShowModalDetail(!showModalDetail);
+  };
+
   const abrirCerrarModalSave = (e) => {
     e.preventDefault();
     listRolName();
@@ -130,6 +136,16 @@ const PrivilegioData = () => {
     listRolName();
     listMenuName();
     setShowModalDelete(!showModalDelete);
+  };
+
+  // limpiando los campos
+  const clear = () => {
+    setDataSelect(() => ({
+      CtgId: "",
+      CtgNomCat: "",
+      CtgColorCat: "",
+      CtgEstCat: "",
+    }));
   };
 
   // obteniendo los datos de las cajas de texto
@@ -201,6 +217,7 @@ const PrivilegioData = () => {
   };
 
   useEffect(() => {
+    clear();
     listPrivilegio();
     listSelectRol();
     listSelectMenu();
@@ -222,12 +239,14 @@ const PrivilegioData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro creado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -256,12 +275,14 @@ const PrivilegioData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro actualizado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -277,20 +298,25 @@ const PrivilegioData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro eliminado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
   // Esta función permite elegir el modal que se abrirá y guaerda los datos en el estado
   const selectedItem = (priv, type) => {
-    setDataSelect(priv);
     if (type === "Edit") {
+      setDataSelect(priv);
       abrirCerrarModalEdit();
+    } else if (type === "Detail") {
+      setDataSelect(priv);
+      abrirCerrarModalDetail();
     } else {
       abrirCerrarModalDelete();
     }
@@ -412,7 +438,7 @@ const PrivilegioData = () => {
                 size='md'
                 onClick={() => abrirCerrarModal()}>
                 <Tooltip title='Cancelar' placement='right'>
-                  <i className='zmdi zmdi-stop' />
+                  <i className='zmdi zmdi-close' />
                 </Tooltip>
               </Button>
             </ModalFooter>
@@ -504,8 +530,61 @@ const PrivilegioData = () => {
                 size='md'
                 onClick={() => abrirCerrarModalEdit()}>
                 <Tooltip title='Cancelar' placement='right'>
-                  <i className='zmdi zmdi-stop' />
+                  <i className='zmdi zmdi-close' />
                 </Tooltip>
+              </Button>
+            </ModalFooter>
+          </Modal>
+          {/* Modal que muestra los datos del rol */}
+          <Modal isOpen={showModalDetail} className={classList.modal}>
+            <ModalHeader className={classList.modalHeaderEdit}>
+              Detalles Privilegio
+            </ModalHeader>
+            <ModalBody>
+              <input type='hidden' name='MxRId' value={dataSelect.MxRId} />
+              <TextField
+                disabled
+                variant='standard'
+                margin='normal'
+                type='text'
+                size='small'
+                id='CtgNomCat'
+                label='Nombre del Rol'
+                fullWidth
+                value={dataSelect.RrlNomRol}
+              />
+              &nbsp;
+              <TextField
+                disabled
+                variant='standard'
+                margin='normal'
+                type='text'
+                size='small'
+                id='CtgNomCat'
+                label='Nombre del Menú'
+                fullWidth
+                value={dataSelect.MnuNomMen}
+              />
+            </ModalBody>
+            <ModalFooter className={classList.modalFooter}>
+              <Button
+                type='submit'
+                color='success'
+                size='md'
+                onClick={() => selectedItem(0, "Delete")}>
+                <Tooltip title='Eliminar' placement='left'>
+                  <i className='zmdi zmdi-delete' />
+                </Tooltip>
+              </Button>{" "}
+              <Button
+                color='danger'
+                size='md'
+                onClick={() => abrirCerrarModalDetail()}>
+                <span>
+                  <Tooltip title='Cerrar' placement='right'>
+                    <i className='zmdi zmdi-close' />
+                  </Tooltip>
+                </span>
               </Button>
             </ModalFooter>
           </Modal>

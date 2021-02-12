@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Modal, ModalBody, ModalFooter, ModalHeader, Button } from "reactstrap";
-import { makeStyles, Grid, TextField, Tooltip } from "@material-ui/core";
+import {
+  makeStyles,
+  Grid,
+  TextField,
+  Tooltip,
+  InputLabel,
+  FormControl,
+  Select,
+} from "@material-ui/core";
 import axios from "axios";
 // importandom los componentes
 import MenuBar from "../templates/menu";
@@ -83,12 +91,28 @@ const UnityData = () => {
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
+  const [showModalDetail, setShowModalDetail] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalSave, setShowModalSave] = useState(false);
   const [showModalActual, setShowModalActual] = useState(false);
   const [show, setShow] = useState("alertHide");
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
+  const [fieldName, setFieldName] = useState("");
+  const [message, setMessage] = useState({
+    nom: "",
+    ident: "",
+    dir: "",
+    email: "",
+    telf: "",
+  });
+  const [error, setError] = useState({
+    nom: false,
+    ident: false,
+    dir: false,
+    email: false,
+    telf: false,
+  });
   const [dataSelect, setDataSelect] = useState({
     UmdId: "",
     UmdIdentUdm: "",
@@ -106,24 +130,190 @@ const UnityData = () => {
 
   const abrirCerrarModal = () => {
     setShowModal(!showModal);
+    setError({
+      nom: false,
+      ident: false,
+      dir: false,
+      email: false,
+      telf: false,
+    });
+    setMessage({
+      nom: "",
+      ident: "",
+      dir: "",
+      email: "",
+      telf: "",
+    });
   };
 
   const abrirCerrarModalEdit = () => {
     setShowModalEdit(!showModalEdit);
+    setError({
+      nom: false,
+      ident: false,
+      dir: false,
+      email: false,
+      telf: false,
+    });
+    setMessage({
+      nom: "",
+      ident: "",
+      dir: "",
+      email: "",
+      telf: "",
+    });
   };
 
   const abrirCerrarModalSave = (e) => {
     e.preventDefault();
-    setShowModalSave(!showModalSave);
+    if (
+      error.nom === false &&
+      error.ident === false &&
+      error.dir === false &&
+      error.email === false &&
+      error.telf === false
+    ) {
+      setShowModalSave(!showModalSave);
+    }
   };
 
   const abrirCerrarModalActual = (e) => {
     e.preventDefault();
-    setShowModalActual(!showModalActual);
+    if (
+      error.nom === false &&
+      error.ident === false &&
+      error.dir === false &&
+      error.email === false &&
+      error.telf === false
+    ) {
+      setShowModalActual(!showModalActual);
+    }
+  };
+
+  const abrirCerrarModalDetail = () => {
+    setShowModalDetail(!showModalDetail);
   };
 
   const abrirCerrarModalDelete = () => {
     setShowModalDelete(!showModalDelete);
+  };
+
+  // limpiando los campos
+  const clear = () => {
+    setDataSelect(() => ({
+      UmdId: "",
+      UmdIdentUdm: "",
+      UmdNomUdm: "",
+      UmdTelfUdm: "",
+      UmdDirUdm: "",
+      UmdEmailUdm: "",
+      UmdEstUdm: "",
+    }));
+  };
+
+  // mostrando errores de validación
+  const validations = () => {
+    const expressions = {
+      ident: /^[0-9]{10,13}$/,
+      mix2: /^[a-zA-Z0-9_\-. ]{1,60}$/,
+      email: /^[a-zA-Z0-9_\-.]+@+[a-zA-Z0-9]+\.+[a-zA-Z0-9]{3,6}$/,
+      telf: /^[0-9]{7,10}$/,
+    };
+
+    if (fieldName === "ident") {
+      if (expressions.ident.test(dataSelect.UmdIdentUdm)) {
+        setError((prevState) => ({
+          ...prevState,
+          ident: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, ident: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          ident: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          ident:
+            "solo se permiten números con mínimo 10 y máximo 13 caracteres ",
+        }));
+      }
+    } else if (fieldName === "nom") {
+      if (expressions.mix2.test(dataSelect.UmdNomUdm)) {
+        setError((prevState) => ({
+          ...prevState,
+          nom: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, nom: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          nom: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          nom:
+            " no permitidos caracteres especiales, con un máximo 60 caracteres",
+        }));
+      }
+    } else if (fieldName === "telf") {
+      if (expressions.telf.test(dataSelect.UmdTelfUdm)) {
+        setError((prevState) => ({
+          ...prevState,
+          telf: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, telf: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          telf: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          telf: "solo se permiten números con mínimo 7 y máximo 10 caracteres",
+        }));
+      }
+    } else if (fieldName === "email") {
+      if (expressions.email.test(dataSelect.UmdEmailUdm)) {
+        setError((prevState) => ({
+          ...prevState,
+          email: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, email: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          email: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          email: "el email debe contener '@' y '.' ejp(texto@texto.texto)",
+        }));
+      }
+    } else if (fieldName === "dir") {
+      if (expressions.mix2.test(dataSelect.UmdDirUdm)) {
+        setError((prevState) => ({
+          ...prevState,
+          dir: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, dir: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          dir: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          dir: "no se permiten caracteres especiales con máximo 60 caracteres",
+        }));
+      }
+    }
+  };
+
+  // obteniendo el typo para validar
+  const evalinput = (e) => {
+    setFieldName(e.target.id);
+    validations();
   };
 
   // obteniendo los datos de las cajas de texto
@@ -147,6 +337,7 @@ const UnityData = () => {
   };
 
   useEffect(() => {
+    clear();
     listUnity();
   }, []);
 
@@ -169,12 +360,14 @@ const UnityData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro creado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -217,12 +410,14 @@ const UnityData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro actualizado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -238,20 +433,25 @@ const UnityData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro eliminado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
   // Esta función permite elegir el modal que se abrirá y guaerda los datos en el estado
   const selectedItem = (unit, type) => {
-    setDataSelect(unit);
     if (type === "Edit") {
+      setDataSelect(unit);
       abrirCerrarModalEdit();
+    } else if (type === "Detail") {
+      setDataSelect(unit);
+      abrirCerrarModalDetail();
     } else {
       abrirCerrarModalDelete();
     }
@@ -265,6 +465,8 @@ const UnityData = () => {
     { title: "TELF", field: "UmdTelfUdm" },
     { title: "EMAIL", field: "UmdEmailUdm" },
   ];
+
+  const status = dataSelect.UmdEstUdm === "A" ? "Activo" : "Inactivo";
 
   return (
     <div className={classList.root}>
@@ -307,65 +509,80 @@ const UnityData = () => {
                   encType='multipart/form-data'
                   onSubmit={(e) => abrirCerrarModalSave(e)}>
                   <TextField
+                    required
+                    error={error.ident}
+                    helperText={message.ident}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='UmdIdentUdm'
                     size='small'
-                    id='UmdIdentUdm'
+                    id='ident'
                     label='Identificación'
                     fullWidth
                     autoFocus
-                    required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.nom}
+                    helperText={message.nom}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='UmdNomUdm'
                     size='small'
-                    id='UmdNomUdm'
+                    id='nom'
                     label='Nombre'
                     fullWidth
-                    required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.telf}
+                    helperText={message.telf}
                     variant='outlined'
                     margin='normal'
                     type='telf'
                     name='UmdTelfUdm'
                     size='small'
-                    id='UmdTelfUdm'
+                    id='telf'
                     label='Teléfono'
                     fullWidth
-                    required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.dir}
+                    helperText={message.dir}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='UmdDirUdm'
                     size='small'
-                    id='UmdDirUdm'
+                    id='dir'
                     label='Dirección'
                     fullWidth
-                    required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.email}
+                    helperText={message.email}
                     variant='outlined'
                     margin='normal'
                     type='email'
                     name='UmdEmailUdm'
                     size='small'
-                    id='UmdEmailUdm'
+                    id='email'
                     label='Email'
                     fullWidth
-                    required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                 </form>
               </div>
@@ -385,12 +602,12 @@ const UnityData = () => {
                 size='md'
                 onClick={() => abrirCerrarModal()}>
                 <Tooltip title='Cancelar' placement='right'>
-                  <i className='zmdi zmdi-stop' />
+                  <i className='zmdi zmdi-close' />
                 </Tooltip>
               </Button>
             </ModalFooter>
           </Modal>
-          {/* Modal que muestra los datos del rol a ser editado */}
+          {/* Modal que muestra los datos de la unidad a ser editado */}
           <Modal isOpen={showModalEdit} className={classList.modal}>
             <ModalHeader className={classList.modalHeaderEdit}>
               Editar Unidad
@@ -403,84 +620,108 @@ const UnityData = () => {
                   onSubmit={(e) => abrirCerrarModalActual(e)}>
                   <input type='hidden' name='UmdId' value={dataSelect.UmdId} />
                   <TextField
+                    required
+                    error={error.ident}
+                    helperText={message.ident}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='UmdIdentUdm'
                     size='small'
-                    id='UmdIdentUdm'
+                    id='ident'
                     label='Identificación'
                     fullWidth
                     autoFocus
-                    required
                     value={dataSelect.UmdIdentUdm}
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.nom}
+                    helperText={message.nom}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='UmdNomUdm'
                     size='small'
-                    id='UmdNomUdm'
+                    id='nom'
                     label='Nombre'
                     fullWidth
-                    required
                     value={dataSelect.UmdNomUdm}
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.telf}
+                    helperText={message.telf}
                     variant='outlined'
                     margin='normal'
                     type='telf'
                     name='UmdTelfUdm'
                     size='small'
-                    id='UmdTelfUdm'
+                    id='telf'
                     label='Teléfono'
                     fullWidth
-                    required
                     value={dataSelect.UmdTelfUdm}
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.dir}
+                    helperText={message.dir}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='UmdDirUdm'
                     size='small'
-                    id='UmdDirUdm'
+                    id='dir'
                     label='Dirección'
                     fullWidth
-                    required
                     value={dataSelect.UmdDirUdm}
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.email}
+                    helperText={message.email}
                     variant='outlined'
                     margin='normal'
                     type='email'
                     name='UmdEmailUdm'
                     size='small'
-                    id='UmdEmailUdm'
+                    id='email'
                     label='Email'
                     fullWidth
-                    required
                     value={dataSelect.UmdEmailUdm}
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='UmdEstUdm'
-                    size='small'
-                    id='UmdEstUdm'
-                    label='Estado'
-                    fullWidth
-                    required
-                    value={dataSelect.UmdEstUdm}
-                    onChange={eventinput}
-                  />
+                  <FormControl size='small' variant='outlined' fullWidth>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Estado
+                    </InputLabel>
+                    <Select
+                      native
+                      required
+                      onChange={eventinput}
+                      label='Estado'
+                      inputProps={{
+                        name: "UmdEstUdm",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option
+                        key='0'
+                        label={status}
+                        value={dataSelect.UmdEstUdm}
+                      />
+                      <option key='1' value={"A"} label={"Activo"} />
+                      <option key='2' value={"X"} label={"Inactivo"} />
+                    </Select>
+                  </FormControl>
                 </form>
               </div>
             </ModalBody>
@@ -499,8 +740,104 @@ const UnityData = () => {
                 size='md'
                 onClick={() => abrirCerrarModalEdit()}>
                 <Tooltip title='Cancelar' placement='right'>
-                  <i className='zmdi zmdi-stop' />
+                  <i className='zmdi zmdi-close' />
                 </Tooltip>
+              </Button>
+            </ModalFooter>
+          </Modal>
+          {/* Modal que muestra los datos de la unidad */}
+          <Modal isOpen={showModalDetail} className={classList.modal}>
+            <ModalHeader className={classList.modalHeaderEdit}>
+              Editar Unidad
+            </ModalHeader>
+            <ModalBody>
+              <input type='hidden' name='UmdId' value={dataSelect.UmdId} />
+              <TextField
+                disabled
+                variant='standard'
+                margin='normal'
+                type='text'
+                size='small'
+                id='ident'
+                label='Identificación'
+                fullWidth
+                value={dataSelect.UmdIdentUdm}
+              />
+              <TextField
+                disabled
+                variant='standard'
+                margin='normal'
+                type='text'
+                size='small'
+                id='nom'
+                label='Nombre'
+                fullWidth
+                value={dataSelect.UmdNomUdm}
+              />
+              <TextField
+                disabled
+                variant='standard'
+                margin='normal'
+                type='telf'
+                size='small'
+                id='telf'
+                label='Teléfono'
+                fullWidth
+                value={dataSelect.UmdTelfUdm}
+              />
+              <TextField
+                disabled
+                variant='standard'
+                margin='normal'
+                type='text'
+                size='small'
+                id='dir'
+                label='Dirección'
+                fullWidth
+                value={dataSelect.UmdDirUdm}
+              />
+              <TextField
+                disabled
+                variant='standard'
+                margin='normal'
+                type='email'
+                size='small'
+                id='email'
+                label='Email'
+                fullWidth
+                value={dataSelect.UmdEmailUdm}
+              />
+              <TextField
+                disabled
+                variant='standard'
+                margin='normal'
+                type='text'
+                size='small'
+                id='estado'
+                label='Estado'
+                fullWidth
+                value={status}
+              />
+            </ModalBody>
+            <ModalFooter className={classList.modalFooter}>
+              <Button
+                type='submit'
+                color='success'
+                size='md'
+                onClick={() => selectedItem(0, "Delete")}>
+                <Tooltip title='Eliminar' placement='left'>
+                  <i className='zmdi zmdi-delete' />
+                </Tooltip>
+              </Button>{" "}
+              <Button
+                color='danger'
+                size='md'
+                onClick={() => abrirCerrarModalDetail()}>
+                <span>
+                  <Tooltip title='Cerrar' placement='right'>
+                    <i className='zmdi zmdi-close' />
+                  </Tooltip>
+                </span>
               </Button>
             </ModalFooter>
           </Modal>

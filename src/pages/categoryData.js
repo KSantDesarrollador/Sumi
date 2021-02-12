@@ -6,6 +6,10 @@ import {
   TextField,
   Tooltip,
   Popover,
+  InputLabel,
+  InputBase,
+  FormControl,
+  Select,
 } from "@material-ui/core";
 import SketchPicker from "react-color";
 import axios from "axios";
@@ -76,6 +80,7 @@ const CategoryData = () => {
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
+  const [showModalDetail, setShowModalDetail] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalSave, setShowModalSave] = useState(false);
   const [showModalActual, setShowModalActual] = useState(false);
@@ -83,6 +88,15 @@ const CategoryData = () => {
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
   const [open, setOpen] = useState(null);
+  const [fieldName, setFieldName] = useState("");
+  const [message, setMessage] = useState({
+    nom: "",
+    color: "",
+  });
+  const [error, setError] = useState({
+    nom: false,
+    color: false,
+  });
   const [dataSelect, setDataSelect] = useState({
     CtgId: "",
     CtgNomCat: "",
@@ -97,24 +111,90 @@ const CategoryData = () => {
 
   const abrirCerrarModal = () => {
     setShowModal(!showModal);
+    setError({ nom: false, color: false });
+    setMessage({ nom: "", color: "" });
   };
 
   const abrirCerrarModalEdit = () => {
     setShowModalEdit(!showModalEdit);
+    setError({ nom: false, color: false });
+    setMessage({ nom: "", color: "" });
   };
 
   const abrirCerrarModalSave = (e) => {
     e.preventDefault();
-    setShowModalSave(!showModalSave);
+    if (error.nom === false && error.color === false) {
+      setShowModalSave(!showModalSave);
+    }
   };
 
   const abrirCerrarModalActual = (e) => {
     e.preventDefault();
-    setShowModalActual(!showModalActual);
+    if (error.nom === false && error.color === false) {
+      setShowModalActual(!showModalActual);
+    }
+  };
+
+  const abrirCerrarModalDetail = () => {
+    setShowModalDetail(!showModalDetail);
   };
 
   const abrirCerrarModalDelete = () => {
     setShowModalDelete(!showModalDelete);
+  };
+
+  // limpiando los campos
+  const clear = () => {
+    setDataSelect(() => ({
+      CtgId: "",
+      CtgNomCat: "",
+      CtgColorCat: "",
+      CtgEstCat: "",
+    }));
+  };
+
+  // mostrando errores de validación
+  const validations = () => {
+    const expressions = {
+      text: /^[a-zA-ZA-ý\s]{1,40}$/,
+      code: /^[a-zA-Z0-9]{6,10}$/,
+    };
+
+    if (fieldName === "nom") {
+      if (expressions.text.test(dataSelect.CtgNomCat)) {
+        setError((prevState) => ({
+          ...prevState,
+          nom: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, nom: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          nom: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          nom: "solo se permiten letras con un máximo 40 caracteres",
+        }));
+      }
+    } else if (fieldName === "color") {
+      if (expressions.code.test(dataSelect.CtgColorCat)) {
+        setError((prevState) => ({
+          ...prevState,
+          color: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, color: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          color: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          color: "solo código hexadecimal",
+        }));
+      }
+    }
   };
 
   // abrir y cerrar el picker de color
@@ -128,6 +208,12 @@ const CategoryData = () => {
 
   const opened = Boolean(open);
   const id = opened ? "simple-popover" : undefined;
+
+  // obteniendo el typo para validar
+  const evalinput = (e) => {
+    setFieldName(e.target.id);
+    validations();
+  };
 
   // obteniendo los datos de las cajas de texto
   const eventinput = (e) => {
@@ -158,6 +244,7 @@ const CategoryData = () => {
   };
 
   useEffect(() => {
+    clear();
     listCategory();
   }, []);
 
@@ -177,12 +264,14 @@ const CategoryData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro creado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -214,12 +303,14 @@ const CategoryData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro actualizado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -235,20 +326,25 @@ const CategoryData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro eliminado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
   // Esta función permite elegir el modal que se abrirá y guaerda los datos en el estado
   const selectedItem = (category, type) => {
-    setDataSelect(category);
     if (type === "Edit") {
+      setDataSelect(category);
       abrirCerrarModalEdit();
+    } else if (type === "Detail") {
+      setDataSelect(category);
+      abrirCerrarModalDetail();
     } else {
       abrirCerrarModalDelete();
     }
@@ -264,6 +360,8 @@ const CategoryData = () => {
     },
     { title: "ESTADO", field: "CtgEstCat" },
   ];
+
+  const status = dataSelect.CtgEstCat === "A" ? "Activo" : "Inactivo";
 
   return (
     <div className={classList.root}>
@@ -306,19 +404,22 @@ const CategoryData = () => {
                   encType='multipart/form-data'
                   onSubmit={(e) => abrirCerrarModalSave(e)}>
                   <TextField
+                    error={error.nom}
+                    helperText={message.nom}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='CtgNomCat'
                     size='small'
-                    id='CtgNomCat'
+                    id='nom'
                     label='Nombre de la categoría'
                     fullWidth
                     autoFocus
                     required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
-                  <TextField fullWidth></TextField>
+                  <InputBase fullWidth />
                   <Button
                     aria-label={id}
                     variant='contained'
@@ -337,12 +438,15 @@ const CategoryData = () => {
                       horizontal: "left",
                     }}>
                     <SketchPicker
-                      id='CtgColorCat'
+                      error={error.color}
+                      helperText={message.color}
+                      id='color'
                       label='Color de la categoría'
                       fullWidth
                       color={dataSelect.CtgColorCat}
                       required
                       onChange={eventcolor}
+                      onKeyUp={evalinput}
                     />
                   </Popover>
                 </form>
@@ -363,7 +467,7 @@ const CategoryData = () => {
                 size='md'
                 onClick={() => abrirCerrarModal()}>
                 <Tooltip title='Cancelar' placement='right'>
-                  <i className='zmdi zmdi-stop' />
+                  <i className='zmdi zmdi-close' />
                 </Tooltip>
               </Button>
             </ModalFooter>
@@ -381,20 +485,23 @@ const CategoryData = () => {
                   onSubmit={(e) => abrirCerrarModalActual(e)}>
                   <input type='hidden' name='CtgId' value={dataSelect.CtgId} />
                   <TextField
+                    error={error.nom}
+                    helperText={message.nom}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='CtgNomCat'
                     size='small'
-                    id='CtgNomCat'
+                    id='nom'
                     label='Nombre de la categoría'
                     fullWidth
                     autoFocus
                     required
                     value={dataSelect.CtgNomCat}
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
-                  <TextField fullWidth></TextField>
+                  <InputBase fullWidth />
                   <Button
                     aria-label={id}
                     variant='contained'
@@ -413,27 +520,55 @@ const CategoryData = () => {
                       horizontal: "left",
                     }}>
                     <SketchPicker
-                      id='CtgColorCat'
+                      error={error.color}
+                      helperText={message.color}
+                      id='color'
                       label='Color de la categoría'
                       fullWidth
                       color={dataSelect.CtgColorCat}
                       required
                       onChange={eventcolor}
+                      onKeyUp={evalinput}
                     />
                   </Popover>
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='CtgEstCat'
+                  <Button
+                    size='lg'
+                    aria-label='CtgColorCat'
+                    variant='contained'
+                    style={{
+                      background: dataSelect.CtgColorCat,
+                      float: "right",
+                    }}></Button>
+                  <InputBase fullWidth />
+                  <FormControl
                     size='small'
-                    id='CtgEstCat'
-                    label='Estado'
+                    variant='outlined'
                     fullWidth
-                    required
-                    value={dataSelect.CtgEstCat}
-                    onChange={eventinput}
-                  />
+                    className={classList.formControl}>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Estado
+                    </InputLabel>
+                    <Select
+                      native
+                      onChange={eventinput}
+                      label='Estado'
+                      inputProps={{
+                        name: "CtgEstCat",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option
+                        key='0'
+                        label={status}
+                        value={dataSelect.CtgEstCat}
+                      />
+                      <option key='1' value={"A"}>
+                        Activo
+                      </option>
+                      <option key='2' value={"X"}>
+                        Inactivo
+                      </option>
+                    </Select>
+                  </FormControl>
                 </form>
               </div>
             </ModalBody>
@@ -452,8 +587,70 @@ const CategoryData = () => {
                 size='md'
                 onClick={() => abrirCerrarModalEdit()}>
                 <Tooltip title='Cancelar' placement='right'>
-                  <i className='zmdi zmdi-stop' />
+                  <i className='zmdi zmdi-close' />
                 </Tooltip>
+              </Button>
+            </ModalFooter>
+          </Modal>
+          {/* Modal que muestra los datos de la categoría */}
+          <Modal isOpen={showModalDetail} className={classList.modal}>
+            <ModalHeader className={classList.modalHeaderEdit}>
+              Detalles Categoría
+            </ModalHeader>
+            <ModalBody>
+              <input type='hidden' name='CtgId' value={dataSelect.CtgId} />
+              <TextField
+                disabled
+                variant='standard'
+                margin='normal'
+                type='text'
+                size='small'
+                id='CtgNomCat'
+                label='Nombre de la categoría'
+                fullWidth
+                value={dataSelect.CtgNomCat}
+              />
+              <label htmlFor='color'>Color de la categoría</label>
+              &nbsp; &nbsp;
+              <Button
+                disabled
+                id='color'
+                fullWidth
+                size='lg'
+                aria-label='CtgColorCat'
+                variant='contained'
+                style={{ background: dataSelect.CtgColorCat }}></Button>
+              <TextField
+                disabled
+                variant='standard'
+                margin='normal'
+                type='text'
+                size='small'
+                id='CtgEstCat'
+                label='Estado'
+                fullWidth
+                value={status}
+              />
+            </ModalBody>
+            <ModalFooter className={classList.modalFooter}>
+              <Button
+                type='submit'
+                color='success'
+                size='md'
+                onClick={() => selectedItem(0, "Delete")}>
+                <Tooltip title='Eliminar' placement='left'>
+                  <i className='zmdi zmdi-delete' />
+                </Tooltip>
+              </Button>{" "}
+              <Button
+                color='danger'
+                size='md'
+                onClick={() => abrirCerrarModalDetail()}>
+                <span>
+                  <Tooltip title='Cerrar' placement='right'>
+                    <i className='zmdi zmdi-close' />
+                  </Tooltip>
+                </span>
               </Button>
             </ModalFooter>
           </Modal>

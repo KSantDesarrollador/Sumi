@@ -1,6 +1,6 @@
 import React from "react";
 import MaterialTable from "material-table";
-import { Grid, MuiThemeProvider } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 
 const DataTable = (props) => {
   if (props.dataTree === "menu") {

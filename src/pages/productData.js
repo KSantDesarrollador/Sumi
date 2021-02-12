@@ -160,6 +160,19 @@ const ProductData = () => {
   const [show, setShow] = useState("alertHide");
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
+  const [fieldName, setFieldName] = useState("");
+  const [message, setMessage] = useState({
+    code: "",
+    desc: "",
+    concen: "",
+    presen: "",
+  });
+  const [error, setError] = useState({
+    code: false,
+    desc: false,
+    concen: false,
+    presen: false,
+  });
   const [dataSelect, setDataSelect] = useState({
     MdcId: "",
     CtgId: "",
@@ -182,10 +195,14 @@ const ProductData = () => {
 
   const abrirCerrarModal = () => {
     setShowModal(!showModal);
+    setError({ code: false, desc: false, presen: false, concen: false });
+    setMessage({ code: "", desc: "", presen: "", concen: "" });
   };
 
   const abrirCerrarModalEdit = () => {
     setShowModalEdit(!showModalEdit);
+    setError({ code: false, desc: false, presen: false, concen: false });
+    setMessage({ code: "", desc: "", presen: "", concen: "" });
   };
 
   const abrirCerrarModalDetail = () => {
@@ -194,12 +211,26 @@ const ProductData = () => {
 
   const abrirCerrarModalSave = (e) => {
     e.preventDefault();
-    setShowModalSave(!showModalSave);
+    if (
+      error.code === false &&
+      error.desc === false &&
+      error.presen === false &&
+      error.concen === false
+    ) {
+      setShowModalSave(!showModalSave);
+    }
   };
 
   const abrirCerrarModalActual = (e) => {
     e.preventDefault();
-    setShowModalActual(!showModalActual);
+    if (
+      error.code === false &&
+      error.desc === false &&
+      error.presen === false &&
+      error.concen === false
+    ) {
+      setShowModalActual(!showModalActual);
+    }
   };
 
   const abrirCerrarModalDelete = () => {
@@ -210,6 +241,105 @@ const ProductData = () => {
     let alert = document.getElementById("al");
     alert.classList.replace("alertHide", "alertShow");
   }
+
+  // limpiando los campos
+  const clear = () => {
+    setDataSelect(() => ({
+      MdcId: "",
+      CtgId: "",
+      CtgNomCat: "",
+      MdcCodMed: "",
+      MdcDescMed: "",
+      MdcPresenMed: "",
+      MdcConcenMed: "",
+      MdcNivPrescMed: "",
+      MdcNivAtencMed: "",
+      MdcViaAdmMed: "",
+      MdcFotoMed: "",
+      MdcEstMed: "",
+    }));
+  };
+
+  // mostrando errores de validación
+  const validations = () => {
+    const expressions = {
+      text: /^[a-zA-ZA-ý\s]{1,40}$/,
+      code: /^[a-zA-Z0-9]{6,10}$/,
+      mix2: /^[a-zA-Z0-9_-]{1,40}$/,
+    };
+
+    if (fieldName === "code") {
+      if (expressions.code.test(dataSelect.MdcCodMed)) {
+        setError((prevState) => ({
+          ...prevState,
+          code: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, code: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          code: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          code:
+            "permitidos letras y números con mínimo 6 y máximo 10 caracteres",
+        }));
+      }
+    } else if (fieldName === "desc") {
+      if (expressions.text.test(dataSelect.MdcDescMed)) {
+        setError((prevState) => ({
+          ...prevState,
+          desc: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, desc: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          desc: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          desc: " solo se permiten letras, con mínimo 3 y máximo 40 caracteres",
+        }));
+      }
+    } else if (fieldName === "presen") {
+      if (expressions.text.test(dataSelect.MdcPresenMed)) {
+        setError((prevState) => ({
+          ...prevState,
+          presen: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, presen: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          presen: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          presen:
+            " solo se permiten letras, con mínimo 3 y máximo 40 caracteres",
+        }));
+      }
+    } else if (fieldName === "concen") {
+      if (expressions.mix2.test(dataSelect.MdcConcenMed)) {
+        setError((prevState) => ({
+          ...prevState,
+          concen: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, concen: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          concen: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          concen: "permitidos solo letras y números",
+        }));
+      }
+    }
+  };
 
   // convirtiendo a base 64
   const base64Convert = (images) => {
@@ -227,6 +357,12 @@ const ProductData = () => {
         }));
       };
     });
+  };
+
+  // obteniendo el typo para validar
+  const evalinput = (e) => {
+    setFieldName(e.target.id);
+    validations();
   };
 
   // obteniendo los datos de las cajas de texto
@@ -266,6 +402,7 @@ const ProductData = () => {
   };
 
   useEffect(() => {
+    clear();
     listProduct();
     listSelectCategory();
   }, []);
@@ -294,12 +431,14 @@ const ProductData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro creado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -350,12 +489,14 @@ const ProductData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro actualizado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -371,12 +512,14 @@ const ProductData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro eliminado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -392,6 +535,8 @@ const ProductData = () => {
       abrirCerrarModalDelete();
     }
   };
+
+  const status = dataSelect.MdcEstMed === "A" ? "Activo" : "Inactivo";
 
   return (
     <div className={classList.root}>
@@ -578,29 +723,35 @@ const ProductData = () => {
                       </Select>
                     </FormControl>
                     <TextField
+                      error={error.code}
+                      helperText={message.code}
                       variant='outlined'
                       margin='normal'
                       type='text'
                       name='MdcCodMed'
                       size='small'
-                      id='MdcCodMed'
+                      id='code'
                       label='Código de Producto'
                       fullWidth
                       autoFocus
                       required
                       onChange={eventinput}
+                      onKeyUp={evalinput}
                     />
                     <TextField
+                      error={error.presen}
+                      helperText={message.presen}
                       variant='outlined'
                       margin='normal'
                       type='text'
                       name='MdcPresenMed'
                       size='small'
-                      id='MdcPresenMed'
+                      id='presen'
                       label='Presentación'
                       fullWidth
                       required
                       onChange={eventinput}
+                      onKeyUp={evalinput}
                     />
                   </Grid>
                   <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
@@ -653,29 +804,35 @@ const ProductData = () => {
                       </Select>
                     </FormControl>
                     <TextField
+                      error={error.desc}
+                      helperText={message.desc}
                       variant='outlined'
                       margin='normal'
                       type='text'
                       name='MdcDescMed'
                       size='small'
-                      id='MdcDescMed'
+                      id='desc'
                       label='Nombre de Producto'
                       fullWidth
                       autoFocus
                       required
                       onChange={eventinput}
+                      onKeyUp={evalinput}
                     />
                     <TextField
+                      error={error.concen}
+                      helperText={message.concen}
                       variant='outlined'
                       margin='normal'
                       type='text'
                       name='MdcConcenMed'
                       size='small'
-                      id='MdcConcenMed'
+                      id='concen'
                       label='Concentración'
                       fullWidth
                       required
                       onChange={eventinput}
+                      onKeyUp={evalinput}
                     />
                   </Grid>
                   <TextField
@@ -690,7 +847,7 @@ const ProductData = () => {
                     accept='image/*'
                     onChange={eventinput}
                   />
-                  <label for='MdcFotoMed'>Imagen de Producto</label>
+                  <label htmlFor='MdcFotoMed'>Imagen de Producto</label>
                 </Grid>
               </form>
             </ModalBody>
@@ -788,30 +945,36 @@ const ProductData = () => {
                       </Select>
                     </FormControl>
                     <TextField
+                      error={error.code}
+                      helperText={message.code}
                       variant='outlined'
                       margin='normal'
                       type='text'
                       name='MdcCodMed'
                       size='small'
-                      id='MdcCodMed'
+                      id='code'
                       label='Código de Producto'
                       fullWidth
                       autoFocus
                       required
                       value={dataSelect.MdcCodMed}
                       onChange={eventinput}
+                      onKeyUp={evalinput}
                     />
                     <TextField
+                      error={error.presen}
+                      helperText={message.presen}
                       variant='outlined'
                       margin='normal'
                       type='text'
                       name='MdcPresenMed'
                       size='small'
-                      id='MdcPresenMed'
+                      id='presen'
                       label='Presentación'
                       fullWidth
                       value={dataSelect.MdcPresenMed}
                       onChange={eventinput}
+                      onKeyUp={evalinput}
                     />
                     <TextField
                       className={classList.file}
@@ -825,7 +988,7 @@ const ProductData = () => {
                       accept='image/*'
                       onChange={eventinput}
                     />
-                    <label for='MdcFotoMed'>Imagen de Producto</label>
+                    <label htmlFor='MdcFotoMed'>Imagen de Producto</label>
                     &nbsp;
                   </Grid>
                   <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
@@ -884,45 +1047,66 @@ const ProductData = () => {
                       </Select>
                     </FormControl>
                     <TextField
+                      error={error.desc}
+                      helperText={message.desc}
                       variant='outlined'
                       margin='normal'
                       type='text'
                       name='MdcDescMed'
                       size='small'
-                      id='MdcDescMed'
+                      id='desc'
                       label='Nombre de Producto'
                       fullWidth
                       autoFocus
                       required
                       value={dataSelect.MdcDescMed}
                       onChange={eventinput}
+                      onKeyUp={evalinput}
                     />
                     <TextField
+                      error={error.concen}
+                      helperText={message.concen}
                       variant='outlined'
                       margin='normal'
                       type='text'
                       name='MdcConcenMed'
                       size='small'
-                      id='MdcConcenMed'
+                      id='concen'
                       label='Concentración'
                       fullWidth
                       required
                       value={dataSelect.MdcConcenMed}
                       onChange={eventinput}
+                      onKeyUp={evalinput}
                     />
-                    <TextField
-                      variant='outlined'
-                      margin='normal'
-                      type='text'
-                      name='MdcEstMed'
+                    <FormControl
                       size='small'
-                      id='MdcEstMed'
-                      label='Estado'
-                      fullWidth
-                      required
-                      value={dataSelect.MdcEstMed}
-                      onChange={eventinput}
-                    />
+                      variant='outlined'
+                      className={classList.formControl}>
+                      <InputLabel htmlFor='outlined-age-native-simple'>
+                        Estado
+                      </InputLabel>
+                      <Select
+                        native
+                        onChange={eventinput}
+                        label='Estado'
+                        inputProps={{
+                          name: "MdcEstMed",
+                          id: "outlined-age-native-simple",
+                        }}>
+                        <option
+                          key='0'
+                          label={status}
+                          value={dataSelect.MdcEstMed}
+                        />
+                        <option key='1' value={"A"}>
+                          Activo
+                        </option>
+                        <option key='2' value={"X"}>
+                          Inactivo
+                        </option>
+                      </Select>
+                    </FormControl>
                   </Grid>
                 </Grid>
               </form>
@@ -1067,7 +1251,7 @@ const ProductData = () => {
                     id='MdcEstMed'
                     label='Estado'
                     fullWidth
-                    value={dataSelect.MdcEstMed}
+                    value={status}
                   />
                 </Grid>
               </Grid>

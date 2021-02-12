@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Modal, ModalBody, ModalFooter, ModalHeader, Button } from "reactstrap";
-import { makeStyles, Grid, TextField, Tooltip } from "@material-ui/core";
+import {
+  makeStyles,
+  Grid,
+  TextField,
+  Tooltip,
+  FormControl,
+  Select,
+  InputLabel,
+} from "@material-ui/core";
 import axios from "axios";
 // importandom los componentes
 import MenuBar from "../templates/menu";
@@ -69,12 +77,20 @@ const RolData = () => {
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
+  const [showModalDetail, setShowModalDetail] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalSave, setShowModalSave] = useState(false);
   const [showModalActual, setShowModalActual] = useState(false);
   const [show, setShow] = useState("alertHide");
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
+  const [fieldName, setFieldName] = useState("");
+  const [message, setMessage] = useState({
+    nom: "",
+  });
+  const [error, setError] = useState({
+    nom: false,
+  });
   const [dataSelect, setDataSelect] = useState({
     RrlId: "",
     RrlNomRol: "",
@@ -88,24 +104,77 @@ const RolData = () => {
 
   const abrirCerrarModal = () => {
     setShowModal(!showModal);
+    setError({ nom: false });
+    setMessage({ nom: "" });
   };
 
   const abrirCerrarModalEdit = () => {
     setShowModalEdit(!showModalEdit);
+    setError({ nom: false });
+    setMessage({ nom: "" });
   };
 
   const abrirCerrarModalSave = (e) => {
     e.preventDefault();
-    setShowModalSave(!showModalSave);
+    if (error.nom === false) {
+      setShowModalSave(!showModalSave);
+    }
   };
 
   const abrirCerrarModalActual = (e) => {
     e.preventDefault();
-    setShowModalActual(!showModalActual);
+    if (error.nom === false) {
+      setShowModalActual(!showModalActual);
+    }
+  };
+
+  const abrirCerrarModalDetail = () => {
+    setShowModalDetail(!showModalDetail);
   };
 
   const abrirCerrarModalDelete = () => {
     setShowModalDelete(!showModalDelete);
+  };
+
+  // limpiando los campos
+  const clear = () => {
+    setDataSelect(() => ({
+      RrlId: "",
+      RrlNomRol: "",
+      RrlEstRol: "",
+    }));
+  };
+
+  // mostrando errores de validación
+  const validations = () => {
+    const expressions = {
+      text: /^[a-zA-ZA-ý\s]{1,40}$/,
+    };
+
+    if (fieldName === "nom") {
+      if (expressions.text.test(dataSelect.RrlNomRol)) {
+        setError((prevState) => ({
+          ...prevState,
+          nom: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, nom: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          nom: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          nom: "solo se permiten letras con un máximo 40 caracteres",
+        }));
+      }
+    }
+  };
+
+  // obteniendo el typo para validar
+  const evalinput = (e) => {
+    setFieldName(e.target.id);
+    validations();
   };
 
   // obteniendo los datos de las cajas de texto
@@ -130,6 +199,7 @@ const RolData = () => {
   };
 
   useEffect(() => {
+    clear();
     listRol();
   }, []);
 
@@ -148,12 +218,14 @@ const RolData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro creado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -182,12 +254,14 @@ const RolData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro actualizado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -203,20 +277,25 @@ const RolData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro eliminado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
   // Esta función permite elegir el modal que se abrirá y guaerda los datos en el estado
   const selectedItem = (rol, type) => {
-    setDataSelect(rol);
     if (type === "Edit") {
+      setDataSelect(rol);
       abrirCerrarModalEdit();
+    } else if (type === "Detail") {
+      setDataSelect(rol);
+      abrirCerrarModalDetail();
     } else {
       abrirCerrarModalDelete();
     }
@@ -228,6 +307,8 @@ const RolData = () => {
     { title: "ROL", field: "RrlNomRol" },
     { title: "ESTADO", field: "RrlEstRol" },
   ];
+
+  const status = dataSelect.RrlEstRol === "A" ? "Activo" : "Inactivo";
 
   return (
     <div className={classList.root}>
@@ -270,17 +351,20 @@ const RolData = () => {
                   encType='multipart/form-data'
                   onSubmit={(e) => abrirCerrarModalSave(e)}>
                   <TextField
+                    error={error.nom}
+                    helperText={message.nom}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='RrlNomRol'
                     size='small'
-                    id='RrlNomRol'
+                    id='nom'
                     label='Nombre del Rol'
                     fullWidth
                     autoFocus
                     required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                 </form>
               </div>
@@ -300,7 +384,7 @@ const RolData = () => {
                 size='md'
                 onClick={() => abrirCerrarModal()}>
                 <Tooltip title='Cancelar' placement='right'>
-                  <i className='zmdi zmdi-stop' />
+                  <i className='zmdi zmdi-close' />
                 </Tooltip>
               </Button>
             </ModalFooter>
@@ -318,6 +402,8 @@ const RolData = () => {
                   onSubmit={(e) => abrirCerrarModalActual(e)}>
                   <input type='hidden' name='RrlId' value={dataSelect.RrlId} />
                   <TextField
+                    error={error.nom}
+                    helperText={message.nom}
                     variant='outlined'
                     margin='normal'
                     type='text'
@@ -330,20 +416,38 @@ const RolData = () => {
                     required
                     value={dataSelect.RrlNomRol}
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='RrlEstRol'
+                  &nbsp;
+                  <FormControl
                     size='small'
-                    id='RrlEstRol'
-                    label='Estado'
+                    variant='outlined'
                     fullWidth
-                    required
-                    value={dataSelect.RrlEstRol}
-                    onChange={eventinput}
-                  />
+                    className={classList.formControl}>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Estado
+                    </InputLabel>
+                    <Select
+                      native
+                      onChange={eventinput}
+                      label='Estado'
+                      inputProps={{
+                        name: "RrlEstRol",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option
+                        key='0'
+                        label={status}
+                        value={dataSelect.RrlEstRol}
+                      />
+                      <option key='1' value={"A"}>
+                        Activo
+                      </option>
+                      <option key='2' value={"X"}>
+                        Inactivo
+                      </option>
+                    </Select>
+                  </FormControl>
                 </form>
               </div>
             </ModalBody>
@@ -362,8 +466,60 @@ const RolData = () => {
                 size='md'
                 onClick={() => abrirCerrarModalEdit()}>
                 <Tooltip title='Cancelar' placement='right'>
-                  <i className='zmdi zmdi-stop' />
+                  <i className='zmdi zmdi-close' />
                 </Tooltip>
+              </Button>
+            </ModalFooter>
+          </Modal>
+          {/* Modal que muestra los datos del rol a ser editado */}
+          <Modal isOpen={showModalDetail} className={classList.modal}>
+            <ModalHeader className={classList.modalHeaderEdit}>
+              Detalles Rol
+            </ModalHeader>
+            <ModalBody>
+              <input type='hidden' name='RrlId' value={dataSelect.RrlId} />
+              <TextField
+                disabled
+                variant='standard'
+                margin='normal'
+                type='text'
+                size='small'
+                id='RrlNomRol'
+                label='Nombre del Rol'
+                fullWidth
+                value={dataSelect.RrlNomRol}
+              />
+              <TextField
+                disabled
+                variant='standard'
+                margin='normal'
+                type='text'
+                size='small'
+                id='RrlEstRol'
+                label='Estado'
+                fullWidth
+                value={status}
+              />
+            </ModalBody>
+            <ModalFooter className={classList.modalFooter}>
+              <Button
+                type='submit'
+                color='success'
+                size='md'
+                onClick={() => selectedItem(0, "Delete")}>
+                <Tooltip title='Eliminar' placement='left'>
+                  <i className='zmdi zmdi-delete' />
+                </Tooltip>
+              </Button>{" "}
+              <Button
+                color='danger'
+                size='md'
+                onClick={() => abrirCerrarModalDetail()}>
+                <span>
+                  <Tooltip title='Cerrar' placement='right'>
+                    <i className='zmdi zmdi-close' />
+                  </Tooltip>
+                </span>
               </Button>
             </ModalFooter>
           </Modal>

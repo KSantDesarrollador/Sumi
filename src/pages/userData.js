@@ -44,10 +44,6 @@ const stylesPage = makeStyles((theme) => ({
     alignItems: "center",
     paddingTop: "15px",
   },
-  formControl: {
-    margin: theme.spacing(0),
-    minWidth: "100%",
-  },
   selectEmpty: {
     marginTop: theme.spacing(2),
   },
@@ -100,6 +96,21 @@ const UserData = () => {
   const [show, setShow] = useState("alertHide");
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
+  const [fieldName, setFieldName] = useState("");
+  const [message, setMessage] = useState({
+    text: "",
+    user: "",
+    password: "",
+    email: "",
+    telf: "",
+  });
+  const [error, setError] = useState({
+    text: false,
+    user: false,
+    password: false,
+    email: false,
+    telf: false,
+  });
   const [dataSelect, setDataSelect] = useState({
     UsrId: "",
     RrlId: "",
@@ -119,10 +130,26 @@ const UserData = () => {
 
   const abrirCerrarModal = () => {
     setShowModal(!showModal);
+    setError({
+      text: false,
+      user: false,
+      password: false,
+      email: false,
+      telf: false,
+    });
+    setMessage({ text: "", user: "", password: "", email: "", telf: "" });
   };
 
   const abrirCerrarModalEdit = () => {
     setShowModalEdit(!showModalEdit);
+    setError({
+      text: false,
+      user: false,
+      password: false,
+      email: false,
+      telf: false,
+    });
+    setMessage({ text: "", user: "", password: "", email: "", telf: "" });
   };
 
   const abrirCerrarModalDetail = () => {
@@ -131,16 +158,147 @@ const UserData = () => {
 
   const abrirCerrarModalSave = (e) => {
     e.preventDefault();
-    setShowModalSave(!showModalSave);
+    if (
+      error.text === false &&
+      error.user === false &&
+      error.password === false &&
+      error.email === false &&
+      error.telf === false
+    ) {
+      setShowModalSave(!showModalSave);
+    }
   };
 
   const abrirCerrarModalActual = (e) => {
     e.preventDefault();
-    setShowModalActual(!showModalActual);
+    if (
+      error.text === false &&
+      error.user === false &&
+      error.password === false &&
+      error.email === false &&
+      error.telf === false
+    ) {
+      setShowModalActual(!showModalActual);
+    }
   };
 
   const abrirCerrarModalDelete = () => {
     setShowModalDelete(!showModalDelete);
+  };
+
+  // limpiando los campos
+  const clear = () => {
+    setDataSelect(() => ({
+      UsrId: "",
+      RrlId: "",
+      RrlNomRol: "",
+      UsrNomUsu: "",
+      UsrContraUsu: "",
+      UsrEmailUsu: "",
+      UsrTelfUsu: "",
+      UsrImgUsu: "",
+      UsrEstUsu: "",
+    }));
+  };
+
+  // mostrando errores de validación
+  const validations = () => {
+    const expressions = {
+      text: /^[a-zA-ZA-ý\s]{1,40}$/,
+      user: /^[a-zA-Z0-9_-]{4,16}$/,
+      password: /^.{4,12}$/,
+      email: /^[a-zA-Z0-9_\-.]+@+[a-zA-Z0-9]+\.+[a-zA-Z0-9]{3,6}$/,
+      telf: /^[0-9]{7,10}$/,
+    };
+
+    if (fieldName === "text") {
+      if (expressions.text.test(dataSelect.UsrNomUsu)) {
+        setError((prevState) => ({
+          ...prevState,
+          text: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, text: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          text: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          text: "solo se permiten letras y un máximo de 40 caracteres",
+        }));
+      }
+    } else if (fieldName === "user") {
+      if (expressions.user.test(dataSelect.UsrNomUsu)) {
+        setError((prevState) => ({
+          ...prevState,
+          user: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, user: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          user: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          user:
+            " no permitidos caracteres especiales, con mínimo 4 y máximo 16 caracteres",
+        }));
+      }
+    } else if (fieldName === "password") {
+      if (expressions.password.test(dataSelect.UsrContraUsu)) {
+        setError((prevState) => ({
+          ...prevState,
+          password: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, password: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          password: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          password:
+            "la contraseña debe tener 4 caracteres mínimo y 12 caracteres máximo",
+        }));
+      }
+    } else if (fieldName === "email") {
+      if (expressions.email.test(dataSelect.UsrEmailUsu)) {
+        setError((prevState) => ({
+          ...prevState,
+          email: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, email: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          email: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          email: "el email debe contener '@' y '.' ejp(texto@texto.texto)",
+        }));
+      }
+    } else if (fieldName === "telf") {
+      if (expressions.telf.test(dataSelect.UsrTelfUsu)) {
+        setError((prevState) => ({
+          ...prevState,
+          telf: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, telf: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          telf: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          telf: "solo se permiten números con mínimo 7 y máximo 10 caracteres",
+        }));
+      }
+    }
   };
 
   // convirtiendo a base 64
@@ -159,6 +317,12 @@ const UserData = () => {
         }));
       };
     });
+  };
+
+  // obteniendo el typo para validar
+  const evalinput = (e) => {
+    setFieldName(e.target.id);
+    validations();
   };
 
   // obteniendo los datos de las cajas de texto
@@ -198,6 +362,7 @@ const UserData = () => {
   };
 
   useEffect(() => {
+    clear();
     listUser();
     listSelectRol();
   }, []);
@@ -222,12 +387,14 @@ const UserData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro creado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -278,12 +445,14 @@ const UserData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro actualizado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -299,12 +468,14 @@ const UserData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro eliminado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -329,6 +500,8 @@ const UserData = () => {
     { title: "EMAIL", field: "UsrEmailUsu" },
     { title: "TELÉFONO", field: "UsrTelfUsu" },
   ];
+
+  const status = dataSelect.UsrEstUsu === "A" ? "Activo" : "Inactivo";
 
   return (
     <div className={classList.root}>
@@ -370,18 +543,15 @@ const UserData = () => {
                   id='formNewData'
                   encType='multipart/form-data'
                   onSubmit={(e) => abrirCerrarModalSave(e)}>
-                  <FormControl
-                    size='small'
-                    variant='outlined'
-                    className={classList.formControl}>
+                  <FormControl size='small' variant='outlined' fullWidth>
                     <InputLabel htmlFor='outlined-age-native-simple'>
                       Rol contenedor
                     </InputLabel>
                     <Select
                       native
+                      required
                       onChange={eventinput}
                       label='Rol contenedor'
-                      required
                       inputProps={{
                         name: "RrlId",
                         id: "outlined-age-native-simple",
@@ -395,67 +565,81 @@ const UserData = () => {
                     </Select>
                   </FormControl>
                   <TextField
+                    required
+                    error={error.user}
+                    helperText={message.user}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='UsrNomUsu'
                     size='small'
-                    id='UsrNomUsu'
+                    id='user'
                     label='Nombre de Usuario'
                     fullWidth
                     autoFocus
-                    required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
+
                   <TextField
+                    required
+                    error={error.password}
+                    helperText={message.password}
                     variant='outlined'
                     margin='normal'
                     type='password'
                     name='UsrContraUsu'
                     size='small'
-                    id='UsrContraUsu'
+                    id='password'
                     label='Contraseña'
                     fullWidth
-                    required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.email}
+                    helperText={message.email}
                     variant='outlined'
                     margin='normal'
                     type='email'
                     name='UsrEmailUsu'
                     size='small'
-                    id='UsrEmailUsu'
+                    id='email'
                     label='Email'
                     fullWidth
-                    required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.telf}
+                    helperText={message.telf}
                     variant='outlined'
                     margin='normal'
                     type='telf'
                     name='UsrTelfUsu'
                     size='small'
-                    id='UsrTelfUsu'
+                    id='telf'
                     label='Teléfono'
                     fullWidth
-                    required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
                     className={classList.file}
                     variant='standard'
                     margin='normal'
                     type='file'
                     name='UsrImgUsu'
                     size='small'
-                    id='UsrImgUsu'
+                    id='file'
                     fullWidth
                     accept='image/*'
                     onChange={eventinput}
                   />
-                  <label for='UsrImgUsu'>Imagen de Usuario</label>
+                  <label htmlFor='UsrImgUsu'>Imagen de Usuario</label>
                 </form>
               </div>
             </ModalBody>
@@ -491,18 +675,15 @@ const UserData = () => {
                   encType='multipart/form-data'
                   onSubmit={(e) => abrirCerrarModalActual(e)}>
                   <input type='hidden' name='UsrId' value={dataSelect.UsrId} />
-                  <FormControl
-                    size='small'
-                    variant='outlined'
-                    className={classList.formControl}>
+                  <FormControl size='small' variant='outlined' fullWidth>
                     <InputLabel htmlFor='outlined-age-native-simple'>
                       Rol contenedor
                     </InputLabel>
                     <Select
                       native
+                      required
                       onChange={eventinput}
                       label='Rol contenedor'
-                      required
                       inputProps={{
                         name: "RrlId",
                         id: "outlined-age-native-simple",
@@ -522,56 +703,68 @@ const UserData = () => {
                     </Select>
                   </FormControl>
                   <TextField
+                    required
+                    error={error.user}
+                    helperText={message.user}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='UsrNomUsu'
                     size='small'
-                    id='UsrNomUsu'
+                    id='user'
                     label='Nombre de Usuario'
                     fullWidth
                     autoFocus
-                    required
                     value={dataSelect.UsrNomUsu}
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    error={error.password}
+                    helperText={message.password}
                     variant='outlined'
                     margin='normal'
                     type='password'
                     name='UsrContraUsu'
                     size='small'
-                    id='UsrContraUsu'
+                    id='password'
                     label='Contraseña'
                     fullWidth
                     placeholder='********'
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.email}
+                    helperText={message.email}
                     variant='outlined'
                     margin='normal'
                     type='email'
                     name='UsrEmailUsu'
                     size='small'
-                    id='UsrEmailUsu'
+                    id='email'
                     label='Email'
                     fullWidth
-                    required
                     value={dataSelect.UsrEmailUsu}
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.telf}
+                    helperText={message.telf}
                     variant='outlined'
                     margin='normal'
                     type='telf'
                     name='UsrTelfUsu'
                     size='small'
-                    id='UsrTelfUsu'
+                    id='telf'
                     label='Teléfono'
                     fullWidth
-                    required
                     value={dataSelect.UsrTelfUsu}
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
                     className={classList.file}
@@ -585,20 +778,29 @@ const UserData = () => {
                     accept='image/*'
                     onChange={eventinput}
                   />
-                  <label for='UsrImgUsu'>Imagen de Usuario</label>
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='UsrEstUsu'
-                    size='small'
-                    id='UsrEstUsu'
-                    label='Estado'
-                    fullWidth
-                    required
-                    value={dataSelect.UsrEstUsu}
-                    onChange={eventinput}
-                  />
+                  <label htmlFor='UsrImgUsu'>Imagen de Usuario</label>
+                  <FormControl size='small' variant='outlined' fullWidth>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Estado
+                    </InputLabel>
+                    <Select
+                      native
+                      required
+                      onChange={eventinput}
+                      label='Estado'
+                      inputProps={{
+                        name: "UsrEstUsu",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option
+                        key='0'
+                        label={status}
+                        value={dataSelect.UsrEstUsu}
+                      />
+                      <option key='1' value={"A"} label={"Activo"} />
+                      <option key='2' value={"X"} label={"Inactivo"} />
+                    </Select>
+                  </FormControl>
                 </form>
               </div>
             </ModalBody>
@@ -709,7 +911,7 @@ const UserData = () => {
                     id='UsrEstUsu'
                     label='Estado'
                     fullWidth
-                    value={dataSelect.UsrEstUsu}
+                    value={status}
                   />
                 </Grid>
               </Grid>

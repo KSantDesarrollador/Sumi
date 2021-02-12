@@ -83,18 +83,34 @@ const MenuData = () => {
   const classList = stylesPage();
   const [data, setData] = useState([]);
   const [datalistSelect, setDatalistSelect] = useState([]);
+  const [jerqSelect, setJerqSelect] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
+  const [showModalDetail, setShowModalDetail] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalSave, setShowModalSave] = useState(false);
   const [showModalActual, setShowModalActual] = useState(false);
   const [show, setShow] = useState("alertHide");
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
+  const [fieldName, setFieldName] = useState("");
+  const [message, setMessage] = useState({
+    nom: "",
+    niv: "",
+    icon: "",
+    url: "",
+    ley: "",
+  });
+  const [error, setError] = useState({
+    nom: false,
+    niv: false,
+    icon: false,
+    url: false,
+    ley: false,
+  });
   const [dataSelect, setDataSelect] = useState({
     MnuId: "",
     MnuJerqMen: "",
-    Jerarquia: "",
     MnuNomMen: "",
     MnuNivelMen: "",
     MnuIconMen: "",
@@ -108,30 +124,191 @@ const MenuData = () => {
     setAlert(null);
   };
 
-  const [jerqSelect, setJerqSelect] = useState({
-    MnuId: "",
-    MnuNomMen: "",
-  });
   const abrirCerrarModal = () => {
     setShowModal(!showModal);
+    setError({
+      nom: false,
+      niv: false,
+      icon: false,
+      url: false,
+      ley: false,
+    });
+    setMessage({
+      nom: "",
+      niv: "",
+      icon: "",
+      url: "",
+      ley: "",
+    });
   };
 
   const abrirCerrarModalEdit = () => {
     setShowModalEdit(!showModalEdit);
+    setError({
+      nom: false,
+      niv: false,
+      icon: false,
+      url: false,
+      ley: false,
+    });
+    setMessage({
+      nom: "",
+      niv: "",
+      icon: "",
+      url: "",
+      ley: "",
+    });
   };
 
   const abrirCerrarModalSave = (e) => {
     e.preventDefault();
-    setShowModalSave(!showModalSave);
+    if (
+      error.nom === false &&
+      error.niv === false &&
+      error.icon === false &&
+      error.url === false &&
+      error.ley === false
+    ) {
+      setShowModalSave(!showModalSave);
+    }
   };
 
   const abrirCerrarModalActual = (e) => {
     e.preventDefault();
-    setShowModalActual(!showModalActual);
+    if (
+      error.nom === false &&
+      error.niv === false &&
+      error.icon === false &&
+      error.url === false &&
+      error.ley === false
+    ) {
+      setShowModalActual(!showModalActual);
+    }
+  };
+
+  const abrirCerrarModalDetail = () => {
+    setShowModalDetail(!showModalDetail);
   };
 
   const abrirCerrarModalDelete = () => {
     setShowModalDelete(!showModalDelete);
+  };
+
+  // limpiando los campos
+  const clear = () => {
+    setDataSelect(() => ({
+      MnuId: "",
+      MnuJerqMen: "",
+      MnuNomMen: "",
+      MnuNivelMen: "",
+      MnuIconMen: "",
+      MnuUrlMen: "",
+      MnuLeyendMen: "",
+      MnuEstMen: "",
+    }));
+  };
+
+  // mostrando errores de validación
+  const validations = () => {
+    const expressions = {
+      nom: /^[a-zA-ZA-ý\s]{1,40}$/,
+      text: /^[a-zA-z/\-. ]{4,50}$/,
+      num: /^[0-9]{0,3}$/,
+    };
+
+    if (fieldName === "nom") {
+      if (expressions.nom.test(dataSelect.MnuNomMen)) {
+        setError((prevState) => ({
+          ...prevState,
+          nom: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, nom: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          nom: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          nom: "solo se permiten letras con un máximo 40 caracteres ",
+        }));
+      }
+    } else if (fieldName === "niv") {
+      if (expressions.num.test(dataSelect.MnuNivelMen)) {
+        setError((prevState) => ({
+          ...prevState,
+          niv: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, niv: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          niv: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          niv: " solo se permiten números enter 0 y 3",
+        }));
+      }
+    } else if (fieldName === "icon") {
+      if (expressions.text.test(dataSelect.MnuIconMen)) {
+        setError((prevState) => ({
+          ...prevState,
+          icon: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, icon: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          icon: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          icon:
+            "permitidos letras y Guión medio con mínimo 4 y máximo 10 caracteres",
+        }));
+      }
+    } else if (fieldName === "url") {
+      if (expressions.text.test(dataSelect.MnuUrlMen)) {
+        setError((prevState) => ({
+          ...prevState,
+          url: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, url: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          url: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          url: "permitidos letras y slash con mínimo 4 y máximo 10 caracteres",
+        }));
+      }
+    } else if (fieldName === "ley") {
+      if (expressions.nom.test(dataSelect.MnuLeyendMen)) {
+        setError((prevState) => ({
+          ...prevState,
+          ley: false,
+        }));
+        setMessage((prevState) => ({ ...prevState, ley: "" }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          ley: true,
+        }));
+        setMessage((prevState) => ({
+          ...prevState,
+          ley: "solo se permiten letras con un máximo 40 caracteres ",
+        }));
+      }
+    }
+  };
+
+  // obteniendo el typo para validar
+  const evalinput = (e) => {
+    setFieldName(e.target.id);
+    validations();
   };
 
   // obteniendo los datos de las cajas de texto
@@ -167,16 +344,19 @@ const MenuData = () => {
   };
 
   useEffect(() => {
+    clear();
     listMenu();
     listSelect();
   }, []);
 
   // obteniendo datos de un servidor
-  const listJerarquia = async () => {
+  const listJerarquia = async (jer) => {
+    console.log(jer);
     await axios
-      .get(ServUrl + "?jer=" + dataSelect.MnuJerqMen)
+      .get(ServUrl + "?jer=" + jer)
       .then((response) => {
         setJerqSelect(response.data);
+        console.log(response.data);
       })
       .catch((er) => {
         console.log(er);
@@ -203,12 +383,14 @@ const MenuData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro creado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -253,12 +435,14 @@ const MenuData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro actualizado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
@@ -274,21 +458,27 @@ const MenuData = () => {
         setType("success");
         setShow("alertShow");
         setAlert("Registro eliminado correctamente");
+        clear();
       })
       .catch((er) => {
         console.log(er);
         setType("error");
         setShow("alertShow");
         setAlert("....Ops! Hubo un error al procesar la petición");
+        clear();
       });
   };
 
   // Esta función permite elegir el modal que se abrirá y guaerda los datos en el estado
   const selectedItem = (menu, type) => {
-    setDataSelect(menu);
     if (type === "Edit") {
-      listJerarquia();
+      setDataSelect(menu);
+      listJerarquia(menu.MnuJerqMen);
       abrirCerrarModalEdit();
+    } else if (type === "Detail") {
+      setDataSelect(menu);
+      listJerarquia(menu.MnuJerqMen);
+      abrirCerrarModalDetail();
     } else {
       abrirCerrarModalDelete();
     }
@@ -303,6 +493,8 @@ const MenuData = () => {
     { title: "ICONO", field: "MnuIconMen" },
     { title: "URL", field: "MnuUrlMen" },
   ];
+
+  const status = dataSelect.MnuEstMen === "A" ? "Activo" : "Inactivo";
 
   return (
     <div className={classList.root}>
@@ -370,68 +562,81 @@ const MenuData = () => {
                     </Select>
                   </FormControl>
                   <TextField
+                    required
+                    error={error.nom}
+                    helperText={message.nom}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='MnuNomMen'
                     size='small'
-                    id='MnuNomMen'
+                    id='nom'
                     label='Nombre del menú'
                     fullWidth
                     autoFocus
-                    required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.niv}
+                    helperText={message.niv}
                     variant='outlined'
                     margin='normal'
                     type='number'
                     name='MnuNivelMen'
                     size='small'
-                    id='MnuNivelMen'
+                    id='niv'
                     label='Nivel'
-                    minimum='0'
-                    maximum='1'
                     fullWidth
-                    required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.icon}
+                    helperText={message.icon}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='MnuIconMen'
                     size='small'
-                    id='MnuIconMen'
+                    id='icon'
                     label='Icono'
                     fullWidth
-                    required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.url}
+                    helperText={message.url}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='MnuUrlMen'
                     size='small'
-                    id='MnuUrlMen'
+                    id='url'
                     label='Url'
                     fullWidth
-                    required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.ley}
+                    helperText={message.ley}
                     className={classList.file}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='MnuLeyendMen'
                     size='small'
-                    id='MnuLeyendMen'
+                    id='ley'
                     label='Leyenda'
                     fullWidth
-                    required
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                 </form>
               </div>
@@ -451,7 +656,7 @@ const MenuData = () => {
                 size='md'
                 onClick={() => abrirCerrarModal()}>
                 <Tooltip title='Cancelar' placement='right'>
-                  <i className='zmdi zmdi-stop' />
+                  <i className='zmdi zmdi-close' />
                 </Tooltip>
               </Button>
             </ModalFooter>
@@ -483,10 +688,19 @@ const MenuData = () => {
                         name: "MnuJerqMen",
                         id: "outlined-age-native-simple",
                       }}>
-                      <option
-                        label={jerqSelect.MnuNomMen}
-                        value={jerqSelect.MnuId}
-                      />
+                      {jerqSelect.map((item, index) => {
+                        if (dataSelect.MnuJerqMen !== 0) {
+                          return (
+                            <option
+                              key={index}
+                              label={item.MnuNomMen}
+                              value={item.MnuId}
+                            />
+                          );
+                        } else {
+                          return <option key='0' aria-label='' value='' />;
+                        }
+                      })}
                       {datalistSelect.map((item, index) => (
                         <option key={index} value={item.MnuId} label=''>
                           {item.MnuNomMen}
@@ -495,84 +709,109 @@ const MenuData = () => {
                     </Select>
                   </FormControl>
                   <TextField
+                    required
+                    error={error.nom}
+                    helperText={message.nom}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='MnuNomMen'
                     size='small'
-                    id='MnuNomMen'
+                    id='nom'
                     label='Nombre del menú'
                     fullWidth
                     autoFocus
-                    required
                     value={dataSelect.MnuNomMen}
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.niv}
+                    helperText={message.niv}
                     variant='outlined'
                     margin='normal'
                     type='number'
                     name='MnuNivelMen'
                     size='small'
-                    id='MnuNivelMen'
+                    id='niv'
                     label='Nivel'
                     fullWidth
-                    required
                     value={dataSelect.MnuNivelMen}
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.icon}
+                    helperText={message.icon}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='MnuIconMen'
                     size='small'
-                    id='MnuIconMen'
+                    id='icon'
                     label='Icono'
                     fullWidth
-                    required
                     value={dataSelect.MnuIconMen}
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.url}
+                    helperText={message.url}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='MnuUrlMen'
                     size='small'
-                    id='MnuUrlMen'
+                    id='url'
                     label='Url'
                     fullWidth
                     value={dataSelect.MnuUrlMen}
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
                   <TextField
+                    required
+                    error={error.ley}
+                    helperText={message.ley}
                     className={classList.file}
                     variant='outlined'
                     margin='normal'
                     type='text'
                     name='MnuLeyendMen'
                     size='small'
-                    id='MnuLeyendMen'
+                    id='ley'
                     label='Leyenda'
                     fullWidth
-                    required
                     value={dataSelect.MnuLeyendMen}
                     onChange={eventinput}
+                    onKeyUp={evalinput}
                   />
-                  <TextField
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='MnuEstMen'
-                    size='small'
-                    id='MnuEstMen'
-                    label='Estado'
-                    fullWidth
-                    required
-                    value={dataSelect.MnuEstMen}
-                    onChange={eventinput}
-                  />
+                  <FormControl size='small' variant='outlined' fullWidth>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Estado
+                    </InputLabel>
+                    <Select
+                      native
+                      required
+                      onChange={eventinput}
+                      label='Estado'
+                      inputProps={{
+                        name: "MnuEstMen",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option
+                        key='0'
+                        label={status}
+                        value={dataSelect.MnuEstMen}
+                      />
+                      <option key='1' value={"A"} label={"Activo"} />
+                      <option key='2' value={"X"} label={"Inactivo"} />
+                    </Select>
+                  </FormControl>
                 </form>
               </div>
             </ModalBody>
@@ -591,8 +830,107 @@ const MenuData = () => {
                 size='md'
                 onClick={() => abrirCerrarModalEdit()}>
                 <Tooltip title='Cancelar' placement='right'>
-                  <i className='zmdi zmdi-stop' />
+                  <i className='zmdi zmdi-close' />
                 </Tooltip>
+              </Button>
+            </ModalFooter>
+          </Modal>
+          {/* Modal que muestra los datos del rol a ser editado */}
+          <Modal isOpen={showModalDetail} className={classList.modal}>
+            <ModalHeader className={classList.modalHeaderEdit}>
+              Detalles Menú
+            </ModalHeader>
+            <ModalBody>
+              <TextField
+                variant='outlined'
+                margin='normal'
+                type='text'
+                size='small'
+                id='jerq'
+                label='Jerarquía'
+                fullWidth
+                // value={item.MnuNomMen}
+              />
+              <TextField
+                variant='outlined'
+                margin='normal'
+                type='text'
+                size='small'
+                id='nom'
+                label='Nombre del menú'
+                fullWidth
+                value={dataSelect.MnuNomMen}
+              />
+              <TextField
+                variant='outlined'
+                margin='normal'
+                type='number'
+                size='small'
+                id='niv'
+                label='Nivel'
+                fullWidth
+                value={dataSelect.MnuNivelMen}
+              />
+              <TextField
+                variant='outlined'
+                margin='normal'
+                type='text'
+                size='small'
+                id='icon'
+                label='Icono'
+                fullWidth
+                value={dataSelect.MnuIconMen}
+              />
+              <TextField
+                variant='outlined'
+                margin='normal'
+                type='text'
+                size='small'
+                id='url'
+                label='Url'
+                fullWidth
+                value={dataSelect.MnuUrlMen}
+              />
+              <TextField
+                variant='outlined'
+                margin='normal'
+                type='text'
+                size='small'
+                id='ley'
+                label='Leyenda'
+                fullWidth
+                value={dataSelect.MnuLeyendMen}
+              />
+              <TextField
+                variant='outlined'
+                margin='normal'
+                type='text'
+                size='small'
+                id='estado'
+                label='Estado'
+                fullWidth
+                value={status}
+              />
+            </ModalBody>
+            <ModalFooter className={classList.modalFooter}>
+              <Button
+                type='submit'
+                color='success'
+                size='md'
+                onClick={() => selectedItem(0, "Delete")}>
+                <Tooltip title='Eliminar' placement='left'>
+                  <i className='zmdi zmdi-delete' />
+                </Tooltip>
+              </Button>{" "}
+              <Button
+                color='danger'
+                size='md'
+                onClick={() => abrirCerrarModalDetail()}>
+                <span>
+                  <Tooltip title='Cerrar' placement='right'>
+                    <i className='zmdi zmdi-close' />
+                  </Tooltip>
+                </span>
               </Button>
             </ModalFooter>
           </Modal>
