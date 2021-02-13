@@ -509,6 +509,7 @@ const ProductData = () => {
       .then((response) => {
         setData(data.filter((product) => product.MdcId !== dataSelect.MdcId));
         abrirCerrarModalDelete();
+        abrirCerrarModalDetail();
         setType("success");
         setShow("alertShow");
         setAlert("Registro eliminado correctamente");
@@ -692,7 +693,14 @@ const ProductData = () => {
                         }}>
                         <option key='0' aria-label='' value='' />
                         {datalistSelectCat.map((item, index) => (
-                          <option key={index} value={item.CtgId} label=''>
+                          <option
+                            key={index}
+                            value={item.CtgId}
+                            label=''
+                            style={{
+                              background: item.CtgColorCat,
+                              fontWeight: "700",
+                            }}>
                             {item.CtgNomCat}
                           </option>
                         ))}
@@ -911,7 +919,14 @@ const ProductData = () => {
                           value={dataSelect.CtgId}
                         />
                         {datalistSelectCat.map((item, index) => (
-                          <option key={index} value={item.CtgId} label=''>
+                          <option
+                            key={index}
+                            value={item.CtgId}
+                            label=''
+                            style={{
+                              background: item.CtgColorCat,
+                              fontWeight: "700",
+                            }}>
                             {item.CtgNomCat}
                           </option>
                         ))}

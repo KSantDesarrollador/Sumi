@@ -321,8 +321,9 @@ const CategoryData = () => {
     await axios
       .post(ServUrl, f, { params: { id: dataSelect.CtgId } })
       .then((response) => {
-        setData(data.filter((rol) => rol.CtgId !== dataSelect.CtgId));
+        setData(data.filter((cat) => cat.CtgId !== dataSelect.CtgId));
         abrirCerrarModalDelete();
+        abrirCerrarModalDetail();
         setType("success");
         setShow("alertShow");
         setAlert("Registro eliminado correctamente");
@@ -419,7 +420,7 @@ const CategoryData = () => {
                     onChange={eventinput}
                     onKeyUp={evalinput}
                   />
-                  <InputBase fullWidth />
+                  <InputBase fullWidth disabled />
                   <Button
                     aria-label={id}
                     variant='contained'
@@ -501,7 +502,7 @@ const CategoryData = () => {
                     onChange={eventinput}
                     onKeyUp={evalinput}
                   />
-                  <InputBase fullWidth />
+                  <InputBase fullWidth disabled />
                   <Button
                     aria-label={id}
                     variant='contained'
@@ -610,6 +611,7 @@ const CategoryData = () => {
                 fullWidth
                 value={dataSelect.CtgNomCat}
               />
+              <InputBase fullWidth disabled />
               <label htmlFor='color'>Color de la categoría</label>
               &nbsp; &nbsp;
               <Button

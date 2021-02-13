@@ -3,11 +3,11 @@ import { Modal, ModalBody, ModalFooter, ModalHeader, Button } from "reactstrap";
 import {
   makeStyles,
   Grid,
-  TextField,
   Tooltip,
-  InputLabel,
   FormControl,
+  InputLabel,
   Select,
+  TextField,
 } from "@material-ui/core";
 import axios from "axios";
 // importandom los componentes
@@ -31,17 +31,10 @@ const stylesPage = makeStyles((theme) => ({
     width: "40px",
     height: "40px",
   },
-
-  image: {
-    borderRadius: "30px",
-    width: "25px",
-    height: "25px",
-  },
-  file: { display: "block" },
-  contain: {
-    marginTop: "auto",
-    alignItems: "center",
-    paddingTop: "15px",
+  iconPge: {
+    color: "black",
+    width: "40px",
+    height: "40px",
   },
   formControl: {
     margin: theme.spacing(0),
@@ -60,7 +53,7 @@ const stylesPage = makeStyles((theme) => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(2),
+    padding: theme.spacing(2, 4),
   },
   modal: {
     marginTop: "5%",
@@ -84,11 +77,15 @@ const stylesPage = makeStyles((theme) => ({
   },
 }));
 
-const ServUrl = "http://localhost/SUMI/models/medicUnitModel.php";
+const ServUrl = "http://localhost/SUMI/models/parameterModel.php";
 
-const UnityData = () => {
+const ParameterData = () => {
   const classList = stylesPage();
   const [data, setData] = useState([]);
+  const [datalistSelectProduct, setDatalistSelectProduct] = useState([]);
+  const [datalistSelectAlert, setDatalistSelectAlert] = useState([]);
+  const [dataProduct, setDataProduct] = useState([]);
+  const [dataAlert, setDataAlert] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showModalDetail, setShowModalDetail] = useState(false);
@@ -100,27 +97,19 @@ const UnityData = () => {
   const [alert, setAlert] = useState(null);
   const [fieldName, setFieldName] = useState("");
   const [message, setMessage] = useState({
-    nom: "",
-    ident: "",
-    dir: "",
-    email: "",
-    telf: "",
+    min: "",
+    max: "",
   });
   const [error, setError] = useState({
-    nom: false,
-    ident: false,
-    dir: false,
-    email: false,
-    telf: false,
+    min: false,
+    max: false,
   });
   const [dataSelect, setDataSelect] = useState({
-    UmdId: "",
-    UmdIdentUdm: "",
-    UmdNomUdm: "",
-    UmdTelfUdm: "",
-    UmdDirUdm: "",
-    UmdEmailUdm: "",
-    UmdEstUdm: "",
+    PmtId: "",
+    MdcId: "",
+    AltId: "",
+    PmtMinPar: "",
+    PmtMaxPar: "",
   });
 
   const changeState = () => {
@@ -131,180 +120,98 @@ const UnityData = () => {
   const abrirCerrarModal = () => {
     setShowModal(!showModal);
     setError({
-      nom: false,
-      ident: false,
-      dir: false,
-      email: false,
-      telf: false,
+      min: false,
+      max: false,
     });
-    setMessage({
-      nom: "",
-      ident: "",
-      dir: "",
-      email: "",
-      telf: "",
-    });
+    setMessage({ min: "", max: "" });
   };
 
   const abrirCerrarModalEdit = () => {
     setShowModalEdit(!showModalEdit);
     setError({
-      nom: false,
-      ident: false,
-      dir: false,
-      email: false,
-      telf: false,
+      min: false,
+      max: false,
     });
-    setMessage({
-      nom: "",
-      ident: "",
-      dir: "",
-      email: "",
-      telf: "",
-    });
-  };
-
-  const abrirCerrarModalSave = (e) => {
-    e.preventDefault();
-    if (
-      error.nom === false &&
-      error.ident === false &&
-      error.dir === false &&
-      error.email === false &&
-      error.telf === false
-    ) {
-      setShowModalSave(!showModalSave);
-    }
-  };
-
-  const abrirCerrarModalActual = (e) => {
-    e.preventDefault();
-    if (
-      error.nom === false &&
-      error.ident === false &&
-      error.dir === false &&
-      error.email === false &&
-      error.telf === false
-    ) {
-      setShowModalActual(!showModalActual);
-    }
+    setMessage({ min: "", max: "" });
   };
 
   const abrirCerrarModalDetail = () => {
     setShowModalDetail(!showModalDetail);
   };
 
+  const abrirCerrarModalSave = (e) => {
+    e.preventDefault();
+    listProductName();
+    listAlertName();
+    if (error.min === false && error.max === false) {
+      setShowModalSave(!showModalSave);
+    }
+  };
+
+  const abrirCerrarModalActual = (e) => {
+    e.preventDefault();
+    listProductName();
+    listAlertName();
+    if (error.min === false && error.max === false) {
+      setShowModalActual(!showModalActual);
+    }
+  };
+
   const abrirCerrarModalDelete = () => {
+    listProductName();
+    listAlertName();
     setShowModalDelete(!showModalDelete);
   };
 
   // limpiando los campos
   const clear = () => {
     setDataSelect(() => ({
-      UmdId: "",
-      UmdIdentUdm: "",
-      UmdNomUdm: "",
-      UmdTelfUdm: "",
-      UmdDirUdm: "",
-      UmdEmailUdm: "",
-      UmdEstUdm: "",
+      PmtId: "",
+      MdcId: "",
+      AltId: "",
+      PmtMinPar: "",
+      PmtMaxPar: "",
     }));
   };
 
   // mostrando errores de validación
   const validations = () => {
     const expressions = {
-      ident: /^[0-9]{10,13}$/,
-      mix2: /^[a-zA-Z0-9_\-. ]{1,60}$/,
-      email: /^[a-zA-Z0-9_\-.]+@+[a-zA-Z0-9]+\.+[a-zA-Z0-9]{3,6}$/,
-      telf: /^[0-9]{7,10}$/,
+      num: /^[0-9]{1,4}$/,
     };
 
-    if (fieldName === "ident") {
-      if (expressions.ident.test(dataSelect.UmdIdentUdm)) {
+    if (fieldName === "min") {
+      if (expressions.num.test(dataSelect.PmtMinPar)) {
         setError((prevState) => ({
           ...prevState,
-          ident: false,
+          min: false,
         }));
-        setMessage((prevState) => ({ ...prevState, ident: "" }));
+        setMessage((prevState) => ({ ...prevState, min: "" }));
       } else {
         setError((prevState) => ({
           ...prevState,
-          ident: true,
+          min: true,
         }));
         setMessage((prevState) => ({
           ...prevState,
-          ident:
-            "solo se permiten números con mínimo 10 y máximo 13 caracteres ",
+          min: "solo se permiten números y un máximo de 1000",
         }));
       }
-    } else if (fieldName === "nom") {
-      if (expressions.mix2.test(dataSelect.UmdNomUdm)) {
+    } else if (fieldName === "max") {
+      if (expressions.num.test(dataSelect.PmtMaxPar)) {
         setError((prevState) => ({
           ...prevState,
-          nom: false,
+          max: false,
         }));
-        setMessage((prevState) => ({ ...prevState, nom: "" }));
+        setMessage((prevState) => ({ ...prevState, max: "" }));
       } else {
         setError((prevState) => ({
           ...prevState,
-          nom: true,
+          max: true,
         }));
         setMessage((prevState) => ({
           ...prevState,
-          nom:
-            " no permitidos caracteres especiales, con un máximo 60 caracteres",
-        }));
-      }
-    } else if (fieldName === "telf") {
-      if (expressions.telf.test(dataSelect.UmdTelfUdm)) {
-        setError((prevState) => ({
-          ...prevState,
-          telf: false,
-        }));
-        setMessage((prevState) => ({ ...prevState, telf: "" }));
-      } else {
-        setError((prevState) => ({
-          ...prevState,
-          telf: true,
-        }));
-        setMessage((prevState) => ({
-          ...prevState,
-          telf: "solo se permiten números con mínimo 7 y máximo 10 caracteres",
-        }));
-      }
-    } else if (fieldName === "email") {
-      if (expressions.email.test(dataSelect.UmdEmailUdm)) {
-        setError((prevState) => ({
-          ...prevState,
-          email: false,
-        }));
-        setMessage((prevState) => ({ ...prevState, email: "" }));
-      } else {
-        setError((prevState) => ({
-          ...prevState,
-          email: true,
-        }));
-        setMessage((prevState) => ({
-          ...prevState,
-          email: "el email debe contener '@' y '.' ejp(texto@texto.texto)",
-        }));
-      }
-    } else if (fieldName === "dir") {
-      if (expressions.mix2.test(dataSelect.UmdDirUdm)) {
-        setError((prevState) => ({
-          ...prevState,
-          dir: false,
-        }));
-        setMessage((prevState) => ({ ...prevState, dir: "" }));
-      } else {
-        setError((prevState) => ({
-          ...prevState,
-          dir: true,
-        }));
-        setMessage((prevState) => ({
-          ...prevState,
-          dir: "no se permiten caracteres especiales con máximo 60 caracteres",
+          max: "solo se permiten números y un máximo de 1000",
         }));
       }
     }
@@ -325,7 +232,7 @@ const UnityData = () => {
   };
 
   // obteniendo datos de un servidor
-  const listUnity = async () => {
+  const listParameter = async () => {
     await axios
       .get(ServUrl)
       .then((response) => {
@@ -336,25 +243,74 @@ const UnityData = () => {
       });
   };
 
+  // llenando select producto
+  const listSelectProduct = async () => {
+    await axios
+      .get(ServUrl + "?med=0")
+      .then((response) => {
+        setDatalistSelectProduct(response.data);
+      })
+      .catch((er) => {
+        console.log(er);
+      });
+  };
+
+  // llenando select producto
+  const listProductName = async () => {
+    await axios
+      .get(ServUrl + "?med=" + dataSelect.MdcId)
+      .then((response) => {
+        setDataProduct(response.data);
+      })
+      .catch((er) => {
+        console.log(er);
+      });
+  };
+
+  // llenando select alerta
+  const listSelectAlert = async () => {
+    await axios
+      .get(ServUrl + "?alt=0")
+      .then((response) => {
+        setDatalistSelectAlert(response.data);
+      })
+      .catch((er) => {
+        console.log(er);
+      });
+  };
+
+  // llenando select alerta
+  const listAlertName = async () => {
+    await axios
+      .get(ServUrl + "?alt=" + dataSelect.AltId)
+      .then((response) => {
+        setDataAlert(response.data);
+      })
+      .catch((er) => {
+        console.log(er);
+      });
+  };
+
   useEffect(() => {
     clear();
-    listUnity();
+    listParameter();
+    listSelectProduct();
+    listSelectAlert();
   }, []);
 
   // Esta función guarda los datos de un nuevo rol
-  const newUnity = async (e) => {
+  const newParameter = async (e) => {
     e.preventDefault();
     let f = new FormData();
-    f.append("UmdIdentUdm", dataSelect.UmdIdentUdm);
-    f.append("UmdNomUdm", dataSelect.UmdNomUdm);
-    f.append("UmdTelfUdm", dataSelect.UmdTelfUdm);
-    f.append("UmdDirUdm", dataSelect.UmdDirUdm);
-    f.append("UmdEmailUdm", dataSelect.UmdEmailUdm);
+    f.append("MdcId", dataSelect.MdcId);
+    f.append("AltId", dataSelect.AltId);
+    f.append("PmtMinPar", dataSelect.PmtMinPar);
+    f.append("PmtMaxPar", dataSelect.PmtMaxPar);
     f.append("METHOD", "POST");
     await axios
-      .post(ServUrl, f, { headers: { "Content-Type": "multipart/form-data" } })
+      .post(ServUrl, f)
       .then((response) => {
-        setData(data.concat(response.data));
+        listParameter();
         abrirCerrarModalSave(e);
         abrirCerrarModal();
         setType("success");
@@ -372,34 +328,22 @@ const UnityData = () => {
   };
 
   // Esta función actualiza los datos del rol selecionado
-  const updateUnity = async (e) => {
+  const updateParameter = async (e) => {
     e.preventDefault();
     let f = new FormData();
-    f.append("UmdIdentUdm", dataSelect.UmdIdentUdm);
-    f.append("UmdNomUdm", dataSelect.UmdNomUdm);
-    f.append("UmdTelfUdm", dataSelect.UmdTelfUdm);
-    f.append("UmdDirUdm", dataSelect.UmdDirUdm);
-    f.append("UmdEmailUdm", dataSelect.UmdEmailUdm);
-    f.append("UmdEstUdm", dataSelect.UmdEstUdm);
+    f.append("MdcId", dataSelect.MdcId);
+    f.append("AltId", dataSelect.AltId);
+    f.append("PmtMinPar", dataSelect.PmtMinPar);
+    f.append("PmtMaxPar", dataSelect.PmtMaxPar);
     f.append("METHOD", "PUT");
     await axios
-      .post(
-        ServUrl,
-        f,
-        { params: { id: dataSelect.UmdId } },
-        { headers: { "Content-Type": "multipart/form-data" } }
-      )
+      .post(ServUrl, f, { params: { id: dataSelect.PmtId } })
       .then((response) => {
-        console.log(response.data);
         let newData = data;
         newData.map((info) => {
-          if (info.UmdId === dataSelect.UmdId) {
-            info.UmdIdentUdm = dataSelect.UmdIdentUdm;
-            info.UmdNomUdm = dataSelect.UmdNomUdm;
-            info.UmdTelfUdm = dataSelect.UmdTelfUdm;
-            info.UmdDirUdm = dataSelect.UmdDirUdm;
-            info.UmdEmailUdm = dataSelect.UmdEmailUdm;
-            info.UmdEstUdm = dataSelect.UmdEstUdm;
+          if (info.PmtId === dataSelect.PmtId) {
+            info.MdcId = dataSelect.MdcId;
+            info.AltId = dataSelect.AltId;
           }
           return info;
         });
@@ -422,13 +366,13 @@ const UnityData = () => {
   };
 
   // Esta función elimina los datos del rol seleccionado
-  const deleteUnity = async () => {
+  const deleteParameter = async () => {
     let f = new FormData();
     f.append("METHOD", "DELETE");
     await axios
-      .post(ServUrl, f, { params: { id: dataSelect.UmdId } })
+      .post(ServUrl, f, { params: { id: dataSelect.PmtId } })
       .then((response) => {
-        setData(data.filter((unit) => unit.UmdId !== dataSelect.UmdId));
+        setData(data.filter((priv) => priv.PmtId !== dataSelect.PmtId));
         abrirCerrarModalDelete();
         abrirCerrarModalDetail();
         setType("success");
@@ -446,12 +390,12 @@ const UnityData = () => {
   };
 
   // Esta función permite elegir el modal que se abrirá y guaerda los datos en el estado
-  const selectedItem = (unit, type) => {
+  const selectedItem = (priv, type) => {
     if (type === "Edit") {
-      setDataSelect(unit);
+      setDataSelect(priv);
       abrirCerrarModalEdit();
     } else if (type === "Detail") {
-      setDataSelect(unit);
+      setDataSelect(priv);
       abrirCerrarModalDetail();
     } else {
       abrirCerrarModalDelete();
@@ -460,14 +404,12 @@ const UnityData = () => {
 
   // Formando las columnas de la tabla
   const columns = [
-    { title: "ID", field: "UmdId" },
-    { title: "RUC", field: "UmdIdentUdm" },
-    { title: "NOMBRE", field: "UmdNomUdm" },
-    { title: "TELF", field: "UmdTelfUdm" },
-    { title: "EMAIL", field: "UmdEmailUdm" },
+    { title: "ID", field: "PmtId" },
+    { title: "PRODUCTO", field: "MdcDescMed" },
+    { title: "ALERTA", field: "AltNomAle" },
+    { title: "VALOR.MIN", field: "PmtMinPar" },
+    { title: "VALOR.MAX", field: "PmtMaxPar" },
   ];
-
-  const status = dataSelect.UmdEstUdm === "A" ? "Activo" : "Inactivo";
 
   return (
     <div className={classList.root}>
@@ -479,8 +421,8 @@ const UnityData = () => {
             {/* Cabecera de la página */}
             <HeaderPage
               AbrirCerrarModal={abrirCerrarModal}
-              title={"Unidades"}
-              icon1={"zmdi zmdi-home"}
+              title={"Parámetros"}
+              icon1={"zmdi zmdi-arrow-merge"}
               icon2={"zmdi zmdi-plus"}
               type={type}
               alert={alert}
@@ -490,18 +432,18 @@ const UnityData = () => {
           </Grid>
           &nbsp;
           <Grid container spacing={2}>
-            {/* Tabla que muestra la información de los usuarios en bd */}
+            {/* Tabla que muestra la información de los parámtros en bd */}
             <DataTable
               selectedItem={selectedItem}
               data={data}
               columns={columns}
-              title={"Unidades habilitados en el sistema"}
+              title={"Parámetros"}
             />
           </Grid>
-          {/* Modal que muestra un formulario para agregar un nuevo rol */}
+          {/* Modal que muestra un formulario para agregar un nuevo parámtro */}
           <Modal isOpen={showModal} className={classList.modal}>
             <ModalHeader className={classList.modalHeaderNew}>
-              Agregar Unidad
+              Agregar Parámetro
             </ModalHeader>
             <ModalBody>
               <div>
@@ -509,79 +451,97 @@ const UnityData = () => {
                   id='formNewData'
                   encType='multipart/form-data'
                   onSubmit={(e) => abrirCerrarModalSave(e)}>
+                  <FormControl
+                    size='small'
+                    variant='outlined'
+                    className={classList.formControl}>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Producto contenedor
+                    </InputLabel>
+                    <Select
+                      native
+                      onChange={eventinput}
+                      label='Producto contenedor'
+                      name='MdcId'
+                      required
+                      inputProps={{
+                        name: "MdcId",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option key='0' aria-label='' value='' />
+                      {datalistSelectProduct.map((item, index) => (
+                        <option key={index} value={item.MdcId} label=''>
+                          {item.MdcDescMed +
+                            " " +
+                            item.MdcPresenMed +
+                            " " +
+                            item.MdcConcenMed}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  &nbsp;
+                  <FormControl
+                    size='small'
+                    variant='outlined'
+                    className={classList.formControl}>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Alerta contenedor
+                    </InputLabel>
+                    <Select
+                      native
+                      onChange={eventinput}
+                      label='Alerta contenedor'
+                      name='AltId'
+                      required
+                      inputProps={{
+                        name: "AltId",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option key='1' aria-label='' value='' />
+                      {datalistSelectAlert.map((item, index) => (
+                        <option
+                          key={index}
+                          value={item.AltId}
+                          label=''
+                          style={{
+                            background: item.AltColorAle,
+                            fontWeight: "700",
+                          }}>
+                          {item.AltNomAle}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
                   <TextField
-                    required
-                    error={error.ident}
-                    helperText={message.ident}
+                    error={error.min}
+                    helperText={message.min}
                     variant='outlined'
                     margin='normal'
-                    type='text'
-                    name='UmdIdentUdm'
+                    type='number'
+                    name='PmtMinPar'
                     size='small'
-                    id='ident'
-                    label='Identificación'
+                    id='min'
+                    label='Valor mínimo'
                     fullWidth
                     autoFocus
+                    required
                     onChange={eventinput}
                     onKeyUp={evalinput}
                   />
                   <TextField
-                    required
-                    error={error.nom}
-                    helperText={message.nom}
+                    error={error.max}
+                    helperText={message.max}
                     variant='outlined'
                     margin='normal'
-                    type='text'
-                    name='UmdNomUdm'
+                    type='number'
+                    name='PmtMaxPar'
                     size='small'
-                    id='nom'
-                    label='Nombre'
+                    id='max'
+                    label='Valor máximo'
                     fullWidth
-                    onChange={eventinput}
-                    onKeyUp={evalinput}
-                  />
-                  <TextField
+                    autoFocus
                     required
-                    error={error.telf}
-                    helperText={message.telf}
-                    variant='outlined'
-                    margin='normal'
-                    type='telf'
-                    name='UmdTelfUdm'
-                    size='small'
-                    id='telf'
-                    label='Teléfono'
-                    fullWidth
-                    onChange={eventinput}
-                    onKeyUp={evalinput}
-                  />
-                  <TextField
-                    required
-                    error={error.dir}
-                    helperText={message.dir}
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='UmdDirUdm'
-                    size='small'
-                    id='dir'
-                    label='Dirección'
-                    fullWidth
-                    onChange={eventinput}
-                    onKeyUp={evalinput}
-                  />
-                  <TextField
-                    required
-                    error={error.email}
-                    helperText={message.email}
-                    variant='outlined'
-                    margin='normal'
-                    type='email'
-                    name='UmdEmailUdm'
-                    size='small'
-                    id='email'
-                    label='Email'
-                    fullWidth
                     onChange={eventinput}
                     onKeyUp={evalinput}
                   />
@@ -608,10 +568,10 @@ const UnityData = () => {
               </Button>
             </ModalFooter>
           </Modal>
-          {/* Modal que muestra los datos de la unidad a ser editado */}
+          {/* Modal que muestra los datos del rol a ser editado */}
           <Modal isOpen={showModalEdit} className={classList.modal}>
             <ModalHeader className={classList.modalHeaderEdit}>
-              Editar Unidad
+              Editar Parámetro
             </ModalHeader>
             <ModalBody>
               <div className='mb-3'>
@@ -619,110 +579,111 @@ const UnityData = () => {
                   id='formUpdateData'
                   encType='multipart/form-data'
                   onSubmit={(e) => abrirCerrarModalActual(e)}>
-                  <input type='hidden' name='UmdId' value={dataSelect.UmdId} />
-                  <TextField
-                    required
-                    error={error.ident}
-                    helperText={message.ident}
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='UmdIdentUdm'
+                  <input type='hidden' name='PmtId' value={dataSelect.PmtId} />
+                  <FormControl
                     size='small'
-                    id='ident'
-                    label='Identificación'
-                    fullWidth
-                    autoFocus
-                    value={dataSelect.UmdIdentUdm}
-                    onChange={eventinput}
-                    onKeyUp={evalinput}
-                  />
-                  <TextField
-                    required
-                    error={error.nom}
-                    helperText={message.nom}
                     variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='UmdNomUdm'
-                    size='small'
-                    id='nom'
-                    label='Nombre'
-                    fullWidth
-                    value={dataSelect.UmdNomUdm}
-                    onChange={eventinput}
-                    onKeyUp={evalinput}
-                  />
-                  <TextField
-                    required
-                    error={error.telf}
-                    helperText={message.telf}
-                    variant='outlined'
-                    margin='normal'
-                    type='telf'
-                    name='UmdTelfUdm'
-                    size='small'
-                    id='telf'
-                    label='Teléfono'
-                    fullWidth
-                    value={dataSelect.UmdTelfUdm}
-                    onChange={eventinput}
-                    onKeyUp={evalinput}
-                  />
-                  <TextField
-                    required
-                    error={error.dir}
-                    helperText={message.dir}
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='UmdDirUdm'
-                    size='small'
-                    id='dir'
-                    label='Dirección'
-                    fullWidth
-                    value={dataSelect.UmdDirUdm}
-                    onChange={eventinput}
-                    onKeyUp={evalinput}
-                  />
-                  <TextField
-                    required
-                    error={error.email}
-                    helperText={message.email}
-                    variant='outlined'
-                    margin='normal'
-                    type='email'
-                    name='UmdEmailUdm'
-                    size='small'
-                    id='email'
-                    label='Email'
-                    fullWidth
-                    value={dataSelect.UmdEmailUdm}
-                    onChange={eventinput}
-                    onKeyUp={evalinput}
-                  />
-                  <FormControl size='small' variant='outlined' fullWidth>
+                    className={classList.formControl}>
                     <InputLabel htmlFor='outlined-age-native-simple'>
-                      Estado
+                      Producto contenedor
                     </InputLabel>
                     <Select
                       native
-                      required
                       onChange={eventinput}
-                      label='Estado'
+                      label='Producto contenedor'
+                      required
                       inputProps={{
-                        name: "UmdEstUdm",
+                        name: "MdcId",
                         id: "outlined-age-native-simple",
                       }}>
                       <option
                         key='0'
-                        label={status}
-                        value={dataSelect.UmdEstUdm}
+                        label={
+                          dataSelect.MdcDescMed +
+                          dataSelect.MdcPresenMed +
+                          dataSelect.MdcConcenMed
+                        }
+                        value={dataSelect.MdcId}
                       />
-                      <option key='1' value={"A"} label={"Activo"} />
-                      <option key='2' value={"X"} label={"Inactivo"} />
+                      {datalistSelectProduct.map((item, index) => (
+                        <option key={index} value={item.MdcId} label=''>
+                          {item.MdcDescMed +
+                            item.MdcPresenMed +
+                            item.MdcConcenMed}
+                        </option>
+                      ))}
                     </Select>
                   </FormControl>
+                  &nbsp;
+                  <FormControl
+                    size='small'
+                    variant='outlined'
+                    className={classList.formControl}>
+                    <InputLabel htmlFor='outlined-age-native-simple'>
+                      Alerta contenedor
+                    </InputLabel>
+                    <Select
+                      native
+                      onChange={eventinput}
+                      label='Alerta contenedor'
+                      required
+                      inputProps={{
+                        name: "AltId",
+                        id: "outlined-age-native-simple",
+                      }}>
+                      <option
+                        key='1'
+                        label={dataSelect.AltNomAle}
+                        value={dataSelect.AltId}
+                      />
+                      {datalistSelectAlert.map((item, index) => (
+                        <option
+                          key={index}
+                          value={item.AltId}
+                          label=''
+                          style={{
+                            background: item.AltColorAle,
+                            fontWeight: "700",
+                          }}>
+                          {item.AltNomAle}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <TextField
+                    error={error.min}
+                    helperText={message.min}
+                    variant='outlined'
+                    margin='normal'
+                    type='number'
+                    name='PmtMinPar'
+                    size='small'
+                    id='min'
+                    label='Valor mínimo'
+                    fullWidth
+                    autoFocus
+                    required
+                    value={dataSelect.PmtMinPar}
+                    onChange={eventinput}
+                    onKeyUp={evalinput}
+                  />
+                  <TextField
+                    error={error.max}
+                    helperText={message.max}
+                    variant='outlined'
+                    margin='normal'
+                    type='number'
+                    name='PmtMaxPar'
+                    size='small'
+                    id='max'
+                    label='Valor máximo'
+                    fullWidth
+                    autoFocus
+                    required
+                    value={dataSelect.PmtMaxPar}
+                    onChange={eventinput}
+                    onKeyUp={evalinput}
+                  />
                 </form>
               </div>
             </ModalBody>
@@ -746,45 +707,27 @@ const UnityData = () => {
               </Button>
             </ModalFooter>
           </Modal>
-          {/* Modal que muestra los datos de la unidad */}
+          {/* Modal que muestra los datos del rol */}
           <Modal isOpen={showModalDetail} className={classList.modal}>
             <ModalHeader className={classList.modalHeaderEdit}>
-              Detalles Unidad
+              Detalles Parámetro
             </ModalHeader>
             <ModalBody>
-              <input type='hidden' name='UmdId' value={dataSelect.UmdId} />
+              <input type='hidden' name='PmtId' value={dataSelect.PmtId} />
               <TextField
                 disabled
                 variant='standard'
                 margin='normal'
                 type='text'
                 size='small'
-                id='ident'
-                label='Identificación'
+                id='MdcId'
+                label='Nombre del producto'
                 fullWidth
-                value={dataSelect.UmdIdentUdm}
-              />
-              <TextField
-                disabled
-                variant='standard'
-                margin='normal'
-                type='text'
-                size='small'
-                id='nom'
-                label='Nombre'
-                fullWidth
-                value={dataSelect.UmdNomUdm}
-              />
-              <TextField
-                disabled
-                variant='standard'
-                margin='normal'
-                type='telf'
-                size='small'
-                id='telf'
-                label='Teléfono'
-                fullWidth
-                value={dataSelect.UmdTelfUdm}
+                value={
+                  dataSelect.MdcDescMed +
+                  dataSelect.MdcPresenMed +
+                  dataSelect.MdcConcenMed
+                }
               />
               <TextField
                 disabled
@@ -792,21 +735,10 @@ const UnityData = () => {
                 margin='normal'
                 type='text'
                 size='small'
-                id='dir'
-                label='Dirección'
+                id='AltId'
+                label='Nombre de la alerta'
                 fullWidth
-                value={dataSelect.UmdDirUdm}
-              />
-              <TextField
-                disabled
-                variant='standard'
-                margin='normal'
-                type='email'
-                size='small'
-                id='email'
-                label='Email'
-                fullWidth
-                value={dataSelect.UmdEmailUdm}
+                value={dataSelect.AltNomAle}
               />
               <TextField
                 disabled
@@ -814,10 +746,21 @@ const UnityData = () => {
                 margin='normal'
                 type='text'
                 size='small'
-                id='estado'
-                label='Estado'
+                id='PmtMinPAr'
+                label='Valor mínimo'
                 fullWidth
-                value={status}
+                value={dataSelect.PmtMinPar}
+              />
+              <TextField
+                disabled
+                variant='standard'
+                margin='normal'
+                type='text'
+                size='small'
+                id='PmtMaxPar'
+                label='Valor máximo'
+                fullWidth
+                value={dataSelect.PmtMaxPar}
               />
             </ModalBody>
             <ModalFooter className={classList.modalFooter}>
@@ -846,33 +789,33 @@ const UnityData = () => {
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Guardar Unidad"}
-            alertTitle={"¿Está seguro de crear la Unidad:"}
-            alertText={dataSelect.UmdNomUdm}
+            title={"Guardar parámetro"}
+            alertTitle={"¿Está seguro de asignar el parámetro:"}
+            alertText={dataProduct.MdcDescMed + "  con  " + dataAlert.AltNomAle}
             showModal={showModalSave}
-            actionUser={(e) => newUnity(e)}
+            actionUser={(e) => newParameter(e)}
             abrirCerrarModal={abrirCerrarModalSave}
           />
           {/* Modal para confirmación antes de actualizar un registro */}
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Actualizar Unidad"}
-            alertTitle={"¿Está seguro de actualizar la Unidad:"}
-            alertText={dataSelect.UmdNomUdm}
+            title={"Actualizar parámetro"}
+            alertTitle={"¿Está seguro de asignar el parámetro:"}
+            alertText={dataProduct.MdcDescMed + "  con  " + dataAlert.AltNomAle}
             showModal={showModalActual}
-            actionUser={(e) => updateUnity(e)}
+            actionUser={(e) => updateParameter(e)}
             abrirCerrarModal={abrirCerrarModalActual}
           />
           {/* Modal para confirmación antes de eliminar un registro */}
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Eliminar Unidad"}
-            alertTitle={"¿Está seguro de eliminar la Unidad:"}
-            alertText={dataSelect.UmdNomUdm}
+            title={"Eliminar parámetro"}
+            alertTitle={"¿Está seguro de eliminar el parámetro:"}
+            alertText={dataProduct.MdcDescMed + "  con  " + dataAlert.AltNomAle}
             showModal={showModalDelete}
-            actionUser={deleteUnity}
+            actionUser={deleteParameter}
             abrirCerrarModal={abrirCerrarModalDelete}
           />
         </Grid>
@@ -882,4 +825,4 @@ const UnityData = () => {
   );
 };
 
-export default UnityData;
+export default ParameterData;

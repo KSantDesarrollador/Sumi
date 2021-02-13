@@ -141,10 +141,9 @@ const PrivilegioData = () => {
   // limpiando los campos
   const clear = () => {
     setDataSelect(() => ({
-      CtgId: "",
-      CtgNomCat: "",
-      CtgColorCat: "",
-      CtgEstCat: "",
+      MxRId: "",
+      RrlId: "",
+      MnuId: "",
     }));
   };
 
@@ -295,6 +294,7 @@ const PrivilegioData = () => {
       .then((response) => {
         setData(data.filter((priv) => priv.MxRId !== dataSelect.MxRId));
         abrirCerrarModalDelete();
+        abrirCerrarModalDetail();
         setType("success");
         setShow("alertShow");
         setAlert("Registro eliminado correctamente");
@@ -548,7 +548,7 @@ const PrivilegioData = () => {
                 margin='normal'
                 type='text'
                 size='small'
-                id='CtgNomCat'
+                id='RrlId'
                 label='Nombre del Rol'
                 fullWidth
                 value={dataSelect.RrlNomRol}
@@ -560,7 +560,7 @@ const PrivilegioData = () => {
                 margin='normal'
                 type='text'
                 size='small'
-                id='CtgNomCat'
+                id='MnuId'
                 label='Nombre del Menú'
                 fullWidth
                 value={dataSelect.MnuNomMen}

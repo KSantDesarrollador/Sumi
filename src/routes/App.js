@@ -14,6 +14,9 @@ import PrivilegioData from "../pages/privilegioData";
 import CategoryData from "../pages/categoryData";
 import ProviderData from "../pages/providerData";
 import UnityData from "../pages/unityData";
+import ParameterData from "../pages/parameterData";
+import AlertData from "../pages/alertData";
+import WinerieData from "../pages/winerieData";
 
 export default class App extends Component {
   state = {
@@ -37,6 +40,9 @@ export default class App extends Component {
           <Route path='/categories' component={CategoryData}></Route>
           <Route path='/providers' component={ProviderData}></Route>
           <Route path='/unities' component={UnityData}></Route>
+          <Route path='/parameters' component={ParameterData}></Route>
+          <Route path='/alerts' component={AlertData}></Route>
+          <Route path='/wineries' component={WinerieData}></Route>
         </Switch>
       </Router>
     );

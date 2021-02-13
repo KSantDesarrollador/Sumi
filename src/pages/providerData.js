@@ -496,6 +496,7 @@ const ProviderData = () => {
       .then((response) => {
         setData(data.filter((prov) => prov.PvdId !== dataSelect.PvdId));
         abrirCerrarModalDelete();
+        abrirCerrarModalDetail();
         setType("success");
         setShow("alertShow");
         setAlert("Registro eliminado correctamente");

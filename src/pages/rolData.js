@@ -274,6 +274,7 @@ const RolData = () => {
       .then((response) => {
         setData(data.filter((rol) => rol.RrlId !== dataSelect.RrlId));
         abrirCerrarModalDelete();
+        abrirCerrarModalDetail();
         setType("success");
         setShow("alertShow");
         setAlert("Registro eliminado correctamente");

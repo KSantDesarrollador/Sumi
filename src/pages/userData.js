@@ -465,6 +465,7 @@ const UserData = () => {
       .then((response) => {
         setData(data.filter((user) => user.UsrId !== dataSelect.UsrId));
         abrirCerrarModalDelete();
+        abrirCerrarModalDetail();
         setType("success");
         setShow("alertShow");
         setAlert("Registro eliminado correctamente");

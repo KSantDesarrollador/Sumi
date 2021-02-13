@@ -5,10 +5,13 @@ import {
   Grid,
   TextField,
   Tooltip,
+  Popover,
   InputLabel,
+  InputBase,
   FormControl,
   Select,
 } from "@material-ui/core";
+import SketchPicker from "react-color";
 import axios from "axios";
 // importandom los componentes
 import MenuBar from "../templates/menu";
@@ -31,24 +34,10 @@ const stylesPage = makeStyles((theme) => ({
     width: "40px",
     height: "40px",
   },
-
-  image: {
-    borderRadius: "30px",
-    width: "25px",
-    height: "25px",
-  },
-  file: { display: "block" },
-  contain: {
-    marginTop: "auto",
-    alignItems: "center",
-    paddingTop: "15px",
-  },
-  formControl: {
-    margin: theme.spacing(0),
-    minWidth: "100%",
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
+  iconPge: {
+    color: "black",
+    width: "40px",
+    height: "40px",
   },
   toolbar: {
     display: "flex",
@@ -60,7 +49,7 @@ const stylesPage = makeStyles((theme) => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(2),
+    padding: theme.spacing(2, 4),
   },
   modal: {
     marginTop: "5%",
@@ -84,9 +73,9 @@ const stylesPage = makeStyles((theme) => ({
   },
 }));
 
-const ServUrl = "http://localhost/SUMI/models/medicUnitModel.php";
+const ServUrl = "http://localhost/SUMI/models/alertModel.php";
 
-const UnityData = () => {
+const AlertData = () => {
   const classList = stylesPage();
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -98,29 +87,23 @@ const UnityData = () => {
   const [show, setShow] = useState("alertHide");
   const [type, setType] = useState("");
   const [alert, setAlert] = useState(null);
+  const [open, setOpen] = useState(null);
   const [fieldName, setFieldName] = useState("");
   const [message, setMessage] = useState({
     nom: "",
-    ident: "",
-    dir: "",
-    email: "",
-    telf: "",
+    color: "",
+    desc: "",
   });
   const [error, setError] = useState({
     nom: false,
-    ident: false,
-    dir: false,
-    email: false,
-    telf: false,
+    color: false,
+    desc: false,
   });
   const [dataSelect, setDataSelect] = useState({
-    UmdId: "",
-    UmdIdentUdm: "",
-    UmdNomUdm: "",
-    UmdTelfUdm: "",
-    UmdDirUdm: "",
-    UmdEmailUdm: "",
-    UmdEstUdm: "",
+    AltId: "",
+    AltNomAle: "",
+    AltColorAle: "",
+    AltDescAle: "",
   });
 
   const changeState = () => {
@@ -130,62 +113,26 @@ const UnityData = () => {
 
   const abrirCerrarModal = () => {
     setShowModal(!showModal);
-    setError({
-      nom: false,
-      ident: false,
-      dir: false,
-      email: false,
-      telf: false,
-    });
-    setMessage({
-      nom: "",
-      ident: "",
-      dir: "",
-      email: "",
-      telf: "",
-    });
+    setError({ nom: false, color: false, desc: false });
+    setMessage({ nom: "", color: "", desc: "" });
   };
 
   const abrirCerrarModalEdit = () => {
     setShowModalEdit(!showModalEdit);
-    setError({
-      nom: false,
-      ident: false,
-      dir: false,
-      email: false,
-      telf: false,
-    });
-    setMessage({
-      nom: "",
-      ident: "",
-      dir: "",
-      email: "",
-      telf: "",
-    });
+    setError({ nom: false, color: false, desc: false });
+    setMessage({ nom: "", color: "", desc: "" });
   };
 
   const abrirCerrarModalSave = (e) => {
     e.preventDefault();
-    if (
-      error.nom === false &&
-      error.ident === false &&
-      error.dir === false &&
-      error.email === false &&
-      error.telf === false
-    ) {
+    if (error.nom === false && error.color === false && error.desc === false) {
       setShowModalSave(!showModalSave);
     }
   };
 
   const abrirCerrarModalActual = (e) => {
     e.preventDefault();
-    if (
-      error.nom === false &&
-      error.ident === false &&
-      error.dir === false &&
-      error.email === false &&
-      error.telf === false
-    ) {
+    if (error.nom === false && error.color === false && error.desc === false) {
       setShowModalActual(!showModalActual);
     }
   };
@@ -201,45 +148,22 @@ const UnityData = () => {
   // limpiando los campos
   const clear = () => {
     setDataSelect(() => ({
-      UmdId: "",
-      UmdIdentUdm: "",
-      UmdNomUdm: "",
-      UmdTelfUdm: "",
-      UmdDirUdm: "",
-      UmdEmailUdm: "",
-      UmdEstUdm: "",
+      AltId: "",
+      AltNomAle: "",
+      AltColorAle: "",
+      AltDescAle: "",
     }));
   };
 
   // mostrando errores de validación
   const validations = () => {
     const expressions = {
-      ident: /^[0-9]{10,13}$/,
-      mix2: /^[a-zA-Z0-9_\-. ]{1,60}$/,
-      email: /^[a-zA-Z0-9_\-.]+@+[a-zA-Z0-9]+\.+[a-zA-Z0-9]{3,6}$/,
-      telf: /^[0-9]{7,10}$/,
+      text: /^[a-zA-ZA-ý\s]{1,70}$/,
+      code: /^[a-zA-Z0-9]{6,10}$/,
     };
 
-    if (fieldName === "ident") {
-      if (expressions.ident.test(dataSelect.UmdIdentUdm)) {
-        setError((prevState) => ({
-          ...prevState,
-          ident: false,
-        }));
-        setMessage((prevState) => ({ ...prevState, ident: "" }));
-      } else {
-        setError((prevState) => ({
-          ...prevState,
-          ident: true,
-        }));
-        setMessage((prevState) => ({
-          ...prevState,
-          ident:
-            "solo se permiten números con mínimo 10 y máximo 13 caracteres ",
-        }));
-      }
-    } else if (fieldName === "nom") {
-      if (expressions.mix2.test(dataSelect.UmdNomUdm)) {
+    if (fieldName === "nom") {
+      if (expressions.text.test(dataSelect.AltNomAle)) {
         setError((prevState) => ({
           ...prevState,
           nom: false,
@@ -252,63 +176,57 @@ const UnityData = () => {
         }));
         setMessage((prevState) => ({
           ...prevState,
-          nom:
-            " no permitidos caracteres especiales, con un máximo 60 caracteres",
+          nom: "solo se permiten letras con un máximo 40 caracteres",
         }));
       }
-    } else if (fieldName === "telf") {
-      if (expressions.telf.test(dataSelect.UmdTelfUdm)) {
+    } else if (fieldName === "color") {
+      if (expressions.code.test(dataSelect.AltColorAle)) {
         setError((prevState) => ({
           ...prevState,
-          telf: false,
+          color: false,
         }));
-        setMessage((prevState) => ({ ...prevState, telf: "" }));
+        setMessage((prevState) => ({ ...prevState, color: "" }));
       } else {
         setError((prevState) => ({
           ...prevState,
-          telf: true,
+          color: true,
         }));
         setMessage((prevState) => ({
           ...prevState,
-          telf: "solo se permiten números con mínimo 7 y máximo 10 caracteres",
+          color: "solo código hexadecimal",
         }));
       }
-    } else if (fieldName === "email") {
-      if (expressions.email.test(dataSelect.UmdEmailUdm)) {
+    } else if (fieldName === "desc") {
+      if (expressions.text.test(dataSelect.AltDescAle)) {
         setError((prevState) => ({
           ...prevState,
-          email: false,
+          desc: false,
         }));
-        setMessage((prevState) => ({ ...prevState, email: "" }));
+        setMessage((prevState) => ({ ...prevState, desc: "" }));
       } else {
         setError((prevState) => ({
           ...prevState,
-          email: true,
+          desc: true,
         }));
         setMessage((prevState) => ({
           ...prevState,
-          email: "el email debe contener '@' y '.' ejp(texto@texto.texto)",
-        }));
-      }
-    } else if (fieldName === "dir") {
-      if (expressions.mix2.test(dataSelect.UmdDirUdm)) {
-        setError((prevState) => ({
-          ...prevState,
-          dir: false,
-        }));
-        setMessage((prevState) => ({ ...prevState, dir: "" }));
-      } else {
-        setError((prevState) => ({
-          ...prevState,
-          dir: true,
-        }));
-        setMessage((prevState) => ({
-          ...prevState,
-          dir: "no se permiten caracteres especiales con máximo 60 caracteres",
+          desc: "solo se permiten letras con un máximo 40 caracteres",
         }));
       }
     }
   };
+
+  // abrir y cerrar el picker de color
+  const openPicker = (event) => {
+    setOpen(event.currentTarget);
+  };
+
+  const closePicker = () => {
+    setOpen(null);
+  };
+
+  const opened = Boolean(open);
+  const id = opened ? "simple-popover" : undefined;
 
   // obteniendo el typo para validar
   const evalinput = (e) => {
@@ -320,12 +238,20 @@ const UnityData = () => {
   const eventinput = (e) => {
     setDataSelect((prevState) => ({
       ...prevState,
-      [e.target.name]: e.target.value,
+      [e.target.name]: [e.target.value],
+    }));
+  };
+
+  // obteniendo el color
+  const eventcolor = (color) => {
+    setDataSelect((prevState) => ({
+      ...prevState,
+      AltColorAle: color.hex,
     }));
   };
 
   // obteniendo datos de un servidor
-  const listUnity = async () => {
+  const listAlert = async () => {
     await axios
       .get(ServUrl)
       .then((response) => {
@@ -338,21 +264,19 @@ const UnityData = () => {
 
   useEffect(() => {
     clear();
-    listUnity();
+    listAlert();
   }, []);
 
-  // Esta función guarda los datos de un nuevo rol
-  const newUnity = async (e) => {
+  // Esta función guarda los datos de una nueva alerta
+  const newAlert = async (e) => {
     e.preventDefault();
     let f = new FormData();
-    f.append("UmdIdentUdm", dataSelect.UmdIdentUdm);
-    f.append("UmdNomUdm", dataSelect.UmdNomUdm);
-    f.append("UmdTelfUdm", dataSelect.UmdTelfUdm);
-    f.append("UmdDirUdm", dataSelect.UmdDirUdm);
-    f.append("UmdEmailUdm", dataSelect.UmdEmailUdm);
+    f.append("AltNomAle", dataSelect.AltNomAle);
+    f.append("AltColorAle", dataSelect.AltColorAle);
+    f.append("AltDescAle", dataSelect.AltDescAle);
     f.append("METHOD", "POST");
     await axios
-      .post(ServUrl, f, { headers: { "Content-Type": "multipart/form-data" } })
+      .post(ServUrl, f)
       .then((response) => {
         setData(data.concat(response.data));
         abrirCerrarModalSave(e);
@@ -371,35 +295,23 @@ const UnityData = () => {
       });
   };
 
-  // Esta función actualiza los datos del rol selecionado
-  const updateUnity = async (e) => {
+  // Esta función actualiza los datos de la alerta selecionada
+  const updateAlert = async (e) => {
     e.preventDefault();
     let f = new FormData();
-    f.append("UmdIdentUdm", dataSelect.UmdIdentUdm);
-    f.append("UmdNomUdm", dataSelect.UmdNomUdm);
-    f.append("UmdTelfUdm", dataSelect.UmdTelfUdm);
-    f.append("UmdDirUdm", dataSelect.UmdDirUdm);
-    f.append("UmdEmailUdm", dataSelect.UmdEmailUdm);
-    f.append("UmdEstUdm", dataSelect.UmdEstUdm);
+    f.append("AltNomAle", dataSelect.AltNomAle);
+    f.append("AltColorAle", dataSelect.AltColorAle);
+    f.append("AltDescAle", dataSelect.AltDescAle);
     f.append("METHOD", "PUT");
     await axios
-      .post(
-        ServUrl,
-        f,
-        { params: { id: dataSelect.UmdId } },
-        { headers: { "Content-Type": "multipart/form-data" } }
-      )
+      .post(ServUrl, f, { params: { id: dataSelect.AltId } })
       .then((response) => {
-        console.log(response.data);
         let newData = data;
         newData.map((info) => {
-          if (info.UmdId === dataSelect.UmdId) {
-            info.UmdIdentUdm = dataSelect.UmdIdentUdm;
-            info.UmdNomUdm = dataSelect.UmdNomUdm;
-            info.UmdTelfUdm = dataSelect.UmdTelfUdm;
-            info.UmdDirUdm = dataSelect.UmdDirUdm;
-            info.UmdEmailUdm = dataSelect.UmdEmailUdm;
-            info.UmdEstUdm = dataSelect.UmdEstUdm;
+          if (info.AltId === dataSelect.AltId) {
+            info.AltNomAle = dataSelect.AltNomAle;
+            info.AltColorAle = dataSelect.AltColorAle;
+            info.AltDescAle = dataSelect.AltDescAle;
           }
           return info;
         });
@@ -421,14 +333,14 @@ const UnityData = () => {
       });
   };
 
-  // Esta función elimina los datos del rol seleccionado
-  const deleteUnity = async () => {
+  // Esta función elimina los datos de la alerta seleccionada
+  const deleteAlert = async () => {
     let f = new FormData();
     f.append("METHOD", "DELETE");
     await axios
-      .post(ServUrl, f, { params: { id: dataSelect.UmdId } })
+      .post(ServUrl, f, { params: { id: dataSelect.AltId } })
       .then((response) => {
-        setData(data.filter((unit) => unit.UmdId !== dataSelect.UmdId));
+        setData(data.filter((alt) => alt.AltId !== dataSelect.AltId));
         abrirCerrarModalDelete();
         abrirCerrarModalDetail();
         setType("success");
@@ -446,12 +358,12 @@ const UnityData = () => {
   };
 
   // Esta función permite elegir el modal que se abrirá y guaerda los datos en el estado
-  const selectedItem = (unit, type) => {
+  const selectedItem = (alert, type) => {
     if (type === "Edit") {
-      setDataSelect(unit);
+      setDataSelect(alert);
       abrirCerrarModalEdit();
     } else if (type === "Detail") {
-      setDataSelect(unit);
+      setDataSelect(alert);
       abrirCerrarModalDetail();
     } else {
       abrirCerrarModalDelete();
@@ -460,14 +372,14 @@ const UnityData = () => {
 
   // Formando las columnas de la tabla
   const columns = [
-    { title: "ID", field: "UmdId" },
-    { title: "RUC", field: "UmdIdentUdm" },
-    { title: "NOMBRE", field: "UmdNomUdm" },
-    { title: "TELF", field: "UmdTelfUdm" },
-    { title: "EMAIL", field: "UmdEmailUdm" },
+    { title: "ID", field: "AltId" },
+    { title: "NOMBRE", field: "AltNomAle" },
+    {
+      title: "COLOR",
+      field: "AltColorAle",
+    },
+    { title: "DESCRIPCIÓN", field: "AltDescAle", width: 10 },
   ];
-
-  const status = dataSelect.UmdEstUdm === "A" ? "Activo" : "Inactivo";
 
   return (
     <div className={classList.root}>
@@ -479,8 +391,8 @@ const UnityData = () => {
             {/* Cabecera de la página */}
             <HeaderPage
               AbrirCerrarModal={abrirCerrarModal}
-              title={"Unidades"}
-              icon1={"zmdi zmdi-home"}
+              title={"Alertas"}
+              icon1={"zmdi zmdi-alert-triangle"}
               icon2={"zmdi zmdi-plus"}
               type={type}
               alert={alert}
@@ -490,18 +402,18 @@ const UnityData = () => {
           </Grid>
           &nbsp;
           <Grid container spacing={2}>
-            {/* Tabla que muestra la información de los usuarios en bd */}
+            {/* Tabla que muestra la información de las alertas en bd */}
             <DataTable
               selectedItem={selectedItem}
               data={data}
               columns={columns}
-              title={"Unidades habilitados en el sistema"}
+              title={"Alerta de productos habilitadas"}
             />
           </Grid>
-          {/* Modal que muestra un formulario para agregar un nuevo rol */}
+          {/* Modal que muestra un formulario para agregar una nueva alerta */}
           <Modal isOpen={showModal} className={classList.modal}>
             <ModalHeader className={classList.modalHeaderNew}>
-              Agregar Unidad
+              Agregar Alerta
             </ModalHeader>
             <ModalBody>
               <div>
@@ -510,81 +422,67 @@ const UnityData = () => {
                   encType='multipart/form-data'
                   onSubmit={(e) => abrirCerrarModalSave(e)}>
                   <TextField
-                    required
-                    error={error.ident}
-                    helperText={message.ident}
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='UmdIdentUdm'
-                    size='small'
-                    id='ident'
-                    label='Identificación'
-                    fullWidth
-                    autoFocus
-                    onChange={eventinput}
-                    onKeyUp={evalinput}
-                  />
-                  <TextField
-                    required
                     error={error.nom}
                     helperText={message.nom}
                     variant='outlined'
                     margin='normal'
                     type='text'
-                    name='UmdNomUdm'
+                    name='AltNomAle'
                     size='small'
                     id='nom'
-                    label='Nombre'
+                    label='Nombre de la Alerta'
                     fullWidth
+                    autoFocus
+                    required
                     onChange={eventinput}
                     onKeyUp={evalinput}
                   />
                   <TextField
-                    required
-                    error={error.telf}
-                    helperText={message.telf}
-                    variant='outlined'
-                    margin='normal'
-                    type='telf'
-                    name='UmdTelfUdm'
-                    size='small'
-                    id='telf'
-                    label='Teléfono'
-                    fullWidth
-                    onChange={eventinput}
-                    onKeyUp={evalinput}
-                  />
-                  <TextField
-                    required
-                    error={error.dir}
-                    helperText={message.dir}
+                    error={error.desc}
+                    helperText={message.desc}
                     variant='outlined'
                     margin='normal'
                     type='text'
-                    name='UmdDirUdm'
+                    name='AltDescAle'
                     size='small'
-                    id='dir'
-                    label='Dirección'
+                    id='desc'
+                    label='Descripción de la Alerta'
                     fullWidth
-                    onChange={eventinput}
-                    onKeyUp={evalinput}
-                  />
-                  <TextField
+                    autoFocus
                     required
-                    error={error.email}
-                    helperText={message.email}
-                    variant='outlined'
-                    margin='normal'
-                    type='email'
-                    name='UmdEmailUdm'
-                    size='small'
-                    id='email'
-                    label='Email'
-                    fullWidth
                     onChange={eventinput}
                     onKeyUp={evalinput}
                   />
+                  <InputBase fullWidth disabled />
+                  <Button
+                    aria-label={id}
+                    variant='contained'
+                    color='info'
+                    onClick={openPicker}>
+                    Seleccione un color
+                  </Button>
+                  <Popover
+                    id={id}
+                    open={opened}
+                    anchorEl={open}
+                    onClose={closePicker}
+                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                    transformOrigin={{
+                      vertical: "left",
+                      horizontal: "left",
+                    }}>
+                    <SketchPicker
+                      error={error.color}
+                      helperText={message.color}
+                      id='color'
+                      label='Color de la Alerta'
+                      fullWidth
+                      color={dataSelect.AltColorAle}
+                      required
+                      onChange={eventcolor}
+                      onKeyUp={evalinput}
+                    />
+                  </Popover>
                 </form>
               </div>
             </ModalBody>
@@ -608,10 +506,10 @@ const UnityData = () => {
               </Button>
             </ModalFooter>
           </Modal>
-          {/* Modal que muestra los datos de la unidad a ser editado */}
+          {/* Modal que muestra los datos del rol a ser editado */}
           <Modal isOpen={showModalEdit} className={classList.modal}>
             <ModalHeader className={classList.modalHeaderEdit}>
-              Editar Unidad
+              Editar Alerta
             </ModalHeader>
             <ModalBody>
               <div className='mb-3'>
@@ -619,110 +517,80 @@ const UnityData = () => {
                   id='formUpdateData'
                   encType='multipart/form-data'
                   onSubmit={(e) => abrirCerrarModalActual(e)}>
-                  <input type='hidden' name='UmdId' value={dataSelect.UmdId} />
+                  <input type='hidden' name='AltId' value={dataSelect.AltId} />
                   <TextField
-                    required
-                    error={error.ident}
-                    helperText={message.ident}
-                    variant='outlined'
-                    margin='normal'
-                    type='text'
-                    name='UmdIdentUdm'
-                    size='small'
-                    id='ident'
-                    label='Identificación'
-                    fullWidth
-                    autoFocus
-                    value={dataSelect.UmdIdentUdm}
-                    onChange={eventinput}
-                    onKeyUp={evalinput}
-                  />
-                  <TextField
-                    required
                     error={error.nom}
                     helperText={message.nom}
                     variant='outlined'
                     margin='normal'
                     type='text'
-                    name='UmdNomUdm'
+                    name='AltNomAle'
                     size='small'
                     id='nom'
-                    label='Nombre'
+                    label='Nombre de la Alerta'
                     fullWidth
-                    value={dataSelect.UmdNomUdm}
+                    autoFocus
+                    required
+                    value={dataSelect.AltNomAle}
                     onChange={eventinput}
                     onKeyUp={evalinput}
                   />
                   <TextField
-                    required
-                    error={error.telf}
-                    helperText={message.telf}
-                    variant='outlined'
-                    margin='normal'
-                    type='telf'
-                    name='UmdTelfUdm'
-                    size='small'
-                    id='telf'
-                    label='Teléfono'
-                    fullWidth
-                    value={dataSelect.UmdTelfUdm}
-                    onChange={eventinput}
-                    onKeyUp={evalinput}
-                  />
-                  <TextField
-                    required
-                    error={error.dir}
-                    helperText={message.dir}
+                    error={error.desc}
+                    helperText={message.desc}
                     variant='outlined'
                     margin='normal'
                     type='text'
-                    name='UmdDirUdm'
+                    name='AltDescAle'
                     size='small'
-                    id='dir'
-                    label='Dirección'
+                    id='desc'
+                    label='Descripción de la Alerta'
                     fullWidth
-                    value={dataSelect.UmdDirUdm}
-                    onChange={eventinput}
-                    onKeyUp={evalinput}
-                  />
-                  <TextField
+                    autoFocus
                     required
-                    error={error.email}
-                    helperText={message.email}
-                    variant='outlined'
-                    margin='normal'
-                    type='email'
-                    name='UmdEmailUdm'
-                    size='small'
-                    id='email'
-                    label='Email'
-                    fullWidth
-                    value={dataSelect.UmdEmailUdm}
+                    value={dataSelect.AltDescAle}
                     onChange={eventinput}
                     onKeyUp={evalinput}
                   />
-                  <FormControl size='small' variant='outlined' fullWidth>
-                    <InputLabel htmlFor='outlined-age-native-simple'>
-                      Estado
-                    </InputLabel>
-                    <Select
-                      native
+                  <InputBase fullWidth disabled />
+                  <Button
+                    aria-label={id}
+                    variant='contained'
+                    color='info'
+                    onClick={openPicker}>
+                    Seleccione un color
+                  </Button>
+                  <Popover
+                    id={id}
+                    open={opened}
+                    anchorEl={open}
+                    onClose={closePicker}
+                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                    transformOrigin={{
+                      vertical: "left",
+                      horizontal: "left",
+                    }}>
+                    <SketchPicker
+                      error={error.color}
+                      helperText={message.color}
+                      id='color'
+                      label='Color de la Alerta'
+                      fullWidth
+                      color={dataSelect.AltColorAle}
                       required
-                      onChange={eventinput}
-                      label='Estado'
-                      inputProps={{
-                        name: "UmdEstUdm",
-                        id: "outlined-age-native-simple",
-                      }}>
-                      <option
-                        key='0'
-                        label={status}
-                        value={dataSelect.UmdEstUdm}
-                      />
-                      <option key='1' value={"A"} label={"Activo"} />
-                      <option key='2' value={"X"} label={"Inactivo"} />
-                    </Select>
-                  </FormControl>
+                      onChange={eventcolor}
+                      onKeyUp={evalinput}
+                    />
+                  </Popover>
+                  <Button
+                    size='lg'
+                    aria-label='AltColorAle'
+                    variant='contained'
+                    style={{
+                      background: dataSelect.AltColorAle,
+                      float: "right",
+                    }}></Button>
+                  <InputBase fullWidth />
                 </form>
               </div>
             </ModalBody>
@@ -746,78 +614,45 @@ const UnityData = () => {
               </Button>
             </ModalFooter>
           </Modal>
-          {/* Modal que muestra los datos de la unidad */}
+          {/* Modal que muestra los datos de la Alerta */}
           <Modal isOpen={showModalDetail} className={classList.modal}>
             <ModalHeader className={classList.modalHeaderEdit}>
-              Detalles Unidad
+              Detalles Alerta
             </ModalHeader>
             <ModalBody>
-              <input type='hidden' name='UmdId' value={dataSelect.UmdId} />
+              <input type='hidden' name='AltId' value={dataSelect.AltId} />
               <TextField
                 disabled
                 variant='standard'
                 margin='normal'
                 type='text'
                 size='small'
-                id='ident'
-                label='Identificación'
+                id='AltNomAle'
+                label='Nombre de la Alerta'
                 fullWidth
-                value={dataSelect.UmdIdentUdm}
+                value={dataSelect.AltNomAle}
               />
+              <InputBase fullWidth disabled />
+              <label htmlFor='color'>Color de la Alerta</label>
+              &nbsp; &nbsp;
+              <Button
+                disabled
+                id='color'
+                fullWidth
+                size='lg'
+                aria-label='AltColorAle'
+                variant='contained'
+                style={{ background: dataSelect.AltColorAle }}></Button>
               <TextField
                 disabled
                 variant='standard'
                 margin='normal'
                 type='text'
                 size='small'
-                id='nom'
-                label='Nombre'
+                id='AltDescAle'
+                label='Descripción de la Alerta'
                 fullWidth
-                value={dataSelect.UmdNomUdm}
-              />
-              <TextField
-                disabled
-                variant='standard'
-                margin='normal'
-                type='telf'
-                size='small'
-                id='telf'
-                label='Teléfono'
-                fullWidth
-                value={dataSelect.UmdTelfUdm}
-              />
-              <TextField
-                disabled
-                variant='standard'
-                margin='normal'
-                type='text'
-                size='small'
-                id='dir'
-                label='Dirección'
-                fullWidth
-                value={dataSelect.UmdDirUdm}
-              />
-              <TextField
-                disabled
-                variant='standard'
-                margin='normal'
-                type='email'
-                size='small'
-                id='email'
-                label='Email'
-                fullWidth
-                value={dataSelect.UmdEmailUdm}
-              />
-              <TextField
-                disabled
-                variant='standard'
-                margin='normal'
-                type='text'
-                size='small'
-                id='estado'
-                label='Estado'
-                fullWidth
-                value={status}
+                value={dataSelect.AltDescAle}
               />
             </ModalBody>
             <ModalFooter className={classList.modalFooter}>
@@ -846,33 +681,33 @@ const UnityData = () => {
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Guardar Unidad"}
-            alertTitle={"¿Está seguro de crear la Unidad:"}
-            alertText={dataSelect.UmdNomUdm}
+            title={"Guardar Alerta"}
+            alertTitle={"¿Está seguro de crear el Alerta:"}
+            alertText={dataSelect.AltNomAle}
             showModal={showModalSave}
-            actionUser={(e) => newUnity(e)}
+            actionUser={(e) => newAlert(e)}
             abrirCerrarModal={abrirCerrarModalSave}
           />
           {/* Modal para confirmación antes de actualizar un registro */}
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Actualizar Unidad"}
-            alertTitle={"¿Está seguro de actualizar la Unidad:"}
-            alertText={dataSelect.UmdNomUdm}
+            title={"Actualizar Alerta"}
+            alertTitle={"¿Está seguro de actualizar la Alerta a:"}
+            alertText={dataSelect.AltNomAle}
             showModal={showModalActual}
-            actionUser={(e) => updateUnity(e)}
+            actionUser={(e) => updateAlert(e)}
             abrirCerrarModal={abrirCerrarModalActual}
           />
           {/* Modal para confirmación antes de eliminar un registro */}
           <AllAlerts
             alertClass={"confirm"}
             alertType={"warning"}
-            title={"Eliminar Unidad"}
-            alertTitle={"¿Está seguro de eliminar la Unidad:"}
-            alertText={dataSelect.UmdNomUdm}
+            title={"Eliminar Alerta"}
+            alertTitle={"¿Está seguro de eliminar la Alerta:"}
+            alertText={dataSelect.AltNomAle}
             showModal={showModalDelete}
-            actionUser={deleteUnity}
+            actionUser={deleteAlert}
             abrirCerrarModal={abrirCerrarModalDelete}
           />
         </Grid>
@@ -882,4 +717,4 @@ const UnityData = () => {
   );
 };
 
-export default UnityData;
+export default AlertData;
